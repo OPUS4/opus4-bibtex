@@ -33,14 +33,13 @@
 
 namespace Opus;
 
-use Opus\Bibtex\Bibtex;
+use Opus\Processor\Processor;
 use RenanBr\BibTexParser\Listener;
 
 class Parser
 {
-    private $rawBibtex;
-
-    private $bibtexList = [];
+    private $bibtexFormat;
+    private $opusFormat;
 
     public function fileToArray($file)
     {
@@ -48,15 +47,15 @@ class Parser
         $listener = new Listener();
         $parser->addListener($listener);
         $parser->parseFile($file);
-        $this->rawBibtex = $listener->export();
+        $this->bibtexFormat = $listener->export();
     }
 
-    public function createBibtexList()
+    public function convert()
     {
-        foreach ($this->rawBibtex as $article){
-            $bibtex = new Bibtex();
-            $bibtex->setData($article);
-            array_push($this->bibtexList, $bibtex);
+        $processor = new Processor();
+        foreach ($this->bibtexFormat as $block)
+        {
+            array_push($this->opusFormat, $processor->convertBibtexToOpus($block));
         }
     }
 }

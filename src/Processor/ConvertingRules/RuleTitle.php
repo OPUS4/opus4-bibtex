@@ -24,24 +24,19 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * @category    BibTex
- * @package     Opus\Bibtex\BibtexRules
+ * @category    Processor
+ * @package     Opus\Processor\ConvertingRules
  * @author      Maximilian Salomon <salomon@zib.de>
  * @copyright   Copyright (c) 2020, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace Opus\Bibtex\BibtexRules;
+namespace Opus\Processor\ConvertingRules;
 
-use Opus\Bibtex\Bibtex;
-
-class BibtexRuleTitle implements BibtexRuleInterface
+class RuleTitle implements RuleInterface
 {
-    public function bibtexRule(Bibtex $bibtex, $field, $value)
+    public function processor($field, $value, $bibtexBlock)
     {
-        if (preg_match('/title/i', $field))
-        {
-            $bibtex->__set('title', $value);
-        }
+
     }
 }

@@ -24,49 +24,41 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * @category    Import
- * @package     Opus\Import
+ * @category    Processor
+ * @package     Opus\Processor
  * @author      Maximilian Salomon <salomon@zib.de>
  * @copyright   Copyright (c) 2020, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace Opus\Import;
+namespace Opus\Processor;
 
-
-
-class Import
+class Processor
 {
-    public function setData($bibtex)
+    public function convertBibtexToOpus($bibtexBlock)
     {
-        foreach ($bibtex->getAllProperties() as $field => $value) {
-            foreach (glob(__DIR__.'/MappingTexToOpusRules/*.php') as $file)
-            {
+        $opusArray = [];
+
+        foreach ($bibtexBlock as $field => $value) {
+            foreach (glob(__DIR__.'/ConvertingRules/*.php') as $file) {
                 require_once $file;
-                $class = "Opus\Import\MappingTexToOpusRules\\" . basename($file, '.php');
-                if (class_exists($class))
-                {
+                $class = "Opus\Bibtex\BibtexRules\\" . basename($file, '.php');
+                if (class_exists($class)) {
                     $rule = new $class;
-                    $rule->mappingRule($this, $field, $value);
+                    $rule->process($field, $value, $bibtexBlock);
                 }
             }
         }
+
+        return $opusArray;
     }
 
-    public function __set($property, $value)
+    public function deleteBrace($string)
     {
-        if (property_exists($this, $property)) {
-            $this->$property = $this->deleteBrace($value);
+        if (substr($string,-1, 1) == '}' and substr($string,0, 1) == '{'){
+            $string = substr_replace($string, "", -1, 1);
+            $string = substr_replace($string, "", 0, 1);
         }
-    }
-
-    public function getPropertyArray()
-    {
-
-    }
-
-    public function getXML()
-    {
-
+        return $string;
     }
 }

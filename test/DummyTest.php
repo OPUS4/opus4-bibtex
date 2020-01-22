@@ -43,14 +43,8 @@ class DummyTest extends \PHPUnit_Framework_TestCase
         $parser = new Parser();
         $list = new Listener();
         $parser->addListener($list);
-        $parser->parseFile('ressources/pubPokutta.bib');
+        $parser->parseFile('ressources/testbib.bib');
         $entries = $list->export();
     }
 
-    public function test2()
-    {
-        $parser = new \Opus\Parser();
-        $parser->fileToArray('ressources/pubPokutta.bib');
-        $parser->createBibtexList();
-    }
 }
