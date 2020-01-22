@@ -1,0 +1,10 @@
+dist: xenial
+language: php
+php:
+  - 7.0
+cache:
+  directories:
+    - $HOME/.composer/cache
+before_script: composer install
+script:
+  - composer check

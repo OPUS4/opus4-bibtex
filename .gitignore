@@ -1,0 +1,14 @@
+# ignore any third-party library
+vendor
+
+# ignore composer runtime
+composer.phar
+composer.lock
+
+# IDE files
+.idea
+*.iml
+nbproject
+
+# Build files
+build
