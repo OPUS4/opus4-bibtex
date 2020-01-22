@@ -24,33 +24,49 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * @category    Tests
- * @package     Test
+ * @category    Import
+ * @package     Opus\Import
  * @author      Maximilian Salomon <salomon@zib.de>
- * @copyright   Copyright (c) 2019, OPUS 4 development team
+ * @copyright   Copyright (c) 2020, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace OpusTest;
-use RenanBr\BibTexParser\Listener;
-use RenanBr\BibTexParser\Parser;
+namespace Opus\Import;
 
-class DummyTest extends \PHPUnit_Framework_TestCase
+
+
+class Import
 {
-    public function testDummy()
+    public function setData($bibtex)
     {
-        $this->assertEquals(1, 1);
-        $parser = new Parser();
-        $list = new Listener();
-        $parser->addListener($list);
-        $parser->parseFile('ressources/pubPokutta.bib');
-        $entries = $list->export();
+        foreach ($bibtex->getAllProperties() as $field => $value) {
+            foreach (glob(__DIR__.'/MappingTexToOpusRules/*.php') as $file)
+            {
+                require_once $file;
+                $class = "Opus\Import\MappingTexToOpusRules\\" . basename($file, '.php');
+                if (class_exists($class))
+                {
+                    $rule = new $class;
+                    $rule->mappingRule($this, $field, $value);
+                }
+            }
+        }
     }
 
-    public function test2()
+    public function __set($property, $value)
     {
-        $parser = new \Opus\Parser();
-        $parser->fileToArray('ressources/pubPokutta.bib');
-        $parser->createBibtexList();
+        if (property_exists($this, $property)) {
+            $this->$property = $this->deleteBrace($value);
+        }
+    }
+
+    public function getPropertyArray()
+    {
+
+    }
+
+    public function getXML()
+    {
+
     }
 }

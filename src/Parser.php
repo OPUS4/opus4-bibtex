@@ -24,33 +24,39 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * @category    Tests
- * @package     Test
+ * @category    BibTex
+ * @package     Opus
  * @author      Maximilian Salomon <salomon@zib.de>
- * @copyright   Copyright (c) 2019, OPUS 4 development team
+ * @copyright   Copyright (c) 2020, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace OpusTest;
-use RenanBr\BibTexParser\Listener;
-use RenanBr\BibTexParser\Parser;
+namespace Opus;
 
-class DummyTest extends \PHPUnit_Framework_TestCase
+use Opus\Bibtex\Bibtex;
+use RenanBr\BibTexParser\Listener;
+
+class Parser
 {
-    public function testDummy()
+    private $rawBibtex;
+
+    private $bibtexList = [];
+
+    public function fileToArray($file)
     {
-        $this->assertEquals(1, 1);
-        $parser = new Parser();
-        $list = new Listener();
-        $parser->addListener($list);
-        $parser->parseFile('ressources/pubPokutta.bib');
-        $entries = $list->export();
+        $parser = new \RenanBr\BibTexParser\Parser();
+        $listener = new Listener();
+        $parser->addListener($listener);
+        $parser->parseFile($file);
+        $this->rawBibtex = $listener->export();
     }
 
-    public function test2()
+    public function createBibtexList()
     {
-        $parser = new \Opus\Parser();
-        $parser->fileToArray('ressources/pubPokutta.bib');
-        $parser->createBibtexList();
+        foreach ($this->rawBibtex as $article){
+            $bibtex = new Bibtex();
+            $bibtex->setData($article);
+            array_push($this->bibtexList, $bibtex);
+        }
     }
 }

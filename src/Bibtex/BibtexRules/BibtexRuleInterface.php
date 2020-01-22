@@ -24,33 +24,18 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * @category    Tests
- * @package     Test
+ * @category    BibTex
+ * @package     Opus\Bibtex\BibtexRules
  * @author      Maximilian Salomon <salomon@zib.de>
- * @copyright   Copyright (c) 2019, OPUS 4 development team
+ * @copyright   Copyright (c) 2020, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace OpusTest;
-use RenanBr\BibTexParser\Listener;
-use RenanBr\BibTexParser\Parser;
+namespace Opus\Bibtex\BibtexRules;
 
-class DummyTest extends \PHPUnit_Framework_TestCase
+use Opus\Bibtex\Bibtex;
+
+interface BibtexRuleInterface
 {
-    public function testDummy()
-    {
-        $this->assertEquals(1, 1);
-        $parser = new Parser();
-        $list = new Listener();
-        $parser->addListener($list);
-        $parser->parseFile('ressources/pubPokutta.bib');
-        $entries = $list->export();
-    }
-
-    public function test2()
-    {
-        $parser = new \Opus\Parser();
-        $parser->fileToArray('ressources/pubPokutta.bib');
-        $parser->createBibtexList();
-    }
+    public function bibtexRule(Bibtex $bibtex, $field, $value);
 }
