@@ -24,16 +24,47 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * @category    Tests
- * @package     Test/Processor
+ * @category    Processor
+ * @package     Opus\Processor\ConvertingRules
  * @author      Maximilian Salomon <salomon@zib.de>
- * @copyright   Copyright (c) 2019, OPUS 4 development team
+ * @copyright   Copyright (c) 2020, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace OpusTest\Processor;
+namespace Opus\Processor\ConvertingRules;
 
-class ProcessorTest extends \PHPUnit_Framework_TestCase
+class RuleNote implements RuleInterface
 {
+    // TODO: Das sollte konfigurierbar und übersetzbar sein.
+    private $noteMap = [
+        'pdfurl' => 'URL of the PDF: ',
+        'slides' => 'URL of the Slides: ',
+        'annote' => 'Additional Note: ',
+        'summary' => 'URL of the Abstract: ',
+        'code' => 'URL of the Code: ',
+        'poster' => 'URL of the Poster: '
+    ];
 
+    public function process($field, $value, $bibtexBlock)
+    {
+        $return = [false];
+        if (array_key_exists($field, $this->noteMap)) {
+            $notes = [];
+            foreach ($bibtexBlock as $key => $value) {
+                if (array_key_exists($key, $this->noteMap)) {
+                    $note = [
+                        'Visibility' => 'public',
+                        'Message' => $this->noteMap[$key].$value
+                    ];
+                    array_push($notes, $note);
+                }
+            }
+            $return = [
+                true,
+                'Note',
+                $notes
+            ];
+        }
+        return $return;
+    }
 }

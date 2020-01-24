@@ -38,27 +38,33 @@ class Processor
     public function convertBibtexToOpus($bibtexBlock)
     {
         $opusArray = [];
-
+        $bibtexBlock = array_change_key_case($bibtexBlock);
         foreach ($bibtexBlock as $field => $value) {
             foreach (glob(__DIR__.'/ConvertingRules/*.php') as $file) {
                 require_once $file;
-                $class = "Opus\Bibtex\BibtexRules\\" . basename($file, '.php');
+                $class = "Opus\Processor\ConvertingRules\\" . basename($file, '.php');
                 if (class_exists($class)) {
                     $rule = new $class;
-                    $rule->process($field, $value, $bibtexBlock);
+                    $return = $rule->process($field, $value, $bibtexBlock);
+                    // TODO: Die Zuordnung ist noch nicht ideal.
+                    // TODO: Die Regeln sind viel zu speziell. Ein Konzept um diese allgemeiner zu halten und konfigurierbar zu machen, wäre die bessere Lösung
+                    // TODO: Nicht bearbeitete Zeilen sollten geloggt werden. Da könnte man gut mit einer Art Registry arbeiten.
+                    if ($return[0] === true and ! array_key_exists($return[1], $opusArray)) {
+                        $opusArray[$return[1]] = $return[2];
+                    }
                 }
             }
         }
-
+        $opusArray = $this->addDefaultEntries($opusArray);
         return $opusArray;
     }
 
-    public function deleteBrace($string)
+    public function addDefaultEntries($opusArray)
     {
-        if (substr($string,-1, 1) == '}' and substr($string,0, 1) == '{'){
-            $string = substr_replace($string, "", -1, 1);
-            $string = substr_replace($string, "", 0, 1);
-        }
-        return $string;
+        // TODO: Das MUSS konfigurierbar sein!
+        $opusArray['Language'] = 'eng';
+        $opusArray['BelongsToBibliography'] = '0';
+
+        return $opusArray;
     }
 }

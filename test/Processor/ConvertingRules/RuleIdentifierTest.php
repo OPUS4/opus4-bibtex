@@ -25,26 +25,52 @@
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
  * @category    Tests
- * @package     Test
+ * @package     OpusTest\Processor\ConvertingRules
  * @author      Maximilian Salomon <salomon@zib.de>
  * @copyright   Copyright (c) 2019, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace OpusTest;
-use RenanBr\BibTexParser\Listener;
-use RenanBr\BibTexParser\Parser;
+namespace OpusTest\Processor\ConvertingRules;
 
-class DummyTest extends \PHPUnit_Framework_TestCase
+use Opus\Processor;
+
+class RuleIdentifierTest extends \PHPUnit_Framework_TestCase
 {
-    public function testDummy()
+    public function testProcess()
     {
-        $this->assertEquals(1, 1);
-        $parser = new Parser();
-        $list = new Listener();
-        $parser->addListener($list);
-        $parser->parseFile('ressources/testbib.bib');
-        $entries = $list->export();
-    }
+        $rule = new Processor\ConvertingRules\RuleIdentifier();
+        $bibtexBlock = [
+            'arxiv' => 'http://papers.ssrn.com/sol3/papers.cfm?abstract_id=9999999',
+            'doi' => '10.2222/j.jbankfin.2222.32.001',
+            'issn' => '1100-0011'
+        ];
 
+        $return = $rule->process(
+            'arxiv',
+            'http://papers.ssrn.com/sol3/papers.cfm?abstract_id=9999999',
+            $bibtexBlock
+        );
+
+        $expected = [
+            true,
+            'Identifier',
+            [
+                [
+                    'Value' => 'http://papers.ssrn.com/sol3/papers.cfm?abstract_id=9999999',
+                    'Type' => 'arxiv'
+                ],
+                [
+                    'Value' => '10.2222/j.jbankfin.2222.32.001',
+                    'Type' => 'doi'
+                ],
+                [
+                    'Value' => '1100-0011',
+                    'Type' => 'issn'
+                ]
+            ]
+        ];
+
+        $this->assertEquals($expected, $return);
+    }
 }

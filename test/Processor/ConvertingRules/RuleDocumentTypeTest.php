@@ -35,49 +35,92 @@ namespace OpusTest\Processor\ConvertingRules;
 
 use Opus\Processor;
 
-class RuleTitleTest extends \PHPUnit_Framework_TestCase
+class RuleDocumentTypeTest extends \PHPUnit_Framework_TestCase
 {
-    public function testProcessWithoutBrace()
+    public function testProcessPtypeConference()
     {
-        $rule = new Processor\ConvertingRules\RuleTitle();
+        $rule = new Processor\ConvertingRules\RuleDocumentType();
         $bibtexBlock = [
-            'title' => 'My Article'
+            'ptype' => 'conference'
         ];
-        $return = $rule->process('title', 'My Article', $bibtexBlock);
+
+        $return = $rule->process(
+            'Ptype',
+            'conference',
+            $bibtexBlock
+        );
+
         $expected = [
-                true,
-                'TitleMain',
-                [
-                    [
-                        // TODO: Konfigurierbarkeit
-                        'Language' => 'eng',
-                        'Value' => 'My Article',
-                        'Type' => 'main'
-                    ]
-                ]
+            true,
+            'Type',
+            'conferenceobject'
         ];
 
         $this->assertEquals($expected, $return);
     }
 
-    public function testProcessWithBrace()
+    public function testProcessPtypeJournal()
     {
-        $rule = new Processor\ConvertingRules\RuleTitle();
+        $rule = new Processor\ConvertingRules\RuleDocumentType();
         $bibtexBlock = [
-            'title' => '{My Article}'
+            'ptype' => 'journal'
         ];
-        $return = $rule->process('title', '{My Article}', $bibtexBlock);
+
+        $return = $rule->process(
+            'Ptype',
+            'journal',
+            $bibtexBlock
+        );
+
         $expected = [
             true,
-            'TitleMain',
-            [
-                [
-                    // TODO: Konfigurierbarkeit
-                    'Language' => 'eng',
-                    'Value' => 'My Article',
-                    'Type' => 'main'
-                ]
-            ]
+            'Type',
+            'article'
+        ];
+
+        $this->assertEquals($expected, $return);
+    }
+
+    public function testProcessReftypeArticle()
+    {
+        $rule = new Processor\ConvertingRules\RuleDocumentType();
+        $bibtexBlock = [
+            'type' => 'article'
+        ];
+
+        $return = $rule->process(
+            'type',
+            'article',
+            $bibtexBlock
+        );
+
+        $expected = [
+            true,
+            'Type',
+            'article'
+        ];
+
+        $this->assertEquals($expected, $return);
+    }
+
+    public function testProcessTwoInfos()
+    {
+        $rule = new Processor\ConvertingRules\RuleDocumentType();
+        $bibtexBlock = [
+            'ptype' => 'conference',
+            'type' => 'article'
+        ];
+
+        $return = $rule->process(
+            'type',
+            'article',
+            $bibtexBlock
+        );
+
+        $expected = [
+            true,
+            'Type',
+            'conferenceobject'
         ];
 
         $this->assertEquals($expected, $return);

@@ -24,16 +24,44 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * @category    Tests
- * @package     Test/Processor
+ * @category    Processor
+ * @package     Opus\Processor\ConvertingRules
  * @author      Maximilian Salomon <salomon@zib.de>
- * @copyright   Copyright (c) 2019, OPUS 4 development team
+ * @copyright   Copyright (c) 2020, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace OpusTest\Processor;
+namespace Opus\Processor\ConvertingRules;
 
-class ProcessorTest extends \PHPUnit_Framework_TestCase
+class RuleIdentifier implements RuleInterface
 {
+    private $identifierMap = [
+        'arxiv' => 'arxiv',
+        'doi' => 'doi',
+        'issn' => 'issn',
+        'isbn' => 'isbn'
+    ];
 
+    public function process($field, $value, $bibtexBlock)
+    {
+        $return = [false];
+        if (array_key_exists($field, $this->identifierMap)) {
+            $identifiers = [];
+            foreach ($bibtexBlock as $key => $value) {
+                if (array_key_exists($key, $this->identifierMap)) {
+                    $identifier = [
+                        'Value' => $value,
+                        'Type' => $this->identifierMap[$key]
+                    ];
+                    array_push($identifiers, $identifier);
+                }
+            }
+            $return = [
+                true,
+                'Identifier',
+                $identifiers
+            ];
+        }
+        return $return;
+    }
 }

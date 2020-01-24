@@ -38,8 +38,8 @@ use RenanBr\BibTexParser\Listener;
 
 class Parser
 {
-    private $bibtexFormat;
-    private $opusFormat;
+    private $bibtexFormat = [];
+    private $opusFormat = [];
 
     public function fileToArray($file)
     {
@@ -53,9 +53,13 @@ class Parser
     public function convert()
     {
         $processor = new Processor();
-        foreach ($this->bibtexFormat as $block)
-        {
+        foreach ($this->bibtexFormat as $block) {
             array_push($this->opusFormat, $processor->convertBibtexToOpus($block));
         }
+    }
+
+    public function getOpusFormat()
+    {
+        return $this->opusFormat;
     }
 }

@@ -33,31 +33,46 @@
 
 namespace Opus\Processor\ConvertingRules;
 
-class RuleTitle implements RuleInterface
+class RulePersons implements RuleInterface
 {
     public function process($field, $value, $bibtexBlock)
     {
         $return = [false];
-        if (preg_match('/title/i', $field)) {
-            $mainTitle = [
-                [
-                    // TODO: Konfigurierbarkeit
-                    'Language' => 'eng',
-                    'Value' => $this->deleteBrace($value),
-                    'Type' => 'main'
-                ]
-            ];
-            $return = [true, 'TitleMain', $mainTitle];
+        $persons = [];
+        foreach ($bibtexBlock as $key => $val) {
+            if (preg_match('/author/i', $key)) {
+                $authors = explode('and', $val);
+                foreach ($authors as $author) {
+                    $split = explode(',', $author);
+                    $person = [
+                        'LastName' => str_replace(' ', '', $split[0]),
+                        'Role' => 'author'
+                    ];
+                    if (sizeof($split) > 1) {
+                        $person['FirstName'] = str_replace(' ', '', $split[1]);
+                    }
+                    array_push($persons, $person);
+                }
+            }
+
+            if (preg_match('/editor/i', $key)) {
+                $authors = explode('and', $val);
+                foreach ($authors as $author) {
+                    $split = explode(',', $author);
+                    $person = [
+                        'LastName' => str_replace(' ', '', $split[0]),
+                        'Role' => 'editor'
+                    ];
+                    if (sizeof($split) > 1) {
+                        $person['FirstName'] = str_replace(' ', '', $split[1]);
+                    }
+                    array_push($persons, $person);
+                }
+            }
+        }
+        if (! empty($persons)) {
+            $return = [true, 'Person', $persons];
         }
         return $return;
-    }
-
-    public function deleteBrace($string)
-    {
-        if (substr($string, -1, 1) == '}' and substr($string, 0, 1) == '{') {
-            $string = substr_replace($string, "", -1, 1);
-            $string = substr_replace($string, "", 0, 1);
-        }
-        return $string;
     }
 }

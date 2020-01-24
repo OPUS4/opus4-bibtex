@@ -25,15 +25,48 @@
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
  * @category    Tests
- * @package     Test/Processor
+ * @package     OpusTest\Processor\ConvertingRules
  * @author      Maximilian Salomon <salomon@zib.de>
  * @copyright   Copyright (c) 2019, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace OpusTest\Processor;
+namespace OpusTest\Processor\ConvertingRules;
 
-class ProcessorTest extends \PHPUnit_Framework_TestCase
+use Opus\Processor;
+
+class RuleKeywordsTest extends \PHPUnit_Framework_TestCase
 {
+    public function testProcess()
+    {
+        $rule = new Processor\ConvertingRules\RuleKeywords();
+        $bibtexBlock = [
+            'Keywords' => 'test, check'
+        ];
 
+        $return = $rule->process(
+            'Keywords',
+            'test, check',
+            $bibtexBlock
+        );
+
+        $expected = [
+            true,
+            'Subject',
+            [
+                [
+                    'Language' => 'eng',
+                    'Type' => 'uncontrolled',
+                    'Value' => 'test'
+                ],
+                [
+                    'Language' => 'eng',
+                    'Type' => 'uncontrolled',
+                    'Value' => 'check'
+                ]
+            ]
+        ];
+
+        $this->assertEquals($expected, $return);
+    }
 }

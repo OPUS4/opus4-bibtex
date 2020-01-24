@@ -24,16 +24,45 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * @category    Tests
- * @package     Test/Processor
+ * @category    Processor
+ * @package     Opus\Processor\ConvertingRules
  * @author      Maximilian Salomon <salomon@zib.de>
- * @copyright   Copyright (c) 2019, OPUS 4 development team
+ * @copyright   Copyright (c) 2020, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace OpusTest\Processor;
+namespace Opus\Processor\ConvertingRules;
 
-class ProcessorTest extends \PHPUnit_Framework_TestCase
+class RuleDocumentType implements RuleInterface
 {
+    // TODO: Das Mapping sollte konfigurierbar sein
+    private $mapping = [
+        'conference' => 'conferenceobject',
+        'journal' => 'article',
+        'article' => 'article',
+        'book' => 'book',
+        'misc' => 'misc'
+    ];
 
+    // TODO: Preg_matches können weg. Die Keys werden automatisch in lower-case umgewandelt
+    // TODO: Hier werden die Felder explizit hardgecoded. Nicht ideal!
+    public function process($field, $value, $bibtexBlock)
+    {
+        $return = [false];
+        if (preg_match('/Type/i', $field) and array_key_exists('ptype', $bibtexBlock)) {
+            $return = [
+                true,
+                'Type',
+                $this->mapping[strtolower($bibtexBlock['ptype'])]
+                ];
+        } elseif (preg_match('/Type/i', $field) and ! array_key_exists('ptype', $bibtexBlock)) {
+            $return = [
+                true,
+                'Type',
+                $this->mapping[strtolower($bibtexBlock['type'])]
+            ];
+        }
+
+        return $return;
+    }
 }
