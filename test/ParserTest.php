@@ -42,7 +42,6 @@ class ParserTest extends \PHPUnit_Framework_TestCase
         $parser = new Parser();
         $parser->fileToArray(__DIR__.'/ressources/testbib.bib');
         $parser->convert();
-        print_r($parser->getBibtexFormat());
 
         $expectedOpusFormat = [
             [
