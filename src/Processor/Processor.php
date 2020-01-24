@@ -56,6 +56,7 @@ class Processor
             }
         }
         $opusArray = $this->addDefaultEntries($opusArray);
+
         return $opusArray;
     }
 

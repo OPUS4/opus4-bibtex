@@ -27,7 +27,7 @@
  * @category    Tests
  * @package     OpusTest\Processor\ConvertingRules
  * @author      Maximilian Salomon <salomon@zib.de>
- * @copyright   Copyright (c) 2019, OPUS 4 development team
+ * @copyright   Copyright (c) 2020, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
@@ -43,7 +43,7 @@ class RuleParentTitleTest extends \PHPUnit_Framework_TestCase
         $bibtexBlock = [
             'Journal' => 'My Journal'
         ];
-        $return = $rule->process('Journal', 'My Journal', $bibtexBlock);
+        $return = $rule->process('journal', 'My Journal', $bibtexBlock);
         $expected = [
             true,
             'TitleParent',
@@ -66,7 +66,7 @@ class RuleParentTitleTest extends \PHPUnit_Framework_TestCase
         $bibtexBlock = [
             'Journal' => '{My Journal}'
         ];
-        $return = $rule->process('Journal', '{My Journal}', $bibtexBlock);
+        $return = $rule->process('journal', '{My Journal}', $bibtexBlock);
         $expected = [
             true,
             'TitleParent',

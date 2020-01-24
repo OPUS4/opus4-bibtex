@@ -62,4 +62,9 @@ class Parser
     {
         return $this->opusFormat;
     }
+
+    public function getBibtexFormat()
+    {
+        return $this->bibtexFormat;
+    }
 }

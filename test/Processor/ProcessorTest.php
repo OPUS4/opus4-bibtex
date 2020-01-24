@@ -27,13 +27,55 @@
  * @category    Tests
  * @package     Test/Processor
  * @author      Maximilian Salomon <salomon@zib.de>
- * @copyright   Copyright (c) 2019, OPUS 4 development team
+ * @copyright   Copyright (c) 2020, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
 namespace OpusTest\Processor;
 
+use Opus\Processor\Processor;
+
 class ProcessorTest extends \PHPUnit_Framework_TestCase
 {
+    public function testProcess()
+    {
+        $processor = new Processor();
+        $bibtex = [
+            'type' => 'misc',
+            'citation-key' => 'Nobody06',
+            'author' => 'Nobody, Jr',
+            'title' => 'My Article',
+            'year' => '2006',
+            '_original' => "@misc{Nobody06,
+       author = \"Nobody, Jr\",
+       title = \"My Article\",
+       year = \"2006\"}"
+        ];
 
+        $opus = [
+            'BelongsToBibliography' => '0',
+            'PublishedYear' => '2006',
+            'Language' => 'eng',
+            'Type' => 'misc',
+            'TitleMain' => [
+                [
+                    'Language' => 'eng',
+                    'Value' => 'My Article',
+                    'Type' => 'main'
+                ]
+            ],
+            'Person' => [
+                [
+                    'FirstName' => 'Jr',
+                    'LastName' => 'Nobody',
+                    'Role' => 'author'
+                ]
+            ],
+            'Enrichment' => [
+                ['opus.rawdata' => "@misc{Nobody06,\n       author = \"Nobody, Jr\",\n       title = \"My Article\",\n       year = \"2006\"}"]
+            ]
+        ];
+
+        $this->assertEquals($opus, $processor->convertBibtexToOpus($bibtex));
+    }
 }

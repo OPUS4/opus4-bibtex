@@ -27,7 +27,7 @@
  * @category    Tests
  * @package     Test
  * @author      Maximilian Salomon <salomon@zib.de>
- * @copyright   Copyright (c) 2019, OPUS 4 development team
+ * @copyright   Copyright (c) 2020, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
@@ -40,8 +40,9 @@ class ParserTest extends \PHPUnit_Framework_TestCase
     public function testConvert()
     {
         $parser = new Parser();
-        $parser->fileToArray('ressources/testbib.bib');
+        $parser->fileToArray(__DIR__.'/ressources/testbib.bib');
         $parser->convert();
+        print_r($parser->getBibtexFormat());
 
         $expectedOpusFormat = [
             [
