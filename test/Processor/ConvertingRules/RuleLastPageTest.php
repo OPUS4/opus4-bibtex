@@ -35,49 +35,25 @@ namespace OpusTest\Processor\ConvertingRules;
 
 use Opus\Processor;
 
-class RuleTitleTest extends \PHPUnit_Framework_TestCase
+class RuleLastPageTest extends \PHPUnit_Framework_TestCase
 {
-    public function testProcessWithoutBrace()
+    public function testProcess()
     {
-        $rule = new Processor\ConvertingRules\RuleTitle();
+        $rule = new Processor\ConvertingRules\RuleLastPage();
         $bibtexBlock = [
-            'title' => 'My Article'
-        ];
-        $return = $rule->process('title', 'My Article', $bibtexBlock);
-        $expected = [
-                true,
-                'TitleMain',
-                [
-                    [
-                        // TODO: Konfigurierbarkeit
-                        'Language' => 'eng',
-                        'Value' => 'My Article',
-                        'Type' => 'main'
-                    ]
-                ]
+            'Pages' => '1--10'
         ];
 
-        $this->assertEquals($expected, $return);
-    }
+        $return = $rule->process(
+            'Pages',
+            '1--10',
+            $bibtexBlock
+        );
 
-    public function testProcessWithBrace()
-    {
-        $rule = new Processor\ConvertingRules\RuleTitle();
-        $bibtexBlock = [
-            'title' => '{My Article}'
-        ];
-        $return = $rule->process('title', '{My Article}', $bibtexBlock);
         $expected = [
             true,
-            'TitleMain',
-            [
-                [
-                    // TODO: Konfigurierbarkeit
-                    'Language' => 'eng',
-                    'Value' => 'My Article',
-                    'Type' => 'main'
-                ]
-            ]
+            'PageLast',
+            '10'
         ];
 
         $this->assertEquals($expected, $return);

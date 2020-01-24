@@ -35,49 +35,58 @@ namespace OpusTest\Processor\ConvertingRules;
 
 use Opus\Processor;
 
-class RuleTitleTest extends \PHPUnit_Framework_TestCase
+class RuleNoteTest extends \PHPUnit_Framework_TestCase
 {
-    public function testProcessWithoutBrace()
+    public function testProcess()
     {
-        $rule = new Processor\ConvertingRules\RuleTitle();
+        $rule = new Processor\ConvertingRules\RuleNote();
         $bibtexBlock = [
-            'title' => 'My Article'
-        ];
-        $return = $rule->process('title', 'My Article', $bibtexBlock);
-        $expected = [
-                true,
-                'TitleMain',
-                [
-                    [
-                        // TODO: Konfigurierbarkeit
-                        'Language' => 'eng',
-                        'Value' => 'My Article',
-                        'Type' => 'main'
-                    ]
-                ]
+            'pdfurl' => 'http://dx.doi.org/10.2222/j.jbankfin.2222.32.001',
+            'slides' => 'https://app.box.com/s/1231451532132slide',
+            'summary' => 'http://www.Forschung.com/blog/research/2020/01/04/Ein-abstract.html',
+            'code' => 'https://colab.research.google.com/drive/123456a456',
+            'poster' => 'https://app.box.com/s/1231451532132post',
+            'annote' => 'http://www.sciencedirect.com/science/article/pii/123456789
+	doi:10.1234/TIT.2020.1234567
+	arXiv:1234.1233v4'
         ];
 
-        $this->assertEquals($expected, $return);
-    }
+        $return = $rule->process(
+            'pdfurl',
+            'http://dx.doi.org/10.2222/j.jbankfin.2222.32.001',
+            $bibtexBlock
+        );
 
-    public function testProcessWithBrace()
-    {
-        $rule = new Processor\ConvertingRules\RuleTitle();
-        $bibtexBlock = [
-            'title' => '{My Article}'
-        ];
-        $return = $rule->process('title', '{My Article}', $bibtexBlock);
         $expected = [
             true,
-            'TitleMain',
+            'Note',
             [
                 [
-                    // TODO: Konfigurierbarkeit
-                    'Language' => 'eng',
-                    'Value' => 'My Article',
-                    'Type' => 'main'
-                ]
-            ]
+                    'Visibility' => 'public',
+                    'Message' => 'URL of the PDF: http://dx.doi.org/10.2222/j.jbankfin.2222.32.001'
+                ],
+                [
+                    'Visibility' => 'public',
+                    'Message' => 'URL of the Slides: https://app.box.com/s/1231451532132slide'
+                ],
+                [
+                    'Visibility' => 'public',
+                    'Message' => 'URL of the Abstract: http://www.Forschung.com/blog/research/2020/01/04/Ein-abstract.html'
+                ],
+                [
+                    'Visibility' => 'public',
+                    'Message' => 'URL of the Code: https://colab.research.google.com/drive/123456a456'
+                ],
+                [
+                    'Visibility' => 'public',
+                    'Message' => 'URL of the Poster: https://app.box.com/s/1231451532132post'
+                ],
+
+                [
+                    'Visibility' => 'public',
+                    'Message' => "Additional Note: http://www.sciencedirect.com/science/article/pii/123456789\n\tdoi:10.1234/TIT.2020.1234567\n\tarXiv:1234.1233v4"
+                ],
+            ],
         ];
 
         $this->assertEquals($expected, $return);

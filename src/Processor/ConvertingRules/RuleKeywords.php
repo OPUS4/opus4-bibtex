@@ -24,62 +24,46 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * @category    Tests
- * @package     OpusTest\Processor\ConvertingRules
+ * @category    Processor
+ * @package     Opus\Processor\ConvertingRules
  * @author      Maximilian Salomon <salomon@zib.de>
  * @copyright   Copyright (c) 2020, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace OpusTest\Processor\ConvertingRules;
+namespace Opus\Processor\ConvertingRules;
 
-use Opus\Processor;
-
-class RuleTitleTest extends \PHPUnit_Framework_TestCase
+class RuleKeywords implements RuleInterface
 {
-    public function testProcessWithoutBrace()
+    public function process($field, $value, $bibtexBlock)
     {
-        $rule = new Processor\ConvertingRules\RuleTitle();
-        $bibtexBlock = [
-            'title' => 'My Article'
-        ];
-        $return = $rule->process('title', 'My Article', $bibtexBlock);
-        $expected = [
+        $return = [false];
+        if (preg_match('/keywords/i', $field)) {
+            $split = explode(', ', $value);
+            $return = [
                 true,
-                'TitleMain',
-                [
-                    [
-                        // TODO: Konfigurierbarkeit
-                        'Language' => 'eng',
-                        'Value' => 'My Article',
-                        'Type' => 'main'
-                    ]
-                ]
-        ];
-
-        $this->assertEquals($expected, $return);
+                'Subject',
+                []
+                ];
+            foreach ($split as $value) {
+                // TODO: Konfigurierbarkeit
+                $person = [
+                    'Language' => 'eng',
+                    'Type' => 'uncontrolled',
+                    'Value' => $this->deleteBrace($value)
+                ];
+                array_push($return[2], $person);
+            }
+        }
+        return $return;
     }
 
-    public function testProcessWithBrace()
+    public function deleteBrace($string)
     {
-        $rule = new Processor\ConvertingRules\RuleTitle();
-        $bibtexBlock = [
-            'title' => '{My Article}'
-        ];
-        $return = $rule->process('title', '{My Article}', $bibtexBlock);
-        $expected = [
-            true,
-            'TitleMain',
-            [
-                [
-                    // TODO: Konfigurierbarkeit
-                    'Language' => 'eng',
-                    'Value' => 'My Article',
-                    'Type' => 'main'
-                ]
-            ]
-        ];
-
-        $this->assertEquals($expected, $return);
+        if (substr($string, -1, 1) == '}' and substr($string, 0, 1) == '{') {
+            $string = substr_replace($string, "", -1, 1);
+            $string = substr_replace($string, "", 0, 1);
+        }
+        return $string;
     }
 }

@@ -35,49 +35,25 @@ namespace OpusTest\Processor\ConvertingRules;
 
 use Opus\Processor;
 
-class RuleTitleTest extends \PHPUnit_Framework_TestCase
+class RuleYearTest extends \PHPUnit_Framework_TestCase
 {
-    public function testProcessWithoutBrace()
+    public function testProcess()
     {
-        $rule = new Processor\ConvertingRules\RuleTitle();
+        $rule = new Processor\ConvertingRules\RuleYear();
         $bibtexBlock = [
-            'title' => 'My Article'
-        ];
-        $return = $rule->process('title', 'My Article', $bibtexBlock);
-        $expected = [
-                true,
-                'TitleMain',
-                [
-                    [
-                        // TODO: Konfigurierbarkeit
-                        'Language' => 'eng',
-                        'Value' => 'My Article',
-                        'Type' => 'main'
-                    ]
-                ]
+            'Year' => '2019'
         ];
 
-        $this->assertEquals($expected, $return);
-    }
+        $return = $rule->process(
+            'Year',
+            '2019',
+            $bibtexBlock
+        );
 
-    public function testProcessWithBrace()
-    {
-        $rule = new Processor\ConvertingRules\RuleTitle();
-        $bibtexBlock = [
-            'title' => '{My Article}'
-        ];
-        $return = $rule->process('title', '{My Article}', $bibtexBlock);
         $expected = [
             true,
-            'TitleMain',
-            [
-                [
-                    // TODO: Konfigurierbarkeit
-                    'Language' => 'eng',
-                    'Value' => 'My Article',
-                    'Type' => 'main'
-                ]
-            ]
+            'PublishedYear',
+            '2019'
         ];
 
         $this->assertEquals($expected, $return);

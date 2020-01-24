@@ -35,26 +35,26 @@ namespace OpusTest\Processor\ConvertingRules;
 
 use Opus\Processor;
 
-class RuleTitleTest extends \PHPUnit_Framework_TestCase
+class RuleParentTitleTest extends \PHPUnit_Framework_TestCase
 {
     public function testProcessWithoutBrace()
     {
-        $rule = new Processor\ConvertingRules\RuleTitle();
+        $rule = new Processor\ConvertingRules\RuleParentTitle();
         $bibtexBlock = [
-            'title' => 'My Article'
+            'Journal' => 'My Journal'
         ];
-        $return = $rule->process('title', 'My Article', $bibtexBlock);
+        $return = $rule->process('journal', 'My Journal', $bibtexBlock);
         $expected = [
-                true,
-                'TitleMain',
+            true,
+            'TitleParent',
+            [
                 [
-                    [
-                        // TODO: Konfigurierbarkeit
-                        'Language' => 'eng',
-                        'Value' => 'My Article',
-                        'Type' => 'main'
-                    ]
+                    // TODO: Konfigurierbarkeit
+                    'Language' => 'eng',
+                    'Value' => 'My Journal',
+                    'Type' => 'parent'
                 ]
+            ]
         ];
 
         $this->assertEquals($expected, $return);
@@ -62,20 +62,43 @@ class RuleTitleTest extends \PHPUnit_Framework_TestCase
 
     public function testProcessWithBrace()
     {
-        $rule = new Processor\ConvertingRules\RuleTitle();
+        $rule = new Processor\ConvertingRules\RuleParentTitle();
         $bibtexBlock = [
-            'title' => '{My Article}'
+            'Journal' => '{My Journal}'
         ];
-        $return = $rule->process('title', '{My Article}', $bibtexBlock);
+        $return = $rule->process('journal', '{My Journal}', $bibtexBlock);
         $expected = [
             true,
-            'TitleMain',
+            'TitleParent',
             [
                 [
                     // TODO: Konfigurierbarkeit
                     'Language' => 'eng',
-                    'Value' => 'My Article',
-                    'Type' => 'main'
+                    'Value' => 'My Journal',
+                    'Type' => 'parent'
+                ]
+            ]
+        ];
+
+        $this->assertEquals($expected, $return);
+    }
+
+    public function testProcessBooktitle()
+    {
+        $rule = new Processor\ConvertingRules\RuleParentTitle();
+        $bibtexBlock = [
+            'booktitle' => '{My Book}'
+        ];
+        $return = $rule->process('booktitle', '{My Book}', $bibtexBlock);
+        $expected = [
+            true,
+            'TitleParent',
+            [
+                [
+                    // TODO: Konfigurierbarkeit
+                    'Language' => 'eng',
+                    'Value' => 'My Book',
+                    'Type' => 'parent'
                 ]
             ]
         ];

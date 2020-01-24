@@ -35,5 +35,5 @@ namespace Opus\Processor\ConvertingRules;
 
 interface RuleInterface
 {
-    public function processor($field, $value, $bibtexBlock);
+    public function process($field, $value, $bibtexBlock);
 }

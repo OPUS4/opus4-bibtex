@@ -35,47 +35,38 @@ namespace OpusTest\Processor\ConvertingRules;
 
 use Opus\Processor;
 
-class RuleTitleTest extends \PHPUnit_Framework_TestCase
+class RuleIdentifierTest extends \PHPUnit_Framework_TestCase
 {
-    public function testProcessWithoutBrace()
+    public function testProcess()
     {
-        $rule = new Processor\ConvertingRules\RuleTitle();
+        $rule = new Processor\ConvertingRules\RuleIdentifier();
         $bibtexBlock = [
-            'title' => 'My Article'
-        ];
-        $return = $rule->process('title', 'My Article', $bibtexBlock);
-        $expected = [
-                true,
-                'TitleMain',
-                [
-                    [
-                        // TODO: Konfigurierbarkeit
-                        'Language' => 'eng',
-                        'Value' => 'My Article',
-                        'Type' => 'main'
-                    ]
-                ]
+            'arxiv' => 'http://papers.ssrn.com/sol3/papers.cfm?abstract_id=9999999',
+            'doi' => '10.2222/j.jbankfin.2222.32.001',
+            'issn' => '1100-0011'
         ];
 
-        $this->assertEquals($expected, $return);
-    }
+        $return = $rule->process(
+            'arxiv',
+            'http://papers.ssrn.com/sol3/papers.cfm?abstract_id=9999999',
+            $bibtexBlock
+        );
 
-    public function testProcessWithBrace()
-    {
-        $rule = new Processor\ConvertingRules\RuleTitle();
-        $bibtexBlock = [
-            'title' => '{My Article}'
-        ];
-        $return = $rule->process('title', '{My Article}', $bibtexBlock);
         $expected = [
             true,
-            'TitleMain',
+            'Identifier',
             [
                 [
-                    // TODO: Konfigurierbarkeit
-                    'Language' => 'eng',
-                    'Value' => 'My Article',
-                    'Type' => 'main'
+                    'Value' => 'http://papers.ssrn.com/sol3/papers.cfm?abstract_id=9999999',
+                    'Type' => 'arxiv'
+                ],
+                [
+                    'Value' => '10.2222/j.jbankfin.2222.32.001',
+                    'Type' => 'doi'
+                ],
+                [
+                    'Value' => '1100-0011',
+                    'Type' => 'issn'
                 ]
             ]
         ];

@@ -35,8 +35,29 @@ namespace Opus\Processor\ConvertingRules;
 
 class RuleTitle implements RuleInterface
 {
-    public function processor($field, $value, $bibtexBlock)
+    public function process($field, $value, $bibtexBlock)
     {
+        $return = [false];
+        if (preg_match('/title/i', $field)) {
+            $mainTitle = [
+                [
+                    // TODO: Konfigurierbarkeit
+                    'Language' => 'eng',
+                    'Value' => $this->deleteBrace($value),
+                    'Type' => 'main'
+                ]
+            ];
+            $return = [true, 'TitleMain', $mainTitle];
+        }
+        return $return;
+    }
 
+    public function deleteBrace($string)
+    {
+        if (substr($string, -1, 1) == '}' and substr($string, 0, 1) == '{') {
+            $string = substr_replace($string, "", -1, 1);
+            $string = substr_replace($string, "", 0, 1);
+        }
+        return $string;
     }
 }

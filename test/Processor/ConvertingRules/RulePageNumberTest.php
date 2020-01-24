@@ -25,26 +25,37 @@
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
  * @category    Tests
- * @package     Test
+ * @package     OpusTest\Processor\ConvertingRules
  * @author      Maximilian Salomon <salomon@zib.de>
- * @copyright   Copyright (c) 2019, OPUS 4 development team
+ * @copyright   Copyright (c) 2020, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace OpusTest;
-use RenanBr\BibTexParser\Listener;
-use RenanBr\BibTexParser\Parser;
+namespace OpusTest\Processor\ConvertingRules;
 
-class DummyTest extends \PHPUnit_Framework_TestCase
+use Opus\Processor;
+
+class RulePageNumberTest extends \PHPUnit_Framework_TestCase
 {
-    public function testDummy()
+    public function testProcess()
     {
-        $this->assertEquals(1, 1);
-        $parser = new Parser();
-        $list = new Listener();
-        $parser->addListener($list);
-        $parser->parseFile('ressources/testbib.bib');
-        $entries = $list->export();
-    }
+        $rule = new Processor\ConvertingRules\RulePageNumber();
+        $bibtexBlock = [
+            'Pages' => '1--10'
+        ];
 
+        $return = $rule->process(
+            'Pages',
+            '1--10',
+            $bibtexBlock
+        );
+
+        $expected = [
+            true,
+            'PageNumber',
+            '10'
+        ];
+
+        $this->assertEquals($expected, $return);
+    }
 }

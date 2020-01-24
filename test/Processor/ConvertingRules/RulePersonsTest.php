@@ -35,47 +35,44 @@ namespace OpusTest\Processor\ConvertingRules;
 
 use Opus\Processor;
 
-class RuleTitleTest extends \PHPUnit_Framework_TestCase
+class RulePersonsTest extends \PHPUnit_Framework_TestCase
 {
-    public function testProcessWithoutBrace()
+    public function testProcessAuthors()
     {
-        $rule = new Processor\ConvertingRules\RuleTitle();
+        $rule = new Processor\ConvertingRules\RulePersons();
         $bibtexBlock = [
-            'title' => 'My Article'
-        ];
-        $return = $rule->process('title', 'My Article', $bibtexBlock);
-        $expected = [
-                true,
-                'TitleMain',
-                [
-                    [
-                        // TODO: Konfigurierbarkeit
-                        'Language' => 'eng',
-                        'Value' => 'My Article',
-                        'Type' => 'main'
-                    ]
-                ]
+            'Author' => 'Wang, Y. and Xie and Steffen, S.',
+            'Editor' => 'Ming, J.'
         ];
 
-        $this->assertEquals($expected, $return);
-    }
+        $return = $rule->process(
+            'Author',
+            'Wang, Y. and Xie, Y. and Steffen, S.',
+            $bibtexBlock
+        );
 
-    public function testProcessWithBrace()
-    {
-        $rule = new Processor\ConvertingRules\RuleTitle();
-        $bibtexBlock = [
-            'title' => '{My Article}'
-        ];
-        $return = $rule->process('title', '{My Article}', $bibtexBlock);
         $expected = [
             true,
-            'TitleMain',
+            'Person',
             [
                 [
-                    // TODO: Konfigurierbarkeit
-                    'Language' => 'eng',
-                    'Value' => 'My Article',
-                    'Type' => 'main'
+                    'FirstName' => 'Y.',
+                    'LastName' => 'Wang',
+                    'Role' => 'author'
+                ],
+                [
+                    'LastName' => 'Xie',
+                    'Role' => 'author'
+                ],
+                [
+                    'FirstName' => 'S.',
+                    'LastName' => 'Steffen',
+                    'Role' => 'author'
+                ],
+                [
+                    'FirstName' => 'J.',
+                    'LastName' => 'Ming',
+                    'Role' => 'editor'
                 ]
             ]
         ];

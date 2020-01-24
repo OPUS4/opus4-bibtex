@@ -24,62 +24,27 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * @category    Tests
- * @package     OpusTest\Processor\ConvertingRules
+ * @category    Processor
+ * @package     Opus\Processor\ConvertingRules
  * @author      Maximilian Salomon <salomon@zib.de>
  * @copyright   Copyright (c) 2020, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace OpusTest\Processor\ConvertingRules;
+namespace Opus\Processor\ConvertingRules;
 
-use Opus\Processor;
-
-class RuleTitleTest extends \PHPUnit_Framework_TestCase
+class RuleIssue implements RuleInterface
 {
-    public function testProcessWithoutBrace()
+    public function process($field, $value, $bibtexBlock)
     {
-        $rule = new Processor\ConvertingRules\RuleTitle();
-        $bibtexBlock = [
-            'title' => 'My Article'
-        ];
-        $return = $rule->process('title', 'My Article', $bibtexBlock);
-        $expected = [
+        $return = [false];
+        if (preg_match('/number/i', $field)) {
+            $return = [
                 true,
-                'TitleMain',
-                [
-                    [
-                        // TODO: Konfigurierbarkeit
-                        'Language' => 'eng',
-                        'Value' => 'My Article',
-                        'Type' => 'main'
-                    ]
-                ]
-        ];
-
-        $this->assertEquals($expected, $return);
-    }
-
-    public function testProcessWithBrace()
-    {
-        $rule = new Processor\ConvertingRules\RuleTitle();
-        $bibtexBlock = [
-            'title' => '{My Article}'
-        ];
-        $return = $rule->process('title', '{My Article}', $bibtexBlock);
-        $expected = [
-            true,
-            'TitleMain',
-            [
-                [
-                    // TODO: Konfigurierbarkeit
-                    'Language' => 'eng',
-                    'Value' => 'My Article',
-                    'Type' => 'main'
-                ]
-            ]
-        ];
-
-        $this->assertEquals($expected, $return);
+                'Issue',
+                $value
+            ];
+        }
+        return $return;
     }
 }

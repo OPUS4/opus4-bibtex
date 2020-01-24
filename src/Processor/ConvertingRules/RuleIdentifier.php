@@ -24,62 +24,44 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * @category    Tests
- * @package     OpusTest\Processor\ConvertingRules
+ * @category    Processor
+ * @package     Opus\Processor\ConvertingRules
  * @author      Maximilian Salomon <salomon@zib.de>
  * @copyright   Copyright (c) 2020, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace OpusTest\Processor\ConvertingRules;
+namespace Opus\Processor\ConvertingRules;
 
-use Opus\Processor;
-
-class RuleTitleTest extends \PHPUnit_Framework_TestCase
+class RuleIdentifier implements RuleInterface
 {
-    public function testProcessWithoutBrace()
+    private $identifierMap = [
+        'arxiv' => 'arxiv',
+        'doi' => 'doi',
+        'issn' => 'issn',
+        'isbn' => 'isbn'
+    ];
+
+    public function process($field, $value, $bibtexBlock)
     {
-        $rule = new Processor\ConvertingRules\RuleTitle();
-        $bibtexBlock = [
-            'title' => 'My Article'
-        ];
-        $return = $rule->process('title', 'My Article', $bibtexBlock);
-        $expected = [
+        $return = [false];
+        if (array_key_exists($field, $this->identifierMap)) {
+            $identifiers = [];
+            foreach ($bibtexBlock as $key => $value) {
+                if (array_key_exists($key, $this->identifierMap)) {
+                    $identifier = [
+                        'Value' => $value,
+                        'Type' => $this->identifierMap[$key]
+                    ];
+                    array_push($identifiers, $identifier);
+                }
+            }
+            $return = [
                 true,
-                'TitleMain',
-                [
-                    [
-                        // TODO: Konfigurierbarkeit
-                        'Language' => 'eng',
-                        'Value' => 'My Article',
-                        'Type' => 'main'
-                    ]
-                ]
-        ];
-
-        $this->assertEquals($expected, $return);
-    }
-
-    public function testProcessWithBrace()
-    {
-        $rule = new Processor\ConvertingRules\RuleTitle();
-        $bibtexBlock = [
-            'title' => '{My Article}'
-        ];
-        $return = $rule->process('title', '{My Article}', $bibtexBlock);
-        $expected = [
-            true,
-            'TitleMain',
-            [
-                [
-                    // TODO: Konfigurierbarkeit
-                    'Language' => 'eng',
-                    'Value' => 'My Article',
-                    'Type' => 'main'
-                ]
-            ]
-        ];
-
-        $this->assertEquals($expected, $return);
+                'Identifier',
+                $identifiers
+            ];
+        }
+        return $return;
     }
 }
