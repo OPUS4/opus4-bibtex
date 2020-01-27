@@ -24,16 +24,56 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * @category    Processor
- * @package     Opus\Processor\ConvertingRules
+ * @category    Tests
+ * @package     OpusTest\Processor\Rules
  * @author      Maximilian Salomon <salomon@zib.de>
  * @copyright   Copyright (c) 2020, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace Opus\Processor\ConvertingRules;
+namespace OpusTest\Bibtex\Import\Processor\Rules;
 
-interface RuleInterface
+
+use Opus\Bibtex\Import\Processor\Rules\DocumentType;
+
+class DocumentTypeTest extends \PHPUnit_Framework_TestCase
 {
-    public function process($field, $value, $bibtexBlock);
+
+    public function dataProvider()
+    {
+        return [
+            [['ptype' => 'conference'], 'conferenceobject'],
+            [['ptype' => 'journal'], 'article'],
+            [['type' => 'article'], 'article']
+        ];
+    }
+    /**
+     * Test Mapping of document-types.
+     *
+     * @param mixed $arg Value to check given by the data provider and $res as expected mapping-result.
+     * @return void
+     *
+     * @dataProvider dataProvider
+     */
+    public function testProcessMapping($arg, $res)
+    {
+        $rule = new DocumentType();
+        foreach ($arg as $key => $value){
+            $return = $rule->process($key, $value, $arg);
+            $this->assertEquals([true, 'Type', $res], $return);
+        }
+    }
+
+    public function testProcessTwoInfos()
+    {
+        $rule = new DocumentType();
+        $bibtexBlock = [
+            'ptype' => 'conference',
+            'type' => 'article'
+        ];
+
+        $return = $rule->process('type', 'article', $bibtexBlock);
+
+        $this->assertEquals([true, 'Type', 'conferenceobject'], $return);
+    }
 }

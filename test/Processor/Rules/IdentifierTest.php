@@ -25,35 +25,50 @@
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
  * @category    Tests
- * @package     OpusTest\Processor\ConvertingRules
+ * @package     OpusTest\Processor\Rules
  * @author      Maximilian Salomon <salomon@zib.de>
  * @copyright   Copyright (c) 2020, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace OpusTest\Processor\ConvertingRules;
+namespace OpusTest\Bibtex\Import\Processor\Rules;
 
-use Opus\Processor;
+use Opus\Bibtex\Import\Processor\Rules\Identifier;
 
-class RuleIssueTest extends \PHPUnit_Framework_TestCase
+class IdentifierTest extends \PHPUnit_Framework_TestCase
 {
     public function testProcess()
     {
-        $rule = new Processor\ConvertingRules\RuleIssue();
+        $rule = new Identifier();
         $bibtexBlock = [
-            'Number' => '3'
+            'arxiv' => 'http://papers.ssrn.com/sol3/papers.cfm?abstract_id=9999999',
+            'doi' => '10.2222/j.jbankfin.2222.32.001',
+            'issn' => '1100-0011'
         ];
 
         $return = $rule->process(
-            'Number',
-            '3',
+            'arxiv',
+            'http://papers.ssrn.com/sol3/papers.cfm?abstract_id=9999999',
             $bibtexBlock
         );
 
         $expected = [
             true,
-            'Issue',
-            '3'
+            'Identifier',
+            [
+                [
+                    'Value' => 'http://papers.ssrn.com/sol3/papers.cfm?abstract_id=9999999',
+                    'Type' => 'arxiv'
+                ],
+                [
+                    'Value' => '10.2222/j.jbankfin.2222.32.001',
+                    'Type' => 'doi'
+                ],
+                [
+                    'Value' => '1100-0011',
+                    'Type' => 'issn'
+                ]
+            ]
         ];
 
         $this->assertEquals($expected, $return);

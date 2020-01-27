@@ -24,58 +24,47 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * @category    Tests
- * @package     Test/Processor
+ * @category    Processor
+ * @package     Opus\Processor\Rules
  * @author      Maximilian Salomon <salomon@zib.de>
  * @copyright   Copyright (c) 2020, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace OpusTest\Bibtex\Import\Processor;
+namespace Opus\Bibtex\Import\Processor\Rules;
 
-use Opus\Bibtex\Import\Processor\Processor;
-
-class ProcessorTest extends \PHPUnit_Framework_TestCase
+class Note implements RuleInterface
 {
-    public function testProcess()
+    // TODO: Das sollte konfigurierbar und übersetzbar sein.
+    private $noteMap = [
+        'pdfurl' => 'URL of the PDF: ',
+        'slides' => 'URL of the Slides: ',
+        'annote' => 'Additional Note: ',
+        'summary' => 'URL of the Abstract: ',
+        'code' => 'URL of the Code: ',
+        'poster' => 'URL of the Poster: '
+    ];
+
+    public function process($field, $value, $bibtexBlock)
     {
-        $processor = new Processor();
-        $bibtex = [
-            'type' => 'misc',
-            'citation-key' => 'Nobody06',
-            'author' => 'Nobody, Jr',
-            'title' => 'My Article',
-            'year' => '2006',
-            '_original' => "@misc{Nobody06,
-       author = \"Nobody, Jr\",
-       title = \"My Article\",
-       year = \"2006\"}"
-        ];
-
-        $opus = [
-            'BelongsToBibliography' => '0',
-            'PublishedYear' => '2006',
-            'Language' => 'eng',
-            'Type' => 'misc',
-            'TitleMain' => [
-                [
-                    'Language' => 'eng',
-                    'Value' => 'My Article',
-                    'Type' => 'main'
-                ]
-            ],
-            'Person' => [
-                [
-                    'FirstName' => 'Jr',
-                    'LastName' => 'Nobody',
-                    'Role' => 'author'
-                ]
-            ],
-            'Enrichment' => [
-                ['opus.rawdata' => "@misc{Nobody06,\n       author = \"Nobody, Jr\",\n       title = \"My Article\",\n       year = \"2006\"}"]
-            ]
-        ];
-
-        $this->assertEquals($opus, $processor->convertBibtexToOpus($bibtex));
+        $return = [false];
+        if (array_key_exists($field, $this->noteMap)) {
+            $notes = [];
+            foreach ($bibtexBlock as $key => $value) {
+                if (array_key_exists($key, $this->noteMap)) {
+                    $note = [
+                        'Visibility' => 'public',
+                        'Message' => $this->noteMap[$key].$value
+                    ];
+                    array_push($notes, $note);
+                }
+            }
+            $return = [
+                true,
+                'Note',
+                $notes
+            ];
+        }
+        return $return;
     }
 }

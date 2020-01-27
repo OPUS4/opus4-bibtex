@@ -25,25 +25,24 @@
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
  * @category    Processor
- * @package     Opus\Processor\ConvertingRules
+ * @package     Opus\Processor\Rules
  * @author      Maximilian Salomon <salomon@zib.de>
  * @copyright   Copyright (c) 2020, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace Opus\Processor\ConvertingRules;
+namespace Opus\Bibtex\Import\Processor\Rules;
 
-class RuleLastPage implements RuleInterface
+class Volume implements RuleInterface
 {
     public function process($field, $value, $bibtexBlock)
     {
         $return = [false];
-        if (preg_match('/Pages/i', $field)) {
-            $pages = explode('--', $value);
+        if (preg_match('/volume/i', $field)) {
             $return = [
                 true,
-                'PageLast',
-                $pages[1]
+                'Volume',
+                $value
             ];
         }
         return $return;

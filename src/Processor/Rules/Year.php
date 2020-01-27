@@ -25,39 +25,26 @@
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
  * @category    Processor
- * @package     Opus\Processor\ConvertingRules
+ * @package     Opus\Processor\Rules
  * @author      Maximilian Salomon <salomon@zib.de>
  * @copyright   Copyright (c) 2020, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace Opus\Processor\ConvertingRules;
+namespace Opus\Bibtex\Import\Processor\Rules;
 
-class RuleTitle implements RuleInterface
+class Year implements RuleInterface
 {
     public function process($field, $value, $bibtexBlock)
     {
         $return = [false];
-        if (preg_match('/title/i', $field)) {
-            $mainTitle = [
-                [
-                    // TODO: Konfigurierbarkeit
-                    'Language' => 'eng',
-                    'Value' => $this->deleteBrace($value),
-                    'Type' => 'main'
-                ]
+        if (preg_match('/year/i', $field)) {
+            $return = [
+                true,
+                'PublishedYear',
+                $value
             ];
-            $return = [true, 'TitleMain', $mainTitle];
         }
         return $return;
-    }
-
-    public function deleteBrace($string)
-    {
-        if (substr($string, -1, 1) == '}' and substr($string, 0, 1) == '{') {
-            $string = substr_replace($string, "", -1, 1);
-            $string = substr_replace($string, "", 0, 1);
-        }
-        return $string;
     }
 }

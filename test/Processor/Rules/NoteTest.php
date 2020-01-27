@@ -25,50 +25,68 @@
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
  * @category    Tests
- * @package     OpusTest\Processor\ConvertingRules
+ * @package     OpusTest\Processor\Rules
  * @author      Maximilian Salomon <salomon@zib.de>
  * @copyright   Copyright (c) 2020, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace OpusTest\Processor\ConvertingRules;
+namespace OpusTest\Bibtex\Import\Processor\Rules;
 
-use Opus\Processor;
+use Opus\Bibtex\Import\Processor\Rules\Note;
 
-class RuleIdentifierTest extends \PHPUnit_Framework_TestCase
+class NoteTest extends \PHPUnit_Framework_TestCase
 {
     public function testProcess()
     {
-        $rule = new Processor\ConvertingRules\RuleIdentifier();
+        $rule = new Note();
         $bibtexBlock = [
-            'arxiv' => 'http://papers.ssrn.com/sol3/papers.cfm?abstract_id=9999999',
-            'doi' => '10.2222/j.jbankfin.2222.32.001',
-            'issn' => '1100-0011'
+            'pdfurl' => 'http://dx.doi.org/10.2222/j.jbankfin.2222.32.001',
+            'slides' => 'https://app.box.com/s/1231451532132slide',
+            'summary' => 'http://www.Forschung.com/blog/research/2020/01/04/Ein-abstract.html',
+            'code' => 'https://colab.research.google.com/drive/123456a456',
+            'poster' => 'https://app.box.com/s/1231451532132post',
+            'annote' => 'http://www.sciencedirect.com/science/article/pii/123456789
+	doi:10.1234/TIT.2020.1234567
+	arXiv:1234.1233v4'
         ];
 
         $return = $rule->process(
-            'arxiv',
-            'http://papers.ssrn.com/sol3/papers.cfm?abstract_id=9999999',
+            'pdfurl',
+            'http://dx.doi.org/10.2222/j.jbankfin.2222.32.001',
             $bibtexBlock
         );
 
         $expected = [
             true,
-            'Identifier',
+            'Note',
             [
                 [
-                    'Value' => 'http://papers.ssrn.com/sol3/papers.cfm?abstract_id=9999999',
-                    'Type' => 'arxiv'
+                    'Visibility' => 'public',
+                    'Message' => 'URL of the PDF: http://dx.doi.org/10.2222/j.jbankfin.2222.32.001'
                 ],
                 [
-                    'Value' => '10.2222/j.jbankfin.2222.32.001',
-                    'Type' => 'doi'
+                    'Visibility' => 'public',
+                    'Message' => 'URL of the Slides: https://app.box.com/s/1231451532132slide'
                 ],
                 [
-                    'Value' => '1100-0011',
-                    'Type' => 'issn'
-                ]
-            ]
+                    'Visibility' => 'public',
+                    'Message' => 'URL of the Abstract: http://www.Forschung.com/blog/research/2020/01/04/Ein-abstract.html'
+                ],
+                [
+                    'Visibility' => 'public',
+                    'Message' => 'URL of the Code: https://colab.research.google.com/drive/123456a456'
+                ],
+                [
+                    'Visibility' => 'public',
+                    'Message' => 'URL of the Poster: https://app.box.com/s/1231451532132post'
+                ],
+
+                [
+                    'Visibility' => 'public',
+                    'Message' => "Additional Note: http://www.sciencedirect.com/science/article/pii/123456789\n\tdoi:10.1234/TIT.2020.1234567\n\tarXiv:1234.1233v4"
+                ],
+            ],
         ];
 
         $this->assertEquals($expected, $return);

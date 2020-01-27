@@ -25,102 +25,35 @@
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
  * @category    Tests
- * @package     OpusTest\Processor\ConvertingRules
+ * @package     OpusTest\Processor\Rules
  * @author      Maximilian Salomon <salomon@zib.de>
  * @copyright   Copyright (c) 2020, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace OpusTest\Processor\ConvertingRules;
+namespace OpusTest\Bibtex\Import\Processor\Rules;
 
-use Opus\Processor;
+use Opus\Bibtex\Import\Processor\Rules\PageNumber;
 
-class RuleDocumentTypeTest extends \PHPUnit_Framework_TestCase
+class PageNumberTest extends \PHPUnit_Framework_TestCase
 {
-    public function testProcessPtypeConference()
+    public function testProcess()
     {
-        $rule = new Processor\ConvertingRules\RuleDocumentType();
+        $rule = new PageNumber();
         $bibtexBlock = [
-            'ptype' => 'conference'
+            'Pages' => '1--10'
         ];
 
         $return = $rule->process(
-            'Ptype',
-            'conference',
+            'Pages',
+            '1--10',
             $bibtexBlock
         );
 
         $expected = [
             true,
-            'Type',
-            'conferenceobject'
-        ];
-
-        $this->assertEquals($expected, $return);
-    }
-
-    public function testProcessPtypeJournal()
-    {
-        $rule = new Processor\ConvertingRules\RuleDocumentType();
-        $bibtexBlock = [
-            'ptype' => 'journal'
-        ];
-
-        $return = $rule->process(
-            'Ptype',
-            'journal',
-            $bibtexBlock
-        );
-
-        $expected = [
-            true,
-            'Type',
-            'article'
-        ];
-
-        $this->assertEquals($expected, $return);
-    }
-
-    public function testProcessReftypeArticle()
-    {
-        $rule = new Processor\ConvertingRules\RuleDocumentType();
-        $bibtexBlock = [
-            'type' => 'article'
-        ];
-
-        $return = $rule->process(
-            'type',
-            'article',
-            $bibtexBlock
-        );
-
-        $expected = [
-            true,
-            'Type',
-            'article'
-        ];
-
-        $this->assertEquals($expected, $return);
-    }
-
-    public function testProcessTwoInfos()
-    {
-        $rule = new Processor\ConvertingRules\RuleDocumentType();
-        $bibtexBlock = [
-            'ptype' => 'conference',
-            'type' => 'article'
-        ];
-
-        $return = $rule->process(
-            'type',
-            'article',
-            $bibtexBlock
-        );
-
-        $expected = [
-            true,
-            'Type',
-            'conferenceobject'
+            'PageNumber',
+            '10'
         ];
 
         $this->assertEquals($expected, $return);

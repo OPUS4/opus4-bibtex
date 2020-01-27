@@ -25,44 +25,26 @@
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
  * @category    Processor
- * @package     Opus\Processor\ConvertingRules
+ * @package     Opus\Processor\Rules
  * @author      Maximilian Salomon <salomon@zib.de>
  * @copyright   Copyright (c) 2020, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace Opus\Processor\ConvertingRules;
+namespace Opus\Bibtex\Import\Processor\Rules;
 
-class RuleDocumentType implements RuleInterface
+class Issue implements RuleInterface
 {
-    // TODO: Das Mapping sollte konfigurierbar sein
-    private $mapping = [
-        'conference' => 'conferenceobject',
-        'journal' => 'article',
-        'article' => 'article',
-        'book' => 'book',
-        'misc' => 'misc'
-    ];
-
-    // TODO: Preg_matches können weg. Die Keys werden automatisch in lower-case umgewandelt
-    // TODO: Hier werden die Felder explizit hardgecoded. Nicht ideal!
     public function process($field, $value, $bibtexBlock)
     {
         $return = [false];
-        if (preg_match('/Type/i', $field) and array_key_exists('ptype', $bibtexBlock)) {
+        if (preg_match('/number/i', $field)) {
             $return = [
                 true,
-                'Type',
-                $this->mapping[strtolower($bibtexBlock['ptype'])]
-                ];
-        } elseif (preg_match('/Type/i', $field) and ! array_key_exists('ptype', $bibtexBlock)) {
-            $return = [
-                true,
-                'Type',
-                $this->mapping[strtolower($bibtexBlock['type'])]
+                'Issue',
+                $value
             ];
         }
-
         return $return;
     }
 }

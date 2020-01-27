@@ -31,9 +31,9 @@
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace OpusTest;
+namespace OpusTest\Bibtex\Import;
 
-use Opus\Parser;
+use Opus\Bibtex\Import\Parser;
 
 class ParserTest extends \PHPUnit_Framework_TestCase
 {

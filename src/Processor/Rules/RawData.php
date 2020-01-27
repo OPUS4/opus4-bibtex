@@ -25,53 +25,31 @@
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
  * @category    Processor
- * @package     Opus\Processor\ConvertingRules
+ * @package     Opus\Processor\Rules
  * @author      Maximilian Salomon <salomon@zib.de>
  * @copyright   Copyright (c) 2020, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace Opus\Processor\ConvertingRules;
+namespace Opus\Bibtex\Import\Processor\Rules;
 
-class RulePersons implements RuleInterface
+class RawData implements RuleInterface
 {
     public function process($field, $value, $bibtexBlock)
     {
         $return = [false];
-        $persons = [];
-        foreach ($bibtexBlock as $key => $val) {
-            if (preg_match('/author/i', $key)) {
-                $authors = explode('and', $val);
-                foreach ($authors as $author) {
-                    $split = explode(',', $author);
-                    $person = [
-                        'LastName' => str_replace(' ', '', $split[0]),
-                        'Role' => 'author'
-                    ];
-                    if (sizeof($split) > 1) {
-                        $person['FirstName'] = str_replace(' ', '', $split[1]);
-                    }
-                    array_push($persons, $person);
-                }
-            }
 
-            if (preg_match('/editor/i', $key)) {
-                $authors = explode('and', $val);
-                foreach ($authors as $author) {
-                    $split = explode(',', $author);
-                    $person = [
-                        'LastName' => str_replace(' ', '', $split[0]),
-                        'Role' => 'editor'
-                    ];
-                    if (sizeof($split) > 1) {
-                        $person['FirstName'] = str_replace(' ', '', $split[1]);
-                    }
-                    array_push($persons, $person);
-                }
-            }
-        }
-        if (! empty($persons)) {
-            $return = [true, 'Person', $persons];
+        if ($field == '_original') {
+            $enrichment = [
+              [
+                  'opus.rawdata' => $value
+              ]
+            ];
+            $return = [
+                true,
+                'Enrichment',
+                $enrichment
+            ];
         }
         return $return;
     }

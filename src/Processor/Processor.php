@@ -31,8 +31,7 @@
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace Opus\Processor;
-
+namespace Opus\Bibtex\Import\Processor;
 class Processor
 {
     public function convertBibtexToOpus($bibtexBlock)
@@ -40,7 +39,7 @@ class Processor
         $opusArray = [];
         $bibtexBlock = array_change_key_case($bibtexBlock);
         foreach ($bibtexBlock as $field => $value) {
-            foreach (glob(__DIR__.'/ConvertingRules/*.php') as $file) {
+            foreach (glob(__DIR__ . '/Rules/*.php') as $file) {
                 require_once $file;
                 $class = "Opus\Processor\ConvertingRules\\" . basename($file, '.php');
                 if (class_exists($class)) {

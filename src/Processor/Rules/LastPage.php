@@ -25,44 +25,25 @@
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
  * @category    Processor
- * @package     Opus\Processor\ConvertingRules
+ * @package     Opus\Processor\Rules
  * @author      Maximilian Salomon <salomon@zib.de>
  * @copyright   Copyright (c) 2020, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace Opus\Processor\ConvertingRules;
+namespace Opus\Bibtex\Import\Processor\Rules;
 
-class RuleNote implements RuleInterface
+class LastPage implements RuleInterface
 {
-    // TODO: Das sollte konfigurierbar und übersetzbar sein.
-    private $noteMap = [
-        'pdfurl' => 'URL of the PDF: ',
-        'slides' => 'URL of the Slides: ',
-        'annote' => 'Additional Note: ',
-        'summary' => 'URL of the Abstract: ',
-        'code' => 'URL of the Code: ',
-        'poster' => 'URL of the Poster: '
-    ];
-
     public function process($field, $value, $bibtexBlock)
     {
         $return = [false];
-        if (array_key_exists($field, $this->noteMap)) {
-            $notes = [];
-            foreach ($bibtexBlock as $key => $value) {
-                if (array_key_exists($key, $this->noteMap)) {
-                    $note = [
-                        'Visibility' => 'public',
-                        'Message' => $this->noteMap[$key].$value
-                    ];
-                    array_push($notes, $note);
-                }
-            }
+        if (preg_match('/Pages/i', $field)) {
+            $pages = explode('--', $value);
             $return = [
                 true,
-                'Note',
-                $notes
+                'PageLast',
+                $pages[1]
             ];
         }
         return $return;
