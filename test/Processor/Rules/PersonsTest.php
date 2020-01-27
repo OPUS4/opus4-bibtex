@@ -24,33 +24,59 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * @category    Processor
- * @package     Opus\Processor\ConvertingRules
+ * @category    Tests
+ * @package     OpusTest\Processor\Rules
  * @author      Maximilian Salomon <salomon@zib.de>
  * @copyright   Copyright (c) 2020, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace Opus\Processor\ConvertingRules;
+namespace OpusTest\Bibtex\Import\Processor\Rules;
 
-class RuleRawData implements RuleInterface
+use Opus\Bibtex\Import\Processor\Rules\Persons;
+
+class PersonsTest extends \PHPUnit_Framework_TestCase
 {
-    public function process($field, $value, $bibtexBlock)
+    public function testProcessAuthors()
     {
-        $return = [false];
+        $rule = new Persons();
+        $bibtexBlock = [
+            'Author' => 'Wang, Y. and Xie and Steffen, S.',
+            'Editor' => 'Ming, J.'
+        ];
 
-        if ($field == '_original') {
-            $enrichment = [
-              [
-                  'opus.rawdata' => $value
-              ]
-            ];
-            $return = [
-                true,
-                'Enrichment',
-                $enrichment
-            ];
-        }
-        return $return;
+        $return = $rule->process(
+            'Author',
+            'Wang, Y. and Xie, Y. and Steffen, S.',
+            $bibtexBlock
+        );
+
+        $expected = [
+            true,
+            'Person',
+            [
+                [
+                    'FirstName' => 'Y.',
+                    'LastName' => 'Wang',
+                    'Role' => 'author'
+                ],
+                [
+                    'LastName' => 'Xie',
+                    'Role' => 'author'
+                ],
+                [
+                    'FirstName' => 'S.',
+                    'LastName' => 'Steffen',
+                    'Role' => 'author'
+                ],
+                [
+                    'FirstName' => 'J.',
+                    'LastName' => 'Ming',
+                    'Role' => 'editor'
+                ]
+            ]
+        ];
+
+        $this->assertEquals($expected, $return);
     }
 }

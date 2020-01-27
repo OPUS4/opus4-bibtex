@@ -24,38 +24,40 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * @category    Tests
- * @package     OpusTest\Processor\ConvertingRules
+ * @category    Processor
+ * @package     Opus\Processor\Rules
  * @author      Maximilian Salomon <salomon@zib.de>
  * @copyright   Copyright (c) 2020, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace OpusTest\Processor\ConvertingRules;
+namespace Opus\Bibtex\Import\Processor\Rules;
 
-use Opus\Processor;
-
-class RuleYearTest extends \PHPUnit_Framework_TestCase
+class Title implements RuleInterface
 {
-    public function testProcess()
+    public function process($field, $value, $bibtexBlock)
     {
-        $rule = new Processor\ConvertingRules\RuleYear();
-        $bibtexBlock = [
-            'Year' => '2019'
-        ];
+        $return = [false];
+        if (preg_match('/title/i', $field)) {
+            $mainTitle = [
+                [
+                    // TODO: Konfigurierbarkeit
+                    'Language' => 'eng',
+                    'Value' => $this->deleteBrace($value),
+                    'Type' => 'main'
+                ]
+            ];
+            $return = [true, 'TitleMain', $mainTitle];
+        }
+        return $return;
+    }
 
-        $return = $rule->process(
-            'Year',
-            '2019',
-            $bibtexBlock
-        );
-
-        $expected = [
-            true,
-            'PublishedYear',
-            '2019'
-        ];
-
-        $this->assertEquals($expected, $return);
+    public function deleteBrace($string)
+    {
+        if (substr($string, -1, 1) == '}' and substr($string, 0, 1) == '{') {
+            $string = substr_replace($string, "", -1, 1);
+            $string = substr_replace($string, "", 0, 1);
+        }
+        return $string;
     }
 }

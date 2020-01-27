@@ -25,54 +25,57 @@
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
  * @category    Tests
- * @package     OpusTest\Processor\ConvertingRules
+ * @package     OpusTest\Processor\Rules
  * @author      Maximilian Salomon <salomon@zib.de>
  * @copyright   Copyright (c) 2020, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace OpusTest\Processor\ConvertingRules;
+namespace OpusTest\Bibtex\Import\Processor\Rules;
 
-use Opus\Processor;
+use Opus\Bibtex\Import\Processor\Rules\Title;
 
-class RulePersonsTest extends \PHPUnit_Framework_TestCase
+class TitleTest extends \PHPUnit_Framework_TestCase
 {
-    public function testProcessAuthors()
+    public function testProcessWithoutBrace()
     {
-        $rule = new Processor\ConvertingRules\RulePersons();
+        $rule = new Title();
         $bibtexBlock = [
-            'Author' => 'Wang, Y. and Xie and Steffen, S.',
-            'Editor' => 'Ming, J.'
+            'title' => 'My Article'
+        ];
+        $return = $rule->process('title', 'My Article', $bibtexBlock);
+        $expected = [
+                true,
+                'TitleMain',
+                [
+                    [
+                        // TODO: Konfigurierbarkeit
+                        'Language' => 'eng',
+                        'Value' => 'My Article',
+                        'Type' => 'main'
+                    ]
+                ]
         ];
 
-        $return = $rule->process(
-            'Author',
-            'Wang, Y. and Xie, Y. and Steffen, S.',
-            $bibtexBlock
-        );
+        $this->assertEquals($expected, $return);
+    }
 
+    public function testProcessWithBrace()
+    {
+        $rule = new Processor\ConvertingRules\RuleTitle();
+        $bibtexBlock = [
+            'title' => '{My Article}'
+        ];
+        $return = $rule->process('title', '{My Article}', $bibtexBlock);
         $expected = [
             true,
-            'Person',
+            'TitleMain',
             [
                 [
-                    'FirstName' => 'Y.',
-                    'LastName' => 'Wang',
-                    'Role' => 'author'
-                ],
-                [
-                    'LastName' => 'Xie',
-                    'Role' => 'author'
-                ],
-                [
-                    'FirstName' => 'S.',
-                    'LastName' => 'Steffen',
-                    'Role' => 'author'
-                ],
-                [
-                    'FirstName' => 'J.',
-                    'LastName' => 'Ming',
-                    'Role' => 'editor'
+                    // TODO: Konfigurierbarkeit
+                    'Language' => 'eng',
+                    'Value' => 'My Article',
+                    'Type' => 'main'
                 ]
             ]
         ];

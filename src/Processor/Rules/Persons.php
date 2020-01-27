@@ -24,38 +24,55 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * @category    Tests
- * @package     OpusTest\Processor\ConvertingRules
+ * @category    Processor
+ * @package     Opus\Processor\Rules
  * @author      Maximilian Salomon <salomon@zib.de>
  * @copyright   Copyright (c) 2020, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace OpusTest\Processor\ConvertingRules;
+namespace Opus\Bibtex\Import\Processor\Rules;
 
-use Opus\Processor;
-
-class RuleVolumeTest extends \PHPUnit_Framework_TestCase
+class Persons implements RuleInterface
 {
-    public function testProcess()
+    public function process($field, $value, $bibtexBlock)
     {
-        $rule = new Processor\ConvertingRules\RuleVolume();
-        $bibtexBlock = [
-            'Volume' => '3'
-        ];
+        $return = [false];
+        $persons = [];
+        foreach ($bibtexBlock as $key => $val) {
+            if (preg_match('/author/i', $key)) {
+                $authors = explode('and', $val);
+                foreach ($authors as $author) {
+                    $split = explode(',', $author);
+                    $person = [
+                        'LastName' => str_replace(' ', '', $split[0]),
+                        'Role' => 'author'
+                    ];
+                    if (sizeof($split) > 1) {
+                        $person['FirstName'] = str_replace(' ', '', $split[1]);
+                    }
+                    array_push($persons, $person);
+                }
+            }
 
-        $return = $rule->process(
-            'Volume',
-            '3',
-            $bibtexBlock
-        );
-
-        $expected = [
-            true,
-            'Volume',
-            '3'
-        ];
-
-        $this->assertEquals($expected, $return);
+            if (preg_match('/editor/i', $key)) {
+                $authors = explode('and', $val);
+                foreach ($authors as $author) {
+                    $split = explode(',', $author);
+                    $person = [
+                        'LastName' => str_replace(' ', '', $split[0]),
+                        'Role' => 'editor'
+                    ];
+                    if (sizeof($split) > 1) {
+                        $person['FirstName'] = str_replace(' ', '', $split[1]);
+                    }
+                    array_push($persons, $person);
+                }
+            }
+        }
+        if (! empty($persons)) {
+            $return = [true, 'Person', $persons];
+        }
+        return $return;
     }
 }

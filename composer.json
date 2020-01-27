@@ -17,12 +17,12 @@
   },
   "autoload": {
     "psr-4": {
-      "Opus\\": "src/"
+      "Opus\\Bibtex\\Import\\": "src/"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "OpusTest\\": "test/"
+      "OpusTest\\Bibtex\\Import\\": "test/"
     }
   },
   "scripts": {

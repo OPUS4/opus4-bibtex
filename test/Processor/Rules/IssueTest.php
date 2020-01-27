@@ -24,27 +24,38 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * @category    Processor
- * @package     Opus\Processor\ConvertingRules
+ * @category    Tests
+ * @package     OpusTest\Processor\Rules
  * @author      Maximilian Salomon <salomon@zib.de>
  * @copyright   Copyright (c) 2020, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace Opus\Processor\ConvertingRules;
+namespace OpusTest\Bibtex\Import\Processor\Rules;
 
-class RuleIssue implements RuleInterface
+use Opus\Bibtex\Import\Processor\Rules\Issue;
+
+class IssueTest extends \PHPUnit_Framework_TestCase
 {
-    public function process($field, $value, $bibtexBlock)
+    public function testProcess()
     {
-        $return = [false];
-        if (preg_match('/number/i', $field)) {
-            $return = [
-                true,
-                'Issue',
-                $value
-            ];
-        }
-        return $return;
+        $rule = new Issue();
+        $bibtexBlock = [
+            'Number' => '3'
+        ];
+
+        $return = $rule->process(
+            'Number',
+            '3',
+            $bibtexBlock
+        );
+
+        $expected = [
+            true,
+            'Issue',
+            '3'
+        ];
+
+        $this->assertEquals($expected, $return);
     }
 }

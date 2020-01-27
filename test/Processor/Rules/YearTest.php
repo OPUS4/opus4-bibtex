@@ -25,35 +25,35 @@
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
  * @category    Tests
- * @package     OpusTest\Processor\ConvertingRules
+ * @package     OpusTest\Processor\Rules
  * @author      Maximilian Salomon <salomon@zib.de>
  * @copyright   Copyright (c) 2020, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace OpusTest\Processor\ConvertingRules;
+namespace OpusTest\Bibtex\Import\Processor\Rules;
 
-use Opus\Processor;
+use Opus\Bibtex\Import\Processor\Rules\Year;
 
-class RuleLastPageTest extends \PHPUnit_Framework_TestCase
+class YearTest extends \PHPUnit_Framework_TestCase
 {
     public function testProcess()
     {
-        $rule = new Processor\ConvertingRules\RuleLastPage();
+        $rule = new Year();
         $bibtexBlock = [
-            'Pages' => '1--10'
+            'Year' => '2019'
         ];
 
         $return = $rule->process(
-            'Pages',
-            '1--10',
+            'Year',
+            '2019',
             $bibtexBlock
         );
 
         $expected = [
             true,
-            'PageLast',
-            '10'
+            'PublishedYear',
+            '2019'
         ];
 
         $this->assertEquals($expected, $return);

@@ -31,7 +31,7 @@
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace Opus;
+namespace Opus\Bibtex\Import;
 
 use Opus\Processor\Processor;
 use RenanBr\BibTexParser\Listener;

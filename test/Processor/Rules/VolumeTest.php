@@ -24,28 +24,38 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * @category    Processor
- * @package     Opus\Processor\ConvertingRules
+ * @category    Tests
+ * @package     OpusTest\Processor\Rules
  * @author      Maximilian Salomon <salomon@zib.de>
  * @copyright   Copyright (c) 2020, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace Opus\Processor\ConvertingRules;
+namespace OpusTest\Bibtex\Import\Processor\Rules;
 
-class RulePageNumber implements RuleInterface
+use Opus\Bibtex\Import\Processor\Rules\Volume;
+
+class VolumeTest extends \PHPUnit_Framework_TestCase
 {
-    public function process($field, $value, $bibtexBlock)
+    public function testProcess()
     {
-        $return = [false];
-        if (preg_match('/Pages/i', $field)) {
-            $pages = explode('--', $value);
-            $return = [
-                true,
-                'PageNumber',
-                strval($pages[1] - $pages[0] + 1)
-            ];
-        }
-        return $return;
+        $rule = new Volume();
+        $bibtexBlock = [
+            'Volume' => '3'
+        ];
+
+        $return = $rule->process(
+            'Volume',
+            '3',
+            $bibtexBlock
+        );
+
+        $expected = [
+            true,
+            'Volume',
+            '3'
+        ];
+
+        $this->assertEquals($expected, $return);
     }
 }
