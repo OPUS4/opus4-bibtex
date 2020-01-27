@@ -41,7 +41,7 @@ class Processor
         foreach ($bibtexBlock as $field => $value) {
             foreach (glob(__DIR__ . '/Rules/*.php') as $file) {
                 require_once $file;
-                $class = "Opus\Processor\ConvertingRules\\" . basename($file, '.php');
+                $class = "Opus\Bibtex\Import\Processor\Rules\\" . basename($file, '.php');
                 if (class_exists($class)) {
                     $rule = new $class;
                     $return = $rule->process($field, $value, $bibtexBlock);
@@ -62,8 +62,16 @@ class Processor
     public function addDefaultEntries($opusArray)
     {
         // TODO: Das MUSS konfigurierbar sein!
-        $opusArray['Language'] = 'eng';
-        $opusArray['BelongsToBibliography'] = '0';
+        $defaults = [
+            'Language' => 'eng',
+            'BelongsToBibliography' => '0'
+        ];
+
+        foreach ($defaults as $key => $value){
+            if(! array_key_exists($key, $opusArray)){
+                $opusArray[$key] = $value;
+            }
+        }
 
         return $opusArray;
     }
