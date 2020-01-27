@@ -1,12 +1,13 @@
 {
   "name": "opus4-repo/opus4-bibtex",
-  "description": "OPUS 4 bibtex-import library",
+  "description": "OPUS 4 BibTeX Support Library",
   "license": "GPL-2.0+",
   "type": "library",
   "keywords": [
-    "opus4"
+    "opus4",
+    "bibtex"
   ],
-  "homepage": "http://www.opus-repository.org",
+  "homepage": "https://www.opus-repository.org",
   "require": {
     "zendframework/zendframework1": "1.12.*", 
     "renanbr/bibtex-parser": "^2"
