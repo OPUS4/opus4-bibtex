@@ -40,22 +40,10 @@ class IssueTest extends \PHPUnit_Framework_TestCase
     public function testProcess()
     {
         $rule = new Issue();
-        $bibtexBlock = [
-            'Number' => '3'
-        ];
+        $bibtexBlock = ['Number' => '3'];
 
-        $return = $rule->process(
-            'Number',
-            '3',
-            $bibtexBlock
-        );
+        $return = $rule->process('Number', '3', $bibtexBlock);
 
-        $expected = [
-            true,
-            'Issue',
-            '3'
-        ];
-
-        $this->assertEquals($expected, $return);
+        $this->assertEquals([true, 'Issue', '3'], $return);
     }
 }

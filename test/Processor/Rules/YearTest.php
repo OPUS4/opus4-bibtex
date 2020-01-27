@@ -40,22 +40,10 @@ class YearTest extends \PHPUnit_Framework_TestCase
     public function testProcess()
     {
         $rule = new Year();
-        $bibtexBlock = [
-            'Year' => '2019'
-        ];
+        $bibtexBlock = ['Year' => '2019'];
 
-        $return = $rule->process(
-            'Year',
-            '2019',
-            $bibtexBlock
-        );
+        $return = $rule->process('Year', '2019', $bibtexBlock);
 
-        $expected = [
-            true,
-            'PublishedYear',
-            '2019'
-        ];
-
-        $this->assertEquals($expected, $return);
+        $this->assertEquals([true, 'PublishedYear', '2019'], $return);
     }
 }

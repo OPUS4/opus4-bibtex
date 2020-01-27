@@ -40,33 +40,13 @@ class KeywordsTest extends \PHPUnit_Framework_TestCase
     public function testProcess()
     {
         $rule = new Keywords();
-        $bibtexBlock = [
-            'Keywords' => 'test, check'
-        ];
+        $bibtexBlock = ['Keywords' => 'test, check'];
 
-        $return = $rule->process(
-            'Keywords',
-            'test, check',
-            $bibtexBlock
-        );
+        $return = $rule->process('Keywords', 'test, check', $bibtexBlock);
 
-        $expected = [
-            true,
-            'Subject',
-            [
-                [
-                    'Language' => 'eng',
-                    'Type' => 'uncontrolled',
-                    'Value' => 'test'
-                ],
-                [
-                    'Language' => 'eng',
-                    'Type' => 'uncontrolled',
-                    'Value' => 'check'
-                ]
-            ]
-        ];
-
-        $this->assertEquals($expected, $return);
+        $this->assertEquals([true, 'Subject', [
+            ['Language' => 'eng', 'Type' => 'uncontrolled', 'Value' => 'test'],
+            ['Language' => 'eng', 'Type' => 'uncontrolled', 'Value' => 'check']
+        ]], $return);
     }
 }

@@ -40,22 +40,10 @@ class PageNumberTest extends \PHPUnit_Framework_TestCase
     public function testProcess()
     {
         $rule = new PageNumber();
-        $bibtexBlock = [
-            'Pages' => '1--10'
-        ];
+        $bibtexBlock = ['Pages' => '1--10'];
 
-        $return = $rule->process(
-            'Pages',
-            '1--10',
-            $bibtexBlock
-        );
+        $return = $rule->process('Pages', '1--10', $bibtexBlock);
 
-        $expected = [
-            true,
-            'PageNumber',
-            '10'
-        ];
-
-        $this->assertEquals($expected, $return);
+        $this->assertEquals([true, 'PageNumber', '10'], $return);
     }
 }

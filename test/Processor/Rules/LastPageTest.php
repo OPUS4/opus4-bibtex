@@ -40,22 +40,10 @@ class LastPageTest extends \PHPUnit_Framework_TestCase
     public function testProcess()
     {
         $rule = new LastPage();
-        $bibtexBlock = [
-            'Pages' => '1--10'
-        ];
+        $bibtexBlock = ['Pages' => '1--10'];
 
-        $return = $rule->process(
-            'Pages',
-            '1--10',
-            $bibtexBlock
-        );
+        $return = $rule->process('Pages', '1--10', $bibtexBlock);
 
-        $expected = [
-            true,
-            'PageLast',
-            '10'
-        ];
-
-        $this->assertEquals($expected, $return);
+        $this->assertEquals([true, 'PageLast', '10'], $return);
     }
 }

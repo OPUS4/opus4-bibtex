@@ -40,22 +40,10 @@ class VolumeTest extends \PHPUnit_Framework_TestCase
     public function testProcess()
     {
         $rule = new Volume();
-        $bibtexBlock = [
-            'Volume' => '3'
-        ];
+        $bibtexBlock = ['Volume' => '3'];
 
-        $return = $rule->process(
-            'Volume',
-            '3',
-            $bibtexBlock
-        );
+        $return = $rule->process('Volume', '3', $bibtexBlock);
 
-        $expected = [
-            true,
-            'Volume',
-            '3'
-        ];
-
-        $this->assertEquals($expected, $return);
+        $this->assertEquals([true, 'Volume', '3'], $return);
     }
 }

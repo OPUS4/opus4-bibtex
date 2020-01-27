@@ -40,22 +40,10 @@ class FirstPageTest extends \PHPUnit_Framework_TestCase
     public function testProcess()
     {
         $rule = new FirstPage();
-        $bibtexBlock = [
-            'Pages' => '1--10'
-        ];
+        $bibtexBlock = ['Pages' => '1--10'];
 
-        $return = $rule->process(
-            'Pages',
-            '1--10',
-            $bibtexBlock
-        );
+        $return = $rule->process('Pages', '1--10', $bibtexBlock);
 
-        $expected = [
-            true,
-            'PageFirst',
-            '1'
-        ];
-
-        $this->assertEquals($expected, $return);
+        $this->assertEquals([true, 'PageFirst', '1'], $return);
     }
 }
