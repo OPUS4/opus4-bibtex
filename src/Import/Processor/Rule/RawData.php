@@ -42,7 +42,8 @@ class RawData implements RuleInterface
         if ($field == '_original') {
             $enrichment = [
               [
-                  'opus.rawdata' => $value
+                  'KeyName' => 'opus.rawdata',
+                  'Value' => $value
               ]
             ];
             $return = [

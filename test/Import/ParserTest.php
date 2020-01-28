@@ -63,9 +63,10 @@ class ParserTest extends \PHPUnit_Framework_TestCase
                         'Role' => 'author'
                     ]
                 ],
-                'Enrichment' => [
-                    ['opus.rawdata' => "@misc{Nobody06,\n       author = \"Nobody, Jr\",\n       title = \"My Article\",\n       year = \"2006\"}"]
-                ]
+                'Enrichment' => [[
+                    'KeyName' => 'opus.rawdata',
+                    'Value' => "@misc{Nobody06,\n       author = \"Nobody, Jr\",\n       title = \"My Article\",\n       year = \"2006\"}"
+                ]]
             ],
             [
                 'BelongsToBibliography' => '0',
@@ -78,9 +79,10 @@ class ParserTest extends \PHPUnit_Framework_TestCase
                     ]
                 ],
                 'Type' => 'article',
-                'Enrichment' => [
-                    ['opus.rawdata' => "@article{BigReference,\n\tArxiv = {http://papers.ssrn.com/sol3/papers.cfm?abstract_id=9999999},\n\tAuthor = {Disterer, S. and Nobody, C.},\n\tEditor = {Women, Cool and Men, Cool},\n\tDoi = {10.2222/j.jbankfin.2222.32.001},\n\tIssn = {1100-0011},\n\tJournal = {Journal of Cool Stuff},\n\tKeywords = {Cool, {Stuff}},\n\tPages = {1--12},\n\tPdfurl = {http://dx.doi.org/10.2222/j.jbankfin.2222.32.001},\n\tPtype = {journal},\n\tTitle = {{Cool Stuff: With Apples}},\n\tVolume = {32},\n\tYear = {2020},\n\tSlides = {https://app.box.com/s/1231451532132slide},\n\tNumber = {1},\n\tAnnote = {http://www.sciencedirect.com/science/article/pii/123456789\n\tdoi:10.1234/TIT.2020.1234567\n\tarXiv:1234.1233v4},\n\tSummary = {http://www.Forschung.com/blog/research/2020/01/04/Ein-abstract.html},\n\tCode = {https://colab.research.google.com/drive/123456a456},\n\tPoster = {https://app.box.com/s/1231451532132post},\n}"]
-                ],
+                'Enrichment' => [[
+                    'KeyName' => 'opus.rawdata',
+                    'Value' => "@article{BigReference,\n\tArxiv = {http://papers.ssrn.com/sol3/papers.cfm?abstract_id=9999999},\n\tAuthor = {Disterer, S. and Nobody, C.},\n\tEditor = {Women, Cool and Men, Cool},\n\tDoi = {10.2222/j.jbankfin.2222.32.001},\n\tIssn = {1100-0011},\n\tJournal = {Journal of Cool Stuff},\n\tKeywords = {Cool, {Stuff}},\n\tPages = {1--12},\n\tPdfurl = {http://dx.doi.org/10.2222/j.jbankfin.2222.32.001},\n\tPtype = {journal},\n\tTitle = {{Cool Stuff: With Apples}},\n\tVolume = {32},\n\tYear = {2020},\n\tSlides = {https://app.box.com/s/1231451532132slide},\n\tNumber = {1},\n\tAnnote = {http://www.sciencedirect.com/science/article/pii/123456789\n\tdoi:10.1234/TIT.2020.1234567\n\tarXiv:1234.1233v4},\n\tSummary = {http://www.Forschung.com/blog/research/2020/01/04/Ein-abstract.html},\n\tCode = {https://colab.research.google.com/drive/123456a456},\n\tPoster = {https://app.box.com/s/1231451532132post},\n}"
+                ]],
                 'Issue' => '1',
                 'PageFirst' => '1',
                 'PageLast' => '12',

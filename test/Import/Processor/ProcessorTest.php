@@ -57,23 +57,20 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
             'PublishedYear' => '2006',
             'Language' => 'eng',
             'Type' => 'misc',
-            'TitleMain' => [
-                [
-                    'Language' => 'eng',
-                    'Value' => 'My Article',
-                    'Type' => 'main'
-                ]
-            ],
-            'Person' => [
-                [
-                    'FirstName' => 'Jr',
-                    'LastName' => 'Nobody',
-                    'Role' => 'author'
-                ]
-            ],
-            'Enrichment' => [
-                ['opus.rawdata' => "@misc{Nobody06,\n       author = \"Nobody, Jr\",\n       title = \"My Article\",\n       year = \"2006\"}"]
-            ]
+            'TitleMain' => [[
+                'Language' => 'eng',
+                'Value' => 'My Article',
+                'Type' => 'main'
+            ]],
+            'Person' => [[
+                'FirstName' => 'Jr',
+                'LastName' => 'Nobody',
+                'Role' => 'author'
+            ]],
+            'Enrichment' => [[
+                'KeyName' => 'opus.rawdata',
+                'Value' => "@misc{Nobody06,\n       author = \"Nobody, Jr\",\n       title = \"My Article\",\n       year = \"2006\"}"
+            ]]
         ];
 
         $this->assertEquals($opus, $processor->convertBibtexToOpus($bibtex));
