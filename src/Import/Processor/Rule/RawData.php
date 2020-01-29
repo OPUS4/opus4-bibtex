@@ -40,12 +40,13 @@ class RawData implements RuleInterface
         $return = [false];
 
         if ($field == '_original') {
-            $enrichment = [
-              [
-                  'KeyName' => 'opus.rawdata',
-                  'Value' => $value
-              ]
-            ];
+            $enrichment = [[
+                'KeyName' => 'opus.rawdata',
+                'Value' => $value
+            ], [
+                'KeyName' => 'opus.rawdata.hash',
+                'Value' => self::hash($value)
+            ]];
             $return = [
                 true,
                 'Enrichment',
@@ -53,5 +54,9 @@ class RawData implements RuleInterface
             ];
         }
         return $return;
+    }
+
+    public static function hash($data) {
+        return md5($data);
     }
 }

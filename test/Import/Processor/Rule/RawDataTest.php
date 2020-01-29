@@ -25,60 +25,33 @@
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
  * @category    Tests
- * @package     Test/Processor
+ * @package     OpusTest\Processor\Rule
  * @author      Maximilian Salomon <salomon@zib.de>
  * @copyright   Copyright (c) 2020, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace OpusTest\Bibtex\Import\Processor;
+namespace OpusTest\Bibtex\Import\Processor\Rule;
 
-use Opus\Bibtex\Import\Processor\Processor;
+use Opus\Bibtex\Import\Processor\Rule\RawData;
 
-class ProcessorTest extends \PHPUnit_Framework_TestCase
+class RawDataTest extends \PHPUnit_Framework_TestCase
 {
 
     public function testProcess()
     {
-        $bibtex = "@misc{Nobody06,\n       author = \"Nobody, Jr\",\n       title = \"My Article\",\n       year = \"2006\"}";
-        $bibtexHash = md5($bibtex);
+        $rule = new RawData();
+        $bibtexBlock = ['_original' => '@article{...}'];
 
-        $processor = new Processor();
-        $bibtexArray = [
-            'type' => 'misc',
-            'citation-key' => 'Nobody06',
-            'author' => 'Nobody, Jr',
-            'title' => 'My Article',
-            'year' => '2006',
-            '_original' => $bibtex
-        ];
+        $return = $rule->process('_original', '@article{...}', $bibtexBlock);
 
-        $opus = [
-            'BelongsToBibliography' => '0',
-            'PublishedYear' => '2006',
-            'Language' => 'eng',
-            'Type' => 'misc',
-            'TitleMain' => [[
-                'Language' => 'eng',
-                'Value' => 'My Article',
-                'Type' => 'main'
-            ]],
-            'Person' => [[
-                'FirstName' => 'Jr',
-                'LastName' => 'Nobody',
-                'Role' => 'author'
-            ]],
-            'Enrichment' => [
-                [
-                    'KeyName' => 'opus.rawdata',
-                    'Value' => $bibtex
-                ], [
-                    'KeyName' => 'opus.rawdata.hash',
-                    'Value' => $bibtexHash
-                ]
+        $this->assertEquals([
+            true,
+            'Enrichment',
+            [
+                ['KeyName' => 'opus.rawdata', 'Value' => '@article{...}'],
+                ['KeyName' => 'opus.rawdata.hash', 'Value' => RawData::hash('@article{...}')]
             ]
-        ];
-
-        $this->assertEquals($opus, $processor->convertBibtexToOpus($bibtexArray));
+        ], $return);
     }
 }
