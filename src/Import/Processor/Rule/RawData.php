@@ -35,16 +35,23 @@ namespace Opus\Bibtex\Import\Processor\Rule;
 
 class RawData implements RuleInterface
 {
+
+    const SOURCE_DATA_KEY = 'opus.import.data';
+
+    const SOURCE_DATA_HASH_KEY = 'opus.import.dataHash';
+
     public function process($field, $value, $bibtexBlock)
     {
         $return = [false];
 
         if ($field == '_original') {
-            $enrichment = [
-              [
-                  'opus.rawdata' => $value
-              ]
-            ];
+            $enrichment = [[
+                'KeyName' => self::SOURCE_DATA_KEY,
+                'Value' => $value
+            ], [
+                'KeyName' => self::SOURCE_DATA_HASH_KEY,
+                'Value' => self::hash($value)
+            ]];
             $return = [
                 true,
                 'Enrichment',
@@ -52,5 +59,9 @@ class RawData implements RuleInterface
             ];
         }
         return $return;
+    }
+
+    public static function hash($data) {
+        return md5($data);
     }
 }

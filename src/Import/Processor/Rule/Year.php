@@ -35,9 +35,11 @@ namespace Opus\Bibtex\Import\Processor\Rule;
 
 class Year implements RuleInterface
 {
+
     public function process($field, $value, $bibtexBlock)
     {
         $return = [false];
+        $value = preg_replace('/[^0-9]/', '', $value);
         if (preg_match('/year/i', $field)) {
             $return = [
                 true,

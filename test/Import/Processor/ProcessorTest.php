@@ -34,22 +34,24 @@
 namespace OpusTest\Bibtex\Import\Processor;
 
 use Opus\Bibtex\Import\Processor\Processor;
+use Opus\Bibtex\Import\Processor\Rule\RawData;
 
 class ProcessorTest extends \PHPUnit_Framework_TestCase
 {
+
     public function testProcess()
     {
+        $bibtex = "@misc{Nobody06,\n       author = \"Nobody, Jr\",\n       title = \"My Article\",\n       year = \"2006\"}";
+        $bibtexHash = md5($bibtex);
+
         $processor = new Processor();
-        $bibtex = [
+        $bibtexArray = [
             'type' => 'misc',
             'citation-key' => 'Nobody06',
             'author' => 'Nobody, Jr',
             'title' => 'My Article',
             'year' => '2006',
-            '_original' => "@misc{Nobody06,
-       author = \"Nobody, Jr\",
-       title = \"My Article\",
-       year = \"2006\"}"
+            '_original' => $bibtex
         ];
 
         $opus = [
@@ -57,25 +59,27 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
             'PublishedYear' => '2006',
             'Language' => 'eng',
             'Type' => 'misc',
-            'TitleMain' => [
-                [
-                    'Language' => 'eng',
-                    'Value' => 'My Article',
-                    'Type' => 'main'
-                ]
-            ],
-            'Person' => [
-                [
-                    'FirstName' => 'Jr',
-                    'LastName' => 'Nobody',
-                    'Role' => 'author'
-                ]
-            ],
+            'TitleMain' => [[
+                'Language' => 'eng',
+                'Value' => 'My Article',
+                'Type' => 'main'
+            ]],
+            'Person' => [[
+                'FirstName' => 'Jr',
+                'LastName' => 'Nobody',
+                'Role' => 'author'
+            ]],
             'Enrichment' => [
-                ['opus.rawdata' => "@misc{Nobody06,\n       author = \"Nobody, Jr\",\n       title = \"My Article\",\n       year = \"2006\"}"]
+                [
+                    'KeyName' => RawData::SOURCE_DATA_KEY,
+                    'Value' => $bibtex
+                ], [
+                    'KeyName' => RawData::SOURCE_DATA_HASH_KEY,
+                    'Value' => $bibtexHash
+                ]
             ]
         ];
 
-        $this->assertEquals($opus, $processor->convertBibtexToOpus($bibtex));
+        $this->assertEquals($opus, $processor->convertBibtexToOpus($bibtexArray));
     }
 }

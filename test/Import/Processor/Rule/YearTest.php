@@ -46,4 +46,13 @@ class YearTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals([true, 'PublishedYear', '2019'], $return);
     }
+
+    public function testYearPlus()
+    {
+        $rule = new Year();
+
+        $bibtexBlock = ['Year' => '2017+'];
+
+        $this->assertEquals([true, 'PublishedYear', '2017'], $rule->process('Year', '2017+', $bibtexBlock));
+    }
 }
