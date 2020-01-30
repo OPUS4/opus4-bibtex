@@ -61,10 +61,16 @@ class ParserTest extends \PHPUnit_Framework_TestCase
                         'FirstName' => 'Jr',
                         'LastName' => 'Nobody',
                         'Role' => 'author'
+                    ],
+                    [
+                        'FirstName' => 'J',
+                        'LastName' => 'Müller',
+                        'Role' => 'author'
                     ]
                 ],
                 'Enrichment' => [
-                    ['opus.rawdata' => "@misc{Nobody06,\n       author = \"Nobody, Jr\",\n       title = \"My Article\",\n       year = \"2006\"}"]
+                    ['opus.rawdata' => "@miscNobody06, author = “Nobody, Jr and Müller, J.”, title = “My
+            Article”, year = “2006”"]
                 ]
             ],
             [

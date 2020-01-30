@@ -35,6 +35,7 @@ namespace Opus\Bibtex\Import;
 
 use Opus\Bibtex\Import\Processor\Processor;
 use RenanBr\BibTexParser\Listener;
+use RenanBr\BibTexParser\Processor\LatexToUnicodeProcessor;
 
 class Parser
 {
@@ -45,6 +46,7 @@ class Parser
     {
         $parser = new \RenanBr\BibTexParser\Parser();
         $listener = new Listener();
+        //$listener->addProcessor(new LatexToUnicodeProcessor());
         $parser->addListener($listener);
         $parser->parseFile($file);
         $this->bibtexFormat = $listener->export();
