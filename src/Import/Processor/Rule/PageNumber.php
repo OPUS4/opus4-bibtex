@@ -39,8 +39,8 @@ class PageNumber implements RuleInterface
     {
         $return = [false];
         if (preg_match('/Pages/i', $field)) {
-            $value = str_replace('–', '-', $value);
-            $pages = explode('-', $value);
+            // $value = str_replace('–', '-', $value);
+            $pages = explode('--', $value);
             $return = [
                 true,
                 'PageNumber',
