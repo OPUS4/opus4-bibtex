@@ -220,7 +220,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
                     ],
                     [
                         'FirstName' => 'J.',
-                        'LastName' => 'M{/"u}ller',
+                        'LastName' => 'Müller',
                         'Role' => 'author'
                     ]
                 ]

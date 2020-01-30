@@ -39,7 +39,8 @@ class FirstPage implements RuleInterface
     {
         $return = [false];
         if (preg_match('/Pages/i', $field)) {
-            $pages = explode('--', $value);
+            $value = str_replace('–', '-', $value);
+            $pages = explode('-', $value);
             $return = [
                 true,
                 'PageFirst',
