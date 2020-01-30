@@ -45,9 +45,38 @@ class Parser
     public function fileToArray($file)
     {
         $parser = new \RenanBr\BibTexParser\Parser();
+
         $listener = new Listener();
+
+        $latexProcessor = new LatexToUnicodeProcessor();
+        $latexProcessor->setTagCoverage([
+            'Author',
+            'Editor',
+            'Title'
+        ]);
+
+        $listener->addProcessor($latexProcessor);
         $parser->addListener($listener);
         $parser->parseFile($file);
+        $this->bibtexFormat = $listener->export();
+    }
+
+    public function stringToArray($bibtex)
+    {
+        $parser = new \RenanBr\BibTexParser\Parser();
+
+        $listener = new Listener();
+
+        $latexProcessor = new LatexToUnicodeProcessor();
+        $latexProcessor->setTagCoverage([
+            'Author',
+            'Editor',
+            'Title'
+        ]);
+
+        $listener->addProcessor($latexProcessor);
+        $parser->addListener($listener);
+        $parser->parseString($bibtex);
         $this->bibtexFormat = $listener->export();
     }
 
