@@ -35,6 +35,7 @@ namespace Opus\Bibtex\Import;
 
 use Opus\Bibtex\Import\Processor\Processor;
 use RenanBr\BibTexParser\Listener;
+use RenanBr\BibTexParser\Processor\LatexToUnicodeProcessor;
 
 class Parser
 {

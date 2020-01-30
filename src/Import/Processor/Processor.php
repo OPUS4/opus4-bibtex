@@ -41,7 +41,6 @@ class Processor
         $bibtexBlock = array_change_key_case($bibtexBlock);
         foreach ($bibtexBlock as $field => $value) {
             foreach (glob(__DIR__ . '/Rule/*.php') as $file) {
-                require_once $file;
                 $class = "Opus\Bibtex\Import\Processor\Rule\\" . basename($file, '.php');
                 if (class_exists($class)) {
                     $rule = new $class;

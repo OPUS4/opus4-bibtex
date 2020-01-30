@@ -44,6 +44,7 @@ class Persons implements RuleInterface
                 $authors = explode('and', $val);
                 foreach ($authors as $author) {
                     $split = explode(',', $author);
+                    $split2 = str_split($split[0]);
                     $person = [
                         'LastName' => str_replace(' ', '', $split[0]),
                         'Role' => 'author'
