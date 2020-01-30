@@ -36,6 +36,12 @@ namespace OpusTest\Bibtex\Import;
 use Opus\Bibtex\Import\Parser;
 use Opus\Bibtex\Import\Processor\Rule\RawData;
 
+/**
+ * Class ParserTest
+ * @package OpusTest\Bibtex\Import
+ *
+ * TODO Tests sortieren - wo gehören sie wirklich hin?
+ */
 class ParserTest extends \PHPUnit_Framework_TestCase
 {
     public function testConvert()
@@ -175,15 +181,15 @@ class ParserTest extends \PHPUnit_Framework_TestCase
     public function testConvertSpecialChars()
     {
         $testfile = __DIR__ . '/resources/specialchars.bib';
+        $bibtex = file_get_contents($testfile);
 
         $parser = new Parser();
-        $parser->fileToArray($testfile);
+        $parser->stringToArray($bibtex);
         $parser->convert();
 
         $opus = $parser->getOpusFormat();
 
-        var_dump($opus[0]['Person']);
-
+        $this->assertEquals('Müller', $opus[0]['Person'][0]['LastName']);
     }
 
     public function testPersonsSpecialCharacters()
