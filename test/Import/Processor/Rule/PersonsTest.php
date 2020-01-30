@@ -90,6 +90,6 @@ class PersonsTest extends \PHPUnit_Framework_TestCase
 
         $result = $rule->process('Author', $bibtex['Author'], $bibtex);
 
-        var_dump($result);
+        $this->assertEquals('M{\"u}ller', $result[2][0]['LastName']);
     }
 }
