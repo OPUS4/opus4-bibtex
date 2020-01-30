@@ -46,161 +46,130 @@ class ParserTest extends \PHPUnit_Framework_TestCase
         $parser->fileToArray($testfile);
         $parser->convert();
 
-        // TODO read and split test file instead of duplicating content here
-        $bibtex1 = "@misc{Nobody06,\n       author = \"Nobody, Jr and M{\"u}ller, J.\",\n       title = \"My Article\",\n       year = \"2006\"}";
+        $entries = $this->splitBibtex(file_get_contents($testfile));
+
+        $bibtex1 = $entries[0];
         $bibtexHash1 = RawData::hash($bibtex1);
 
-        $bibtex2 = "@article{BigReference,\n\tArxiv = {http://papers.ssrn.com/sol3/papers.cfm?abstract_id=9999999},\n\tAuthor = {Disterer, S. and Nobody, C.},\n\tEditor = {Women, Cool and Men, Cool},\n\tDoi = {10.2222/j.jbankfin.2222.32.001},\n\tIssn = {1100-0011},\n\tJournal = {Journal of Cool Stuff},\n\tKeywords = {Cool, {Stuff}},\n\tPages = {1--12},\n\tPdfurl = {http://dx.doi.org/10.2222/j.jbankfin.2222.32.001},\n\tPtype = {journal},\n\tTitle = {{Cool Stuff: With Apples}},\n\tVolume = {32},\n\tYear = {2020},\n\tSlides = {https://app.box.com/s/1231451532132slide},\n\tNumber = {1},\n\tAnnote = {http://www.sciencedirect.com/science/article/pii/123456789\n\tdoi:10.1234/TIT.2020.1234567\n\tarXiv:1234.1233v4},\n\tSummary = {http://www.Forschung.com/blog/research/2020/01/04/Ein-abstract.html},\n\tCode = {https://colab.research.google.com/drive/123456a456},\n\tPoster = {https://app.box.com/s/1231451532132post},\n}";
+        $bibtex2 = $entries[1];
         $bibtexHash2 = md5($bibtex2);
 
-        $expectedOpusFormat = [
-            [
-                'BelongsToBibliography' => '0',
-                'PublishedYear' => '2006',
+        $expectedDoc1 = [
+            'BelongsToBibliography' => '0',
+            'PublishedYear' => '2006',
+            'Language' => 'eng',
+            'Type' => 'misc',
+            'TitleMain' => [[
                 'Language' => 'eng',
-                'Type' => 'misc',
-                'TitleMain' => [
-                    [
-                        'Language' => 'eng',
-                        'Value' => 'My Article',
-                        'Type' => 'main'
-                    ]
-                ],
-                'Person' => [
-                    [
-                        'FirstName' => 'Jr',
-                        'LastName' => 'Nobody',
-                        'Role' => 'author'
-                    ],
-                    [
-                        'FirstName' => 'J.',
-                        'LastName' => 'Müller',
-                        'Role' => 'author'
-                    ]
-                ],
-                'Enrichment' => [
-                    [
-                        'KeyName' => RawData::SOURCE_DATA_KEY,
-                        'Value' => $bibtex1
-                    ],
-                    [
-                        'KeyName' => RawData::SOURCE_DATA_HASH_KEY,
-                        'Value' => $bibtexHash1
-                    ]
-                ]
-            ],
-            [
-                'BelongsToBibliography' => '0',
-                'Language' => 'eng',
-                'TitleMain' => [
-                    [
-                        'Language' => 'eng',
-                        'Value' => 'Cool Stuff: With Apples',
-                        'Type' => 'main'
-                    ]
-                ],
-                'Type' => 'article',
-                'Enrichment' => [
-                    [
-                        'KeyName' => RawData::SOURCE_DATA_KEY,
-                        'Value' => $bibtex2
-                    ], [
-                        'KeyName' => RawData::SOURCE_DATA_HASH_KEY,
-                        'Value' => $bibtexHash2
-                    ]
-                ],
-                'Issue' => '1',
-                'PageFirst' => '1',
-                'PageLast' => '12',
-                'PageNumber' => '12',
-                'PublishedYear' => '2020',
-                'Volume' => '32',
-                'TitleParent' => [
-                    [
-                        'Language' => 'eng',
-                        'Value' => 'Journal of Cool Stuff',
-                        'Type' => 'parent'
-                    ]
-                ],
-                'Identifier' => [
-                    [
-                        'Value' => 'http://papers.ssrn.com/sol3/papers.cfm?abstract_id=9999999',
-                        'Type' => 'arxiv'
-                    ],
-                    [
-                        'Value' => '10.2222/j.jbankfin.2222.32.001',
-                        'Type' => 'doi'
-                    ],
-                    [
-                        'Value' => '1100-0011',
-                        'Type' => 'issn'
-                    ]
-                ],
-                'Note' => [
-                    [
-                        'Visibility' => 'public',
-                        'Message' => 'URL of the PDF: http://dx.doi.org/10.2222/j.jbankfin.2222.32.001'
-                    ],
-                    [
-                        'Visibility' => 'public',
-                        'Message' => 'URL of the Slides: https://app.box.com/s/1231451532132slide'
-                    ],
-                    [
-                        'Visibility' => 'public',
-                        'Message' => "Additional Note: http://www.sciencedirect.com/science/article/pii/123456789\n\tdoi:10.1234/TIT.2020.1234567\n\tarXiv:1234.1233v4"
-                    ],
-                    [
-                        'Visibility' => 'public',
-                        'Message' => 'URL of the Abstract: http://www.Forschung.com/blog/research/2020/01/04/Ein-abstract.html'
-                    ],
-                    [
-                        'Visibility' => 'public',
-                        'Message' => 'URL of the Code: https://colab.research.google.com/drive/123456a456'
-                    ],
-                    [
-                        'Visibility' => 'public',
-                        'Message' => 'URL of the Poster: https://app.box.com/s/1231451532132post'
-                    ]
-                ],
-                'Person' => [
-                    [
-                        'FirstName' => 'S.',
-                        'LastName' => 'Disterer',
-                        'Role' => 'author'
-                    ],
-                    [
-                        'FirstName' => 'C.',
-                        'LastName' => 'Nobody',
-                        'Role' => 'author'
-                    ],
-                    [
-                        'FirstName' => 'Cool',
-                        'LastName' => 'Women',
-                        'Role' => 'editor'
-                    ],
-                    [
-                        'FirstName' => 'Cool',
-                        'LastName' => 'Men',
-                        'Role' => 'editor'
-                    ]
-                ],
-                'Subject' => [
-                    [
-                        'Language' => 'eng',
-                        'Type' => 'uncontrolled',
-                        'Value' => 'Cool'
-                    ],
-                    [
-                        'Language' => 'eng',
-                        'Type' => 'uncontrolled',
-                        'Value' => 'Stuff'
-                    ]
-                ]
-            ]
+                'Value' => 'My Article',
+                'Type' => 'main'
+            ]],
+            'Person' => [[
+                'FirstName' => 'Jr',
+                'LastName' => 'Nobody',
+                'Role' => 'author'
+            ], [
+                'FirstName' => 'J.',
+                'LastName' => 'Müller',
+                'Role' => 'author'
+            ]],
+            'Enrichment' => [[
+                'KeyName' => RawData::SOURCE_DATA_KEY,
+                'Value' => $bibtex1
+            ], [
+                'KeyName' => RawData::SOURCE_DATA_HASH_KEY,
+                'Value' => $bibtexHash1
+            ]]
         ];
 
-        $this->assertEquals($expectedOpusFormat[0], $parser->getOpusFormat()[0]);
-        $this->assertEquals($expectedOpusFormat[1], $parser->getOpusFormat()[1]);
+        $expectedDoc2 = [
+            'BelongsToBibliography' => '0',
+            'Language' => 'eng',
+            'TitleMain' => [[
+                'Language' => 'eng',
+                'Value' => 'Cool Stuff: With Apples',
+                'Type' => 'main'
+            ]],
+            'Type' => 'article',
+            'Enrichment' => [[
+                'KeyName' => RawData::SOURCE_DATA_KEY,
+                'Value' => $bibtex2
+            ], [
+                'KeyName' => RawData::SOURCE_DATA_HASH_KEY,
+                'Value' => $bibtexHash2
+            ]],
+            'Issue' => '1',
+            'PageFirst' => '1',
+            'PageLast' => '12',
+            'PageNumber' => '12',
+            'PublishedYear' => '2020',
+            'Volume' => '32',
+            'TitleParent' => [[
+                'Language' => 'eng',
+                'Value' => 'Journal of Cool Stuff',
+                'Type' => 'parent'
+            ]],
+            'Identifier' => [[
+                'Value' => 'http://papers.ssrn.com/sol3/papers.cfm?abstract_id=9999999',
+                'Type' => 'arxiv'
+            ], [
+                'Value' => '10.2222/j.jbankfin.2222.32.001',
+                'Type' => 'doi'
+            ], [
+                'Value' => '1100-0011',
+                'Type' => 'issn'
+            ]],
+            'Note' => [[
+                'Visibility' => 'public',
+                'Message' => 'URL of the PDF: http://dx.doi.org/10.2222/j.jbankfin.2222.32.001'
+            ], [
+                'Visibility' => 'public',
+                'Message' => 'URL of the Slides: https://app.box.com/s/1231451532132slide'
+            ], [
+                'Visibility' => 'public',
+                'Message' => "Additional Note: http://www.sciencedirect.com/science/article/pii/123456789\n\tdoi:10.1234/TIT.2020.1234567\n\tarXiv:1234.1233v4"
+            ], [
+                'Visibility' => 'public',
+                'Message' => 'URL of the Abstract: http://www.Forschung.com/blog/research/2020/01/04/Ein-abstract.html'
+            ], [
+                'Visibility' => 'public',
+                'Message' => 'URL of the Code: https://colab.research.google.com/drive/123456a456'
+            ], [
+                'Visibility' => 'public',
+                'Message' => 'URL of the Poster: https://app.box.com/s/1231451532132post'
+            ]],
+            'Person' => [[
+                'FirstName' => 'S.',
+                'LastName' => 'Disterer',
+                'Role' => 'author'
+            ], [
+                'FirstName' => 'C.',
+                'LastName' => 'Nobody',
+                'Role' => 'author'
+            ], [
+                'FirstName' => 'Cool',
+                'LastName' => 'Women',
+                'Role' => 'editor'
+            ], [
+                'FirstName' => 'Cool',
+                'LastName' => 'Men',
+                'Role' => 'editor'
+            ]],
+            'Subject' => [[
+                'Language' => 'eng',
+                'Type' => 'uncontrolled',
+                'Value' => 'Cool'
+            ], [
+                'Language' => 'eng',
+                'Type' => 'uncontrolled',
+                'Value' => 'Stuff'
+            ]]
+        ];
+
+        $opusFormat = $parser->getOpusFormat();
+
+        $this->assertEquals($expectedDoc1, $opusFormat[0]);
+        $this->assertEquals($expectedDoc2, $opusFormat[1]);
     }
 
     public function testConvertSpecialChars()
@@ -225,21 +194,27 @@ class ParserTest extends \PHPUnit_Framework_TestCase
         $parser->fileToArray($testfile);
         $parser->convert();
 
-        $expectedOpusFormat = [
-            ['Person' => [
-                    [
-                        'FirstName' => 'Jr',
-                        'LastName' => 'Nobody',
-                        'Role' => 'author'
-                    ],
-                    [
-                        'FirstName' => 'J.',
-                        'LastName' => 'Müller',
-                        'Role' => 'author'
-                    ]
-                ]
-            ]
-        ];
-        $this->assertEquals($expectedOpusFormat[0]['Person'], $parser->getOpusFormat()[0]['Person']);
+        $this->assertEquals([[
+                'FirstName' => 'Jr',
+                'LastName' => 'Nobody',
+                'Role' => 'author'
+            ], [
+                'FirstName' => 'J.',
+                'LastName' => 'Müller',
+                'Role' => 'author'
+            ]],
+            $parser->getOpusFormat()[0]['Person']
+        );
+    }
+
+    public function splitBibtex($bibtex)
+    {
+        $entries = preg_split('/^@/m', $bibtex, null, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+
+        $entries = array_map(function($value) {
+            return '@' . trim($value);
+        }, $entries);
+
+        return $entries;
     }
 }
