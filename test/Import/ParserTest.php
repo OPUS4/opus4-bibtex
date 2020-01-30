@@ -73,7 +73,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
                         'Role' => 'author'
                     ],
                     [
-                        'FirstName' => 'J',
+                        'FirstName' => 'J.',
                         'LastName' => 'Müller',
                         'Role' => 'author'
                     ]
@@ -201,5 +201,31 @@ class ParserTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($expectedOpusFormat[0], $parser->getOpusFormat()[0]);
         $this->assertEquals($expectedOpusFormat[1], $parser->getOpusFormat()[1]);
+    }
+
+    public function testPersonsSpecialCharacters()
+    {
+        $testfile = __DIR__ . '/resources/testbib.bib';
+
+        $parser = new Parser();
+        $parser->fileToArray($testfile);
+        $parser->convert();
+
+        $expectedOpusFormat = [
+            ['Person' => [
+                    [
+                        'FirstName' => 'Jr',
+                        'LastName' => 'Nobody',
+                        'Role' => 'author'
+                    ],
+                    [
+                        'FirstName' => 'J.',
+                        'LastName' => 'M{/"u}ller',
+                        'Role' => 'author'
+                    ]
+                ]
+            ]
+        ];
+        $this->assertEquals($expectedOpusFormat[0]['Person'], $parser->getOpusFormat()[0]['Person']);
     }
 }
