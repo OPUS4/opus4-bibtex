@@ -33,14 +33,13 @@
 
 namespace Opus\Bibtex\Import\Processor\Rule;
 
-class FirstPage implements RuleInterface
+class FirstPage extends PageNumber
 {
     public function process($field, $value, $bibtexBlock)
     {
         $return = [false];
         if (preg_match('/Pages/i', $field)) {
-            $value = str_replace('–', '-', $value);
-            $pages = explode('-', $value);
+            $pages = $this->parseValue($value);
             $return = [
                 true,
                 'PageFirst',
