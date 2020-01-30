@@ -47,7 +47,7 @@ class PersonsTest extends \PHPUnit_Framework_TestCase
 
         $return = $rule->process(
             'Author',
-            'Wang, Y. and Xie, Y. and Steffen, S.',
+            $bibtexBlock['Author'],
             $bibtexBlock
         );
 
@@ -78,5 +78,18 @@ class PersonsTest extends \PHPUnit_Framework_TestCase
         ];
 
         $this->assertEquals($expected, $return);
+    }
+
+    public function testProcessSpecialCharacters()
+    {
+        $bibtex = [
+            'Author' => 'M{\"u}ller, Michael'
+        ];
+
+        $rule = new Persons();
+
+        $result = $rule->process('Author', $bibtex['Author'], $bibtex);
+
+        var_dump($result);
     }
 }
