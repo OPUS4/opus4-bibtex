@@ -34,6 +34,7 @@
 namespace OpusTest\Bibtex\Import\Processor;
 
 use Opus\Bibtex\Import\Processor\Processor;
+use Opus\Bibtex\Import\Processor\Rule\RawData;
 
 class ProcessorTest extends \PHPUnit_Framework_TestCase
 {
@@ -70,10 +71,10 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
             ]],
             'Enrichment' => [
                 [
-                    'KeyName' => 'opus.rawdata',
+                    'KeyName' => RawData::SOURCE_DATA_KEY,
                     'Value' => $bibtex
                 ], [
-                    'KeyName' => 'opus.rawdata.hash',
+                    'KeyName' => RawData::SOURCE_DATA_HASH_KEY,
                     'Value' => $bibtexHash
                 ]
             ]

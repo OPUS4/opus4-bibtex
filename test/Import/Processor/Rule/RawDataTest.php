@@ -49,8 +49,8 @@ class RawDataTest extends \PHPUnit_Framework_TestCase
             true,
             'Enrichment',
             [
-                ['KeyName' => 'opus.rawdata', 'Value' => '@article{...}'],
-                ['KeyName' => 'opus.rawdata.hash', 'Value' => RawData::hash('@article{...}')]
+                ['KeyName' => RawData::SOURCE_DATA_KEY, 'Value' => '@article{...}'],
+                ['KeyName' => RawData::SOURCE_DATA_HASH_KEY, 'Value' => RawData::hash('@article{...}')]
             ]
         ], $return);
     }

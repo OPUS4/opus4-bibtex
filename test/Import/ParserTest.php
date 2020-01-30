@@ -75,11 +75,11 @@ class ParserTest extends \PHPUnit_Framework_TestCase
                 ],
                 'Enrichment' => [
                     [
-                        'KeyName' => 'opus.rawdata',
+                        'KeyName' => RawData::SOURCE_DATA_KEY,
                         'Value' => $bibtex1
                     ],
                     [
-                        'KeyName' => 'opus.rawdata.hash',
+                        'KeyName' => RawData::SOURCE_DATA_HASH_KEY,
                         'Value' => $bibtexHash1
                     ]
                 ]
@@ -97,10 +97,10 @@ class ParserTest extends \PHPUnit_Framework_TestCase
                 'Type' => 'article',
                 'Enrichment' => [
                     [
-                        'KeyName' => 'opus.rawdata',
+                        'KeyName' => RawData::SOURCE_DATA_KEY,
                         'Value' => $bibtex2
                     ], [
-                        'KeyName' => 'opus.rawdata.hash',
+                        'KeyName' => RawData::SOURCE_DATA_HASH_KEY,
                         'Value' => $bibtexHash2
                     ]
                 ],
