@@ -52,13 +52,14 @@ class IdentifierTest extends \PHPUnit_Framework_TestCase
             $bibtexBlock
         );
 
+        // TODO kompaktere Schreibweise für bessere Lesbarkeit
         $expected = [
             true,
             'Identifier',
             [
                 [
                     'Value' => 'http://papers.ssrn.com/sol3/papers.cfm?abstract_id=9999999',
-                    'Type' => 'arxiv'
+                    'Type' => 'url'
                 ],
                 [
                     'Value' => '10.2222/j.jbankfin.2222.32.001',

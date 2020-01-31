@@ -117,7 +117,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
             ]],
             'Identifier' => [[
                 'Value' => 'http://papers.ssrn.com/sol3/papers.cfm?abstract_id=9999999',
-                'Type' => 'arxiv'
+                'Type' => 'url'
             ], [
                 'Value' => '10.2222/j.jbankfin.2222.32.001',
                 'Type' => 'doi'
