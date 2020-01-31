@@ -67,7 +67,7 @@ class Identifier implements RuleInterface
                 if (array_key_exists($key, $this->identifierMap)) {
                     $type = $this->identifierMap[$key];
 
-                    switch ($type) {
+                    switch (strtolower($type)) {
                         case 'arxiv':
                             $baseUrl1 = 'http://arxiv.org/abs/';
                             $baseUrl2 = 'https://arxiv.org/abs/';
