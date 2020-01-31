@@ -194,13 +194,16 @@ class ParserTest extends \PHPUnit_Framework_TestCase
 
     public function testPersonsSpecialCharacters()
     {
+        $this->markTestSkipped('OPUSVIER-4216');
+
         $testfile = __DIR__ . '/resources/testbib.bib';
 
         $parser = new Parser();
         $parser->fileToArray($testfile);
         $parser->convert();
 
-        $this->assertEquals([[
+        $this->assertEquals(
+            [[
                 'FirstName' => 'Jr',
                 'LastName' => 'Nobody',
                 'Role' => 'author'
@@ -217,7 +220,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
     {
         $entries = preg_split('/^@/m', $bibtex, null, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
 
-        $entries = array_map(function($value) {
+        $entries = array_map(function ($value) {
             return '@' . trim($value);
         }, $entries);
 

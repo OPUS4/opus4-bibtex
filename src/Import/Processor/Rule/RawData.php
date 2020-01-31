@@ -61,7 +61,8 @@ class RawData implements RuleInterface
         return $return;
     }
 
-    public static function hash($data) {
+    public static function hash($data)
+    {
         return md5($data);
     }
 }
