@@ -5,6 +5,10 @@ php:
 cache:
   directories:
     - $HOME/.composer/cache
+addons:
+  apt:
+    packages:
+      - pandoc
 before_script: composer install
 script:
   - composer check
