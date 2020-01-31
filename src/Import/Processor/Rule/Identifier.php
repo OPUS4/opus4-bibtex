@@ -33,6 +33,13 @@
 
 namespace Opus\Bibtex\Import\Processor\Rule;
 
+/**
+ * Class Identifier
+ * @package Opus\Bibtex\Import\Processor\Rule
+ *
+ * TODO wird momentan für jeden Artikel mehrfach ausgeführt
+ * TODO handle https://arxiv.org/abs/ and http://arxiv.org/abs/
+ */
 class Identifier implements RuleInterface
 {
     private $identifierMap = [
@@ -42,6 +49,15 @@ class Identifier implements RuleInterface
         'isbn' => 'isbn'
     ];
 
+    /**
+     * @param $field
+     * @param $value
+     * @param $bibtexBlock
+     * @return array
+     *
+     * TODO Mapping-Mechanismus aus dieser Funktion entfernen (kann nicht überschrieben werden)
+     * TODO Spezialbehandlung auslagern (kapseln)
+     */
     public function process($field, $value, $bibtexBlock)
     {
         $return = [false];
@@ -49,10 +65,26 @@ class Identifier implements RuleInterface
             $identifiers = [];
             foreach ($bibtexBlock as $key => $value) {
                 if (array_key_exists($key, $this->identifierMap)) {
+                    $type = $this->identifierMap[$key];
+
+                    switch ($type) {
+                        case 'arxiv':
+                            $baseUrl1 = 'http://arxiv.org/abs/';
+                            $baseUrl2 = 'https://arxiv.org/abs/';
+                            if (substr($value, 0, strlen($baseUrl1)) !== $baseUrl1 &&
+                                substr($value, 0, strlen($baseUrl2)) !== $baseUrl2) {
+                                $type = 'url';
+                            } else {
+                                $value = preg_replace('#http.://arxiv.org/abs/#i', '', $value);
+                            }
+                            break;
+                    }
+
                     $identifier = [
                         'Value' => $value,
-                        'Type' => $this->identifierMap[$key]
+                        'Type' => $type
                     ];
+
                     array_push($identifiers, $identifier);
                 }
             }

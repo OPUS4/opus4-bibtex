@@ -33,6 +33,12 @@
 
 namespace Opus\Bibtex\Import\Processor\Rule;
 
+/**
+ * Class FirstPage
+ * @package Opus\Bibtex\Import\Processor\Rule
+ *
+ * TODO mit LastPage und PageNumber zusammenführen
+ */
 class FirstPage extends PageNumber
 {
     public function process($field, $value, $bibtexBlock)

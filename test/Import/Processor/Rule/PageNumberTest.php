@@ -35,6 +35,9 @@ namespace OpusTest\Bibtex\Import\Processor\Rule;
 
 use Opus\Bibtex\Import\Processor\Rule\PageNumber;
 
+/**
+ * TODO Tests für andere Bindestrich-Varianten
+ */
 class PageNumberTest extends \PHPUnit_Framework_TestCase
 {
     public function testProcess()

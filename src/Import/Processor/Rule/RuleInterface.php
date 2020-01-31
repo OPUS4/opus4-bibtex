@@ -33,6 +33,14 @@
 
 namespace Opus\Bibtex\Import\Processor\Rule;
 
+/**
+ * Interface RuleInterface
+ * @package Opus\Bibtex\Import\Processor\Rule
+ *
+ * TODO komplexer Rückgabewert (array) ist ungünstig und muss mindestens dokumentiert werden
+ * TODO Dokumentation von Interface ist besonders wichtig
+ * TODO wenn sich ein komplexer Rückgabewert nicht vermeiden lässt (selten) dann Objekt verwenden
+ */
 interface RuleInterface
 {
     public function process($field, $value, $bibtexBlock);
