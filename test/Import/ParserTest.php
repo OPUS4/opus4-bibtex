@@ -180,6 +180,8 @@ class ParserTest extends \PHPUnit_Framework_TestCase
 
     public function testConvertSpecialChars()
     {
+        $this->markTestSkipped('OPUSVIER-4216');
+
         $testfile = __DIR__ . '/resources/specialchars.bib';
         $bibtex = file_get_contents($testfile);
 
@@ -194,8 +196,6 @@ class ParserTest extends \PHPUnit_Framework_TestCase
 
     public function testPersonsSpecialCharacters()
     {
-        $this->markTestSkipped('OPUSVIER-4216');
-
         $testfile = __DIR__ . '/resources/testbib.bib';
 
         $parser = new Parser();
