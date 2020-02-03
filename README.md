@@ -11,3 +11,12 @@ with custom fields that are not part of any standard. Therefore it is necessary 
 custom mappings and interpretations of the fields in the specific file. We are currently things about ways to 
 provide this functionality.
 
+## Requirements
+
+For processing of special characters the *pandoc* tool is needed by the BibTeX parser. In Ubuntu it can be installed 
+using ´apt-get´.
+
+´´´
+$ sudo apt-get install pandoc
+´´´
+
