@@ -14,9 +14,9 @@ provide this functionality.
 ## Requirements
 
 For processing of special characters the *pandoc* tool is needed by the BibTeX parser. In Ubuntu it can be installed 
-using ´apt-get´.
+using `apt-get`.
 
-´´´
+```
 $ sudo apt-get install pandoc
-´´´
+```
 
