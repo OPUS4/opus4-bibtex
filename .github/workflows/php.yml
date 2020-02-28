@@ -12,6 +12,9 @@ jobs:
 
       - name: Change to PHP7.0
         run: sudo update-alternatives --set php /usr/bin/php7.0
+      
+      - name: Install Pandoc
+        run: sudo apt-get install pandoc
 
       - name: Install Composer and Dependencies
         run: curl -s http://getcomposer.org/installer | php && php composer.phar self-update && php composer.phar install
