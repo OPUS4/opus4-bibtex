@@ -59,9 +59,7 @@ class Parser
         $parser = new \RenanBr\BibTexParser\Parser();
 
         $listener = new Listener();
-        $latexToUnicodeProcessor = new LatexToUnicodeProcessor();
-        //$latexToUnicodeProcessor->setTagCoverage(['Arxiv', '_original'], 'blacklist');
-        $listener->addProcessor($latexToUnicodeProcessor); // behandelt alle Felder (weil leere Blacklist)
+        $listener->addProcessor(new LatexToUnicodeProcessor()); // behandelt alle Felder (weil leere Blacklist)
         // LTUProcessor schneidet führende und abschließende Leerzeichen in den Feldinhalten ab
         $parser->addListener($listener);
 
