@@ -39,6 +39,8 @@ abstract class AbstractMappingConfiguration
     const SOURCE_DATA_HASH_KEY = 'opus.import.dataHash';
     const HASH_FUNCTION = 'md5';
 
+    protected $ruleList = [];
+
     // wird z.B. für Auswahl der Mapping-Konfiguration in Administration benötigt
     abstract public function getName();
 
@@ -46,9 +48,15 @@ abstract class AbstractMappingConfiguration
 
     abstract public function getRuleList();
 
-    abstract public function prependRule($rule);
+    public function prependRule($rule)
+    {
+        array_unshift($this->ruleList, $rule);
+    }
 
-    abstract public function appendRule($rule);
+    public function appendRule($rule)
+    {
+        $this->ruleList[] = $rule;
+    }
 
     protected function deleteBrace($value)
     {

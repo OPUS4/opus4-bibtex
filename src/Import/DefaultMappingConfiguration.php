@@ -40,8 +40,6 @@ use Opus\Bibtex\Import\Rules\SimpleRule;
 
 class DefaultMappingConfiguration extends AbstractMappingConfiguration
 {
-    private $ruleList;
-
     public function __construct()
     {
         $this->ruleList = [
@@ -362,15 +360,5 @@ class DefaultMappingConfiguration extends AbstractMappingConfiguration
     public function getRuleList()
     {
         return $this->ruleList;
-    }
-
-    public function prependRule($rule)
-    {
-        array_unshift($this->ruleList, $rule);
-    }
-
-    public function appendRule($rule)
-    {
-        $this->ruleList[] = $rule;
     }
 }
