@@ -24,47 +24,55 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * @category    Processor
- * @package     Opus\Processor\Rule
- * @author      Maximilian Salomon <salomon@zib.de>
- * @copyright   Copyright (c) 2020, OPUS 4 development team
+ * @category    BibTeX
+ * @package     Opus\Bibtex\Import\Rules
+ * @author      Sascha Szott <opus-repository@saschaszott.de>
+ * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace Opus\Bibtex\Import\Processor\Rule;
+namespace Opus\Bibtex\Import\Rules;
 
-class Note implements RuleInterface
+/**
+ * Eine Regel, um ein Metadatenfeld mit einer Konstante zu befüllen. Hierbei wird der BibTeX-Record nicht ausgewertet.
+ */
+class ConstantValueRule implements IRule
 {
-    // TODO: Das sollte konfigurierbar und übersetzbar sein.
-    private $noteMap = [
-        'pdfurl' => 'URL of the PDF: ',
-        'slides' => 'URL of the Slides: ',
-        'annote' => 'Additional Note: ',
-        'summary' => 'URL of the Abstract: ',
-        'code' => 'URL of the Code: ',
-        'poster' => 'URL of the Poster: '
-    ];
+    protected $opusFieldName;
 
-    public function process($field, $value, $bibtexBlock)
+    protected $fn;
+
+    /**
+     * @param $opusFieldName Name des zu befüllenden OPUS4-Metadatenfelds
+     * @param null $fn optionale Funktion, die verwendet wird, um den Feldwert für das OPUS4-Metadatenfelds zu bestimmen
+     */
+    public function __construct($opusFieldName, $fn = null)
     {
-        $return = [false];
-        if (array_key_exists($field, $this->noteMap)) {
-            $notes = [];
-            foreach ($bibtexBlock as $key => $value) {
-                if (array_key_exists($key, $this->noteMap)) {
-                    $note = [
-                        'Visibility' => 'public',
-                        'Message' => $this->noteMap[$key].$value
-                    ];
-                    array_push($notes, $note);
+        $this->opusFieldName = ucfirst($opusFieldName);
+        $this->fn = $fn;
+    }
+
+    public function apply($bibtexRecord, &$documentMetadata)
+    {
+        $result = false;
+        // Mehrfachausführung der Regel auf einem OPUS-Metadatenfeld soll vermieden werden
+        if (! array_key_exists($this->opusFieldName, $documentMetadata)) {
+            // der BibTeX-Record wird zur Bestimmung des Metadatenfelds nicht verwendet
+            // d.h. Metadatenfeldwert wird hier auf eine Konstante gesetzt oder Bestimmung des Feldinhalts auf Basis
+            // von anderen Metadatenfeldern
+            if (! is_null($this->fn)) {
+                $value = ($this->fn)($documentMetadata);
+                if (! is_null($value)) {
+                    $documentMetadata[$this->opusFieldName] = $value;
+                    $result = true;
                 }
             }
-            $return = [
-                true,
-                'Note',
-                $notes
-            ];
         }
-        return $return;
+        return $result;
+    }
+
+    public function getEvaluatedBibTexField()
+    {
+        return [];
     }
 }

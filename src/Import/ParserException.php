@@ -24,27 +24,16 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * @category    Processor
- * @package     Opus\Processor\Rule
- * @author      Maximilian Salomon <salomon@zib.de>
- * @copyright   Copyright (c) 2020, OPUS 4 development team
+ * @category    BibTeX
+ * @package     Opus\Bibtex\Import
+ * @author      Sascha Szott <opus-repository@saschaszott.de>
+ * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace Opus\Bibtex\Import\Processor\Rule;
+namespace Opus\Bibtex\Import;
 
-class Issue implements RuleInterface
+class ParserException extends \Exception
 {
-    public function process($field, $value, $bibtexBlock)
-    {
-        $return = [false];
-        if (preg_match('/number/i', $field)) {
-            $return = [
-                true,
-                'Issue',
-                $value
-            ];
-        }
-        return $return;
-    }
+
 }

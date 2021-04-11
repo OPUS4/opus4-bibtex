@@ -24,46 +24,40 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * @category    Processor
- * @package     Opus\Processor\Rule
- * @author      Maximilian Salomon <salomon@zib.de>
- * @copyright   Copyright (c) 2020, OPUS 4 development team
+ * @category    BibTeX
+ * @package     Opus\Bibtex\Import\Rules
+ * @author      Sascha Szott <opus-repository@saschaszott.de>
+ * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace Opus\Bibtex\Import\Processor\Rule;
+namespace Opus\Bibtex\Import\Rules;
 
-class Keywords implements RuleInterface
+class DocumentTypeMapping
 {
-    public function process($field, $value, $bibtexBlock)
-    {
-        $return = [false];
-        if (preg_match('/keywords/i', $field)) {
-            $split = explode(', ', $value);
-            $return = [
-                true,
-                'Subject',
-                []
-                ];
-            foreach ($split as $value) {
-                // TODO: Konfigurierbarkeit
-                $person = [
-                    'Language' => 'eng',
-                    'Type' => 'uncontrolled',
-                    'Value' => $this->deleteBrace($value)
-                ];
-                array_push($return[2], $person);
-            }
-        }
-        return $return;
-    }
+    public static $MAPPING = [
+        'article' => 'article',
+        'book' => 'book',
+        'booklet' => 'bookpart',
+        'conference' => 'conferenceobject',
+        'inbook' => 'bookpart',
+        'incollection' => 'bookpart',
+        'inproceedings' => 'article',
+        'manual' => 'article',
+        'mastersthesis' => 'masterthesis',
+        'misc' => 'misc',
+        'phdthesis' => 'doctoralthesis',
+        'proceedings' => 'conferenceobject',
+        'techreport' => 'report',
+        'unpublished' => 'workingpaper',
 
-    public function deleteBrace($string)
-    {
-        if (substr($string, -1, 1) == '}' and substr($string, 0, 1) == '{') {
-            $string = substr_replace($string, "", -1, 1);
-            $string = substr_replace($string, "", 0, 1);
-        }
-        return $string;
-    }
+        // Mapping von nicht Standard BibTeX-Typen
+        'journal' => 'article'
+    ];
+
+    /**
+     * Dieser Typ wird immer dann verwendet, wenn in $MAPPING kein Mapping für den
+     * aus dem BibTeX-Record abgeleiteten Record-Typ vorliegt.
+     */
+    public static $DEFAULT_OPUS_TYPE = 'misc';
 }

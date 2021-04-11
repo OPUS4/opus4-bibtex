@@ -24,34 +24,49 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * @category    Processor
- * @package     Opus\Processor\Rule
- * @author      Maximilian Salomon <salomon@zib.de>
- * @copyright   Copyright (c) 2020, OPUS 4 development team
+ * @category    BibTeX
+ * @package     Opus\Bibtex\Import\Rules
+ * @author      Sascha Szott <opus-repository@saschaszott.de>
+ * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace Opus\Bibtex\Import\Processor\Rule;
+namespace Opus\Bibtex\Import\Rules;
 
-class PageNumber implements RuleInterface
+/**
+ * Eine Regel, die gleichzeitig auf mehrere BibTeX-Felder zugreift.
+ */
+class ComplexRule implements IRule
 {
-    public function process($field, $value, $bibtexBlock)
+    protected $fn;
+
+    protected $fieldsEvaluated;
+
+    public function __construct($fieldsEvaluated, $fn)
     {
-        $return = [false];
-        if (preg_match('/Pages/i', $field)) {
-            $pages = $this->parseValue($value);
-            $return = [
-                true,
-                'PageNumber',
-                strval($pages[1] - $pages[0] + 1)
-            ];
-        }
-        return $return;
+        $this->fieldsEvaluated = $fieldsEvaluated;
+        $this->fn = $fn;
     }
 
-    public function parseValue($value)
+    public function apply($bibtexRecord, &$documentMetadata)
     {
-        $value = str_replace('–', '--', $value);
-        return explode('--', $value);
+        $fieldValues = [];
+        foreach ($this->fieldsEvaluated as $fieldName) {
+            if (array_key_exists($fieldName, $bibtexRecord)) {
+                $fieldValues[$fieldName] = $bibtexRecord[$fieldName];
+            } else {
+                // Feld existiert nicht im BibTeX-Record und kann daher nicht ausgewertet werden
+                unset($this->fieldsEvaluated[$fieldName]);
+            }
+        }
+        // FIXME wir können nicht wirklich sicherstellen, dass beim Aufruf von $this->fn tatsächlich auf die in
+        //       $this->fieldValues angegebenen Werte des BibTeX-Records zugegriffen wird
+        ($this->fn)($fieldValues, $documentMetadata);
+        return true;
+    }
+
+    public function getEvaluatedBibTexField()
+    {
+        return $this->fieldsEvaluated;
     }
 }

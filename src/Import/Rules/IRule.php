@@ -24,56 +24,26 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * @category    Tests
- * @package     OpusTest\Processor\Rule
- * @author      Maximilian Salomon <salomon@zib.de>
- * @copyright   Copyright (c) 2020, OPUS 4 development team
+ * @category    BibTeX
+ * @package     Opus\Bibtex\Import\Rules
+ * @author      Sascha Szott <opus-repository@saschaszott.de>
+ * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace OpusTest\Bibtex\Import\Processor\Rule;
+namespace Opus\Bibtex\Import\Rules;
 
-use Opus\Bibtex\Import\Processor\Rule\DocumentType;
-
-class DocumentTypeTest extends \PHPUnit_Framework_TestCase
+interface IRule
 {
-
-    public function dataProvider()
-    {
-        return [
-            [['ptype' => 'conference'], 'conferenceobject'],
-            [['ptype' => 'journal'], 'article'],
-            [['type' => 'article'], 'article']
-        ];
-    }
+    /**
+     * @param $bibtexRecord BibTeX-Record, der importiert werden soll
+     * @param $documentMetadata Array von Metadatenfeldern, das schließlich in ein OPUS4-Dokument umgewandelt werden soll
+     * @return boolean Aussage über den Erfolg der Anwendung der Regel (true gdw. erfolgreiche Anwendung)
+     */
+    public function apply($bibtexRecord, &$documentMetadata);
 
     /**
-     * Test Mapping of document-types.
-     *
-     * @param mixed $arg Value to check given by the data provider and $res as expected mapping-result.
-     * @return void
-     *
-     * @dataProvider dataProvider
+     * @return gibt ein Array mit den Namen des BibTeX-Felder zurück, di bei der Regelanwendung auswertet wurden
      */
-    public function testProcessMapping($arg, $res)
-    {
-        $rule = new DocumentType();
-        foreach ($arg as $key => $value) {
-            $return = $rule->process($key, $value, $arg);
-            $this->assertEquals([true, 'Type', $res], $return);
-        }
-    }
-
-    public function testProcessTwoInfos()
-    {
-        $rule = new DocumentType();
-        $bibtexBlock = [
-            'ptype' => 'conference',
-            'type' => 'article'
-        ];
-
-        $return = $rule->process('type', 'article', $bibtexBlock);
-
-        $this->assertEquals([true, 'Type', 'conferenceobject'], $return);
-    }
+    public function getEvaluatedBibTexField();
 }

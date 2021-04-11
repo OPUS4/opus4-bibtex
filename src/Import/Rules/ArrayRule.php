@@ -24,26 +24,38 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * @category    Tests
- * @package     OpusTest\Processor\Rule
- * @author      Maximilian Salomon <salomon@zib.de>
- * @copyright   Copyright (c) 2020, OPUS 4 development team
+ * @category    BibTeX
+ * @package     Opus\Bibtex\Import\Rules
+ * @author      Sascha Szott <opus-repository@saschaszott.de>
+ * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace OpusTest\Bibtex\Import\Processor\Rule;
+namespace Opus\Bibtex\Import\Rules;
 
-use Opus\Bibtex\Import\Processor\Rule\FirstPage;
-
-class FirstPageTest extends \PHPUnit_Framework_TestCase
+/**
+ * Eine Regel, die verwendet werden kann, um ein mehrwertiges Metadatenfeld (Feldwert ist hierbei ein Array) zu füllen.
+ */
+class ArrayRule extends SimpleRule
 {
-    public function testProcess()
+    public function apply($bibtexRecord, &$documentMetadata)
     {
-        $rule = new FirstPage();
-        $bibtexBlock = ['Pages' => '1--10'];
-
-        $return = $rule->process('Pages', '1--10', $bibtexBlock);
-
-        $this->assertEquals([true, 'PageFirst', '1'], $return);
+        $result = false;
+        if (array_key_exists($this->bibtexFieldName, $bibtexRecord)) {
+            $fieldValue = ($this->fn)($bibtexRecord[$this->bibtexFieldName]);
+            if (count($fieldValue) > 0) {
+                $result = true;
+                if (array_key_exists(0, $fieldValue) && is_array($fieldValue[0])) {
+                    // $fieldValue ist ein mehrdimensionales Array
+                    if (! array_key_exists($this->opusFieldName, $documentMetadata)) {
+                        $documentMetadata[$this->opusFieldName] = [];
+                    }
+                    array_push($documentMetadata[$this->opusFieldName], ...$fieldValue);
+                } else {
+                    $documentMetadata[$this->opusFieldName][] = $fieldValue;
+                }
+            }
+        }
+        return $result;
     }
 }
