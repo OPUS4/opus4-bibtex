@@ -72,6 +72,15 @@ class ImprovedParserTest extends \PHPUnit_Framework_TestCase
         $parser->parse();
     }
 
+    public function testProcesInvalidUrlFile()
+    {
+        $testfile = __DIR__ . '/resources/invalid-url.bib';
+
+        $parser = new Parser($testfile);
+        $this->setExpectedException(ParserException::class);
+        $parser->parse();
+    }
+
     public function testProcesUnknownFile()
     {
         $testfile = __DIR__ . '/resources/missing.bib';

@@ -34,6 +34,7 @@
 namespace Opus\Bibtex\Import;
 
 use RenanBr\BibTexParser\Exception\ParserException;
+use RenanBr\BibTexParser\Exception\ProcessorException;
 use RenanBr\BibTexParser\Listener;
 use RenanBr\BibTexParser\Processor\LatexToUnicodeProcessor;
 
@@ -77,7 +78,13 @@ class Parser
             throw new \Opus\Bibtex\Import\ParserException();
         }
 
-        return $listener->export();
+        try {
+            $result = $listener->export();
+        } catch (ProcessorException $e) {
+            // im Feldinhalt eines Felds befindet sich ein unerwartetes Zeichen
+            throw new \Opus\Bibtex\Import\ParserException();
+        }
+        return $result;
     }
 
     /**
