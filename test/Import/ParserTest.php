@@ -708,22 +708,30 @@ class ImprovedParserTest extends \PHPUnit_Framework_TestCase
             function ($fieldValues, &$documentMetadata) {
                 $documentMetadata['PageFirst'] = $fieldValues['firstpage'];
                 $documentMetadata['PageLast'] = $fieldValues['lastpage'];
+                $documentMetadata['PageNumber'] = intval($documentMetadata['PageLast']) - intval($documentMetadata['PageFirst']);
             }
         );
         $mappingConfiguration = new DefaultMappingConfiguration();
+        $mappingConfiguration->resetRules();
         $mappingConfiguration->appendRule($complexRule);
         $proc = new Processor($mappingConfiguration);
         $metadata = [];
         $fieldsEvaluated = $proc->handleRecord($bibTexRecords[0], $metadata);
-        $this->assertCount(4, $fieldsEvaluated);
-        $this->assertContains('type', $fieldsEvaluated);
+
+        $this->assertCount(2, $fieldsEvaluated);
         $this->assertContains('firstpage', $fieldsEvaluated);
         $this->assertContains('lastpage', $fieldsEvaluated);
-        $this->assertContains('author', $fieldsEvaluated);
 
         $bibTexFields = $parser->getBibTexFieldNames($bibTexRecords[0]);
         $unusedFields = array_diff($bibTexFields, $fieldsEvaluated);
-        $this->assertCount(1, $unusedFields);
+        $this->assertCount(3, $unusedFields); // 3 Felder des BibTex-Records werden nicht ausgewertet
+        $this->assertContains('type', $unusedFields);
+        $this->assertContains('author', $unusedFields);
         $this->assertContains('citation-key', $unusedFields);
+
+        $this->assertCount(3, $metadata);
+        $this->assertArrayHasKey('PageFirst', $metadata);
+        $this->assertArrayHasKey('PageLast', $metadata);
+        $this->assertArrayHasKey('PageNumber', $metadata);
     }
 }

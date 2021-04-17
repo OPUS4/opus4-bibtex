@@ -100,6 +100,14 @@ abstract class AbstractMappingConfiguration
         return $this;
     }
 
+    /**
+     * Setzt die Liste der Regeln zurück, so dass die Anwendung der Mapping-Konfiguration einer No-Op entspricht.
+     */
+    public function resetRules()
+    {
+        $this->ruleList = [];
+    }
+
     protected function deleteBrace($value)
     {
         if (strlen($value) >= 2 && substr($value, 0, 1) == '{' && substr($value, -1, 1) == '}') {
