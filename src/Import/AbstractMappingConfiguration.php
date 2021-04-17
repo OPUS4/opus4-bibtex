@@ -39,23 +39,65 @@ abstract class AbstractMappingConfiguration
     const SOURCE_DATA_HASH_KEY = 'opus.import.dataHash';
     const HASH_FUNCTION = 'md5';
 
-    protected $ruleList = [];
+    protected $name;
+    protected $description;
+    private $ruleList = [];
 
-    // wird z.B. für Auswahl der Mapping-Konfiguration in Administration benötigt
-    abstract public function getName();
+    /**
+     * Liefert den Namen der Mapping-Konfiguration. Diese wird z.B. für die Auswahl der
+     * Mapping-Konfiguration in der Administration benötigt.
+     *
+     * @return mixed
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
 
-    abstract public function getDescription();
+    /**
+     * Liefert eine Beschreibung der Mapping-Konfiguration zurück. In dieser können
+     * Hinweise oder Bemerkung zum vorliegenden Mapping hinterlegt werden, so dass
+     * die spätere Auswahl der Mapping-Konfiguration erleichtert wird.
+     *
+     * @return mixed
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
 
-    abstract public function getRuleList();
+    /**
+     * Gibt die momentan konfigurierte Liste der Regeln zurück.
+     *
+     * @return array
+     */
+    public function getRuleList()
+    {
+        return $this->ruleList;
+    }
 
+    /**
+     * Fügt die übergebene Regel am Ende der Regelliste hinzu, d.h. die übergebene Regel
+     * wird erst nach der Ausführung aller anderen Regeln ausgeführt.
+     *
+     * @param $rule die hinzuzufügende Regel
+     */
     public function prependRule($rule)
     {
         array_unshift($this->ruleList, $rule);
+        return $this;
     }
 
+    /**
+     * Fügt die übergebene Regel am Anfang der Regelliste hinzu, d.h. die übergebene Regel
+     * wird vor der Ausführung aller anderen Regeln ausgeführt.
+     *
+     * @param $rule die hinzuzufügende Regel
+     */
     public function appendRule($rule)
     {
         $this->ruleList[] = $rule;
+        return $this;
     }
 
     protected function deleteBrace($value)

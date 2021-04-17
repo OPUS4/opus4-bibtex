@@ -42,20 +42,21 @@ class DefaultMappingConfiguration extends AbstractMappingConfiguration
 {
     public function __construct()
     {
-        $this->ruleList = [
+        $this->name = 'default';
+        $this->description = 'Default BibTeX Mapping Configuration';
+        $this
             // ptype ist kein Standard-BibTeX-Feld: das Feld ptype kann genutzt werden, um das Typ-Mapping
             // auf Basis des BibTeX-Types (die Zeichenkette nach @) zu umgehen
             // ist im BibTeX-Record kein Feld ptype vorhanden, so wird der Typ aus der Zeichenkette nach @ abgeleitet
-            new SimpleRule(
-                'ptype',
-                'Type',
-                function ($value) {
-                    if (array_key_exists($value, DocumentTypeMapping::$MAPPING)) {
-                        return DocumentTypeMapping::$MAPPING[$value];
-                    }
+            ->appendRule(new SimpleRule(
+            'ptype',
+            'Type',
+            function ($value) {
+                if (array_key_exists($value, DocumentTypeMapping::$MAPPING)) {
+                    return DocumentTypeMapping::$MAPPING[$value];
                 }
-            ),
-            new SimpleRule(
+            }))
+            ->appendRule(new SimpleRule(
                 'type',
                 'Type',
                 function ($value) {
@@ -65,11 +66,10 @@ class DefaultMappingConfiguration extends AbstractMappingConfiguration
                         return DocumentTypeMapping::$DEFAULT_OPUS_TYPE;
                     }
                 }
-            ),
-            new SimpleRule('number', 'Issue'),
-            new SimpleRule('volume', 'Volume'),
-
-            new SimpleRule(
+            ))
+            ->appendRule(new SimpleRule('number', 'Issue'))
+            ->appendRule(new SimpleRule('volume', 'Volume'))
+            ->appendRule(new SimpleRule(
                 'pages',
                 'PageFirst',
                 function ($value) {
@@ -77,8 +77,8 @@ class DefaultMappingConfiguration extends AbstractMappingConfiguration
                     $parts = explode('-', $value, 2);
                     return trim($parts[0]);
                 }
-            ),
-            new SimpleRule(
+            ))
+            ->appendRule(new SimpleRule(
                 'pages',
                 'PageLast',
                 function ($value) {
@@ -89,8 +89,8 @@ class DefaultMappingConfiguration extends AbstractMappingConfiguration
                     }
                     return trim($parts[0]);
                 }
-            ),
-            new ConstantValueRule(
+            ))
+            ->appendRule(new ConstantValueRule(
                 'PageNumber',
                 function ($documentMetadata) {
                     $pageFirst =
@@ -101,9 +101,8 @@ class DefaultMappingConfiguration extends AbstractMappingConfiguration
                         return 1 + $pageLast - $pageFirst;
                     }
                 }
-            ),
-
-            new SimpleRule(
+            ))
+            ->appendRule(new SimpleRule(
                 'year',
                 'PublishedYear',
                 function ($value) {
@@ -112,9 +111,8 @@ class DefaultMappingConfiguration extends AbstractMappingConfiguration
                         return $value;
                     }
                 }
-            ),
-
-            new ArrayRule(
+            ))
+            ->appendRule(new ArrayRule(
                 'issn',
                 'Identifier',
                 function ($value) {
@@ -123,8 +121,8 @@ class DefaultMappingConfiguration extends AbstractMappingConfiguration
                         'Type' => 'issn'
                     ];
                 }
-            ),
-            new ArrayRule(
+            ))
+            ->appendRule(new ArrayRule(
                 'isbn',
                 'Identifier',
                 function ($value) {
@@ -133,8 +131,8 @@ class DefaultMappingConfiguration extends AbstractMappingConfiguration
                         'Type' => 'isbn'
                     ];
                 }
-            ),
-            new ArrayRule(
+            ))
+            ->appendRule(new ArrayRule(
                 'doi',
                 'Identifier',
                 function ($value) {
@@ -146,8 +144,8 @@ class DefaultMappingConfiguration extends AbstractMappingConfiguration
                         'Type' => 'doi'
                     ];
                 }
-            ),
-            new ArrayRule(
+            ))
+            ->appendRule(new ArrayRule(
                 'arxiv',
                 'Identifier',
                 function ($value) {
@@ -170,9 +168,8 @@ class DefaultMappingConfiguration extends AbstractMappingConfiguration
                         'Type' => $type
                     ];
                 }
-            ),
-
-            new ArrayRule(
+            ))
+            ->appendRule(new ArrayRule(
                 'title',
                 'TitleMain',
                 function ($value) {
@@ -182,8 +179,8 @@ class DefaultMappingConfiguration extends AbstractMappingConfiguration
                         'Type' => 'main'
                     ];
                 }
-            ),
-            new ArrayRule(
+            ))
+            ->appendRule(new ArrayRule(
                 'journal',
                 'TitleParent',
                 function ($value) {
@@ -193,8 +190,8 @@ class DefaultMappingConfiguration extends AbstractMappingConfiguration
                         'Type' => 'parent'
                     ];
                 }
-            ),
-            new ArrayRule(
+            ))
+            ->appendRule(new ArrayRule(
                 'booktitle',
                 'TitleParent',
                 function ($value) {
@@ -204,9 +201,8 @@ class DefaultMappingConfiguration extends AbstractMappingConfiguration
                         'Type' => 'parent'
                     ];
                 }
-            ),
-
-            new ArrayRule(
+            ))
+            ->appendRule(new ArrayRule(
                 'keywords',
                 'Subject',
                 function ($value) {
@@ -221,9 +217,8 @@ class DefaultMappingConfiguration extends AbstractMappingConfiguration
                     }
                     return $result;
                 }
-            ),
-
-            new ArrayRule(
+            ))
+            ->appendRule(new ArrayRule(
                 'pdfurl',
                 'Note',
                 function ($value) {
@@ -232,8 +227,8 @@ class DefaultMappingConfiguration extends AbstractMappingConfiguration
                         'Message' => 'URL of the PDF: ' . $value
                     ];
                 }
-            ),
-            new ArrayRule(
+            ))
+            ->appendRule(new ArrayRule(
                 'slides',
                 'Note',
                 function ($value) {
@@ -242,8 +237,8 @@ class DefaultMappingConfiguration extends AbstractMappingConfiguration
                         'Message' => 'URL of the Slides: ' . $value
                     ];
                 }
-            ),
-            new ArrayRule(
+            ))
+            ->appendRule(new ArrayRule(
                 'annote',
                 'Note',
                 function ($value) {
@@ -252,8 +247,8 @@ class DefaultMappingConfiguration extends AbstractMappingConfiguration
                         'Message' => 'Additional Note: ' . $value
                     ];
                 }
-            ),
-            new ArrayRule(
+            ))
+            ->appendRule(new ArrayRule(
                 'summary',
                 'Note',
                 function ($value) {
@@ -262,8 +257,8 @@ class DefaultMappingConfiguration extends AbstractMappingConfiguration
                         'Message' => 'URL of the Abstract: ' . $value
                     ];
                 }
-            ),
-            new ArrayRule(
+            ))
+            ->appendRule(new ArrayRule(
                 'code',
                 'Note',
                 function ($value) {
@@ -272,8 +267,8 @@ class DefaultMappingConfiguration extends AbstractMappingConfiguration
                         'Message' => 'URL of the Code: ' . $value
                     ];
                 }
-            ),
-            new ArrayRule(
+            ))
+            ->appendRule(new ArrayRule(
                 'poster',
                 'Note',
                 function ($value) {
@@ -282,9 +277,8 @@ class DefaultMappingConfiguration extends AbstractMappingConfiguration
                         'Message' => 'URL of the Poster: ' . $value
                     ];
                 }
-            ),
-
-            new ArrayRule(
+            ))
+            ->appendRule(new ArrayRule(
                 'author',
                 'Person',
                 function ($value) {
@@ -295,9 +289,8 @@ class DefaultMappingConfiguration extends AbstractMappingConfiguration
                     }
                     return $result;
                 }
-            ),
-
-            new ArrayRule(
+            ))
+            ->appendRule(new ArrayRule(
                 'editor',
                 'Person',
                 function ($value) {
@@ -308,9 +301,8 @@ class DefaultMappingConfiguration extends AbstractMappingConfiguration
                     }
                     return $result;
                 }
-            ),
-
-            new ArrayRule(
+            ))
+            ->appendRule(new ArrayRule(
                 '_original',
                 'Enrichment',
                 function ($value) {
@@ -319,8 +311,8 @@ class DefaultMappingConfiguration extends AbstractMappingConfiguration
                         'Value' => $value
                     ];
                 }
-            ),
-            new ArrayRule(
+            ))
+            ->appendRule(new ArrayRule(
                 '_original',
                 'Enrichment',
                 function ($value) {
@@ -329,36 +321,18 @@ class DefaultMappingConfiguration extends AbstractMappingConfiguration
                         'Value' => self::HASH_FUNCTION . ':' . (self::HASH_FUNCTION)($value)
                     ];
                 }
-            ),
-
-            new ConstantValueRule(
+            ))
+            ->appendRule(new ConstantValueRule(
                 'Language',
                 function () {
                     return 'eng';
                 }
-            ),
-
-            new ConstantValueRule(
+            ))
+            ->appendRule(new ConstantValueRule(
                 'BelongsToBibliography',
                 function () {
                     return '0';
                 }
-            )
-        ];
-    }
-
-    public function getName()
-    {
-        return "default";
-    }
-
-    public function getDescription()
-    {
-        return "Default BibTeX Mapping Configuration";
-    }
-
-    public function getRuleList()
-    {
-        return $this->ruleList;
+            ));
     }
 }
