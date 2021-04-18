@@ -253,13 +253,159 @@ class ImprovedParserTest extends \PHPUnit_Framework_TestCase
 
     public function testFile()
     {
-        $parser = new Parser(__DIR__ . '/resources/testbib.bib');
+        $testfile = __DIR__ . '/resources/testbib.bib';
+        $parser = new Parser($testfile);
         $bibTexRecords = $parser->parse();
+        $this->assertCount(2, $bibTexRecords);
 
+        $entries = $this->splitBibtex(file_get_contents($testfile));
+        $hashFn = AbstractMappingConfiguration::HASH_FUNCTION;
+
+        $expectedDoc = [
+            'BelongsToBibliography' => '0',
+            'PublishedYear' => '2006',
+            'Language' => 'eng',
+            'Type' => 'misc',
+            'TitleMain' => [[
+                'Language' => 'eng',
+                'Value' => 'My Article',
+                'Type' => 'main'
+            ]],
+            'Person' => [[
+                'FirstName' => 'Jr',
+                'LastName' => 'Nobody',
+                'Role' => 'author'
+            ], [
+                'FirstName' => 'J.',
+                'LastName' => 'Müller',
+                'Role' => 'author'
+            ]],
+            'Enrichment' => [[
+                'KeyName' => AbstractMappingConfiguration::SOURCE_DATA_KEY,
+                'Value' => $entries[0]
+            ], [
+                'KeyName' => AbstractMappingConfiguration::SOURCE_DATA_HASH_KEY,
+                'Value' => $hashFn . ':' . $hashFn($entries[0])
+            ]]
+        ];
+        $this->checkBibTexRecord($bibTexRecords[0], $expectedDoc);
+
+        $expectedDoc = [
+            'BelongsToBibliography' => '0',
+            'Language' => 'eng',
+            'TitleMain' => [[
+                'Language' => 'eng',
+                'Value' => 'Cool Stuff: With Apples',
+                'Type' => 'main'
+            ]],
+            'Type' => 'article',
+            'Enrichment' => [[
+                'KeyName' => AbstractMappingConfiguration::SOURCE_DATA_KEY,
+                'Value' => $entries[1]
+            ], [
+                'KeyName' => AbstractMappingConfiguration::SOURCE_DATA_HASH_KEY,
+                'Value' => $hashFn . ':' . $hashFn($entries[1])
+            ]],
+            'Issue' => '1',
+            'PageFirst' => '1',
+            'PageLast' => '12',
+            'PageNumber' => '12',
+            'PublishedYear' => '2020',
+            'Volume' => '32',
+            'TitleParent' => [[
+                'Language' => 'eng',
+                'Value' => 'Journal of Cool Stuff',
+                'Type' => 'parent'
+            ]],
+            'Identifier' => [[
+                'Value' => 'http://papers.ssrn.com/sol3/papers.cfm?abstract_id=9999999',
+                'Type' => 'url'
+            ], [
+                'Value' => '10.2222/j.jbankfin.2222.32.001',
+                'Type' => 'doi'
+            ], [
+                'Value' => '1100-0011',
+                'Type' => 'issn'
+            ]],
+            'Note' => [[
+                'Visibility' => 'public',
+                'Message' => 'URL of the PDF: http://dx.doi.org/10.2222/j.jbankfin.2222.32.001'
+            ], [
+                'Visibility' => 'public',
+                'Message' => 'URL of the Slides: https://app.box.com/s/1231451532132slide'
+            ], [
+                'Visibility' => 'public',
+                'Message' => "Additional Note: http://www.sciencedirect.com/science/article/pii/123456789\n\tdoi:10.1234/TIT.2020.1234567\n\tarXiv:1234.1233v4"
+            ], [
+                'Visibility' => 'public',
+                'Message' => 'URL of the Abstract: http://www.Forschung.com/blog/research/2020/01/04/Ein-abstract.html'
+            ], [
+                'Visibility' => 'public',
+                'Message' => 'URL of the Code: https://colab.research.google.com/drive/123456a456'
+            ], [
+                'Visibility' => 'public',
+                'Message' => 'URL of the Poster: https://app.box.com/s/1231451532132post'
+            ]],
+            'Person' => [[
+                'FirstName' => 'S.',
+                'LastName' => 'Disterer',
+                'Role' => 'author'
+            ], [
+                'FirstName' => 'C.',
+                'LastName' => 'Nobody',
+                'Role' => 'author'
+            ], [
+                'FirstName' => 'Cool',
+                'LastName' => 'Women',
+                'Role' => 'editor'
+            ], [
+                'FirstName' => 'Cool',
+                'LastName' => 'Men',
+                'Role' => 'editor'
+            ]],
+            'Subject' => [[
+                'Language' => 'eng',
+                'Type' => 'uncontrolled',
+                'Value' => 'Cool'
+            ], [
+                'Language' => 'eng',
+                'Type' => 'uncontrolled',
+                'Value' => 'Stuff'
+            ]]
+        ];
+        $this->checkBibTexRecord($bibTexRecords[1], $expectedDoc);
+    }
+
+    private function checkBibTexRecord($bibTexRecord, $expectedDoc)
+    {
         $proc = new Processor();
         $metadata = [];
-        $proc->handleRecord($bibTexRecords[1], $metadata);
-        // FIXME
+        $fieldsEvaluated = $proc->handleRecord($bibTexRecord, $metadata);
+        foreach (array_keys($bibTexRecord) as $fieldName) {
+            $fieldName = strtolower($fieldName); // BibTex-Parser liefert Feldnamen z.T. mit beginnendem Großbuchstaben
+            if (strpos($fieldName, '_') === 0 || $fieldName === 'citation-key' || $fieldName === 'type') {
+                // interne Felder des BibTex-Parsers beim Vergleich ignorieren
+                continue;
+            }
+            if ($fieldName === 'unknown') {
+                // dieses Feld wurde bei der Ausführung des Mappings nicht ausgewertet
+                $this->assertArrayNotHasKey($fieldName, $fieldsEvaluated);
+            } else {
+                $this->assertContains($fieldName, $fieldsEvaluated);
+            }
+        }
+        $this->assertEquals(ksort($expectedDoc), ksort($metadata));
+    }
+
+    private function splitBibtex($bibtex)
+    {
+        $entries = preg_split('/^@/m', $bibtex, null, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+
+        $entries = array_map(function ($value) {
+            return '@' . trim($value);
+        }, $entries);
+
+        return $entries;
     }
 
     public function testDocumentTypeHandling()
