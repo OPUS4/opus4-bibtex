@@ -909,4 +909,54 @@ class ParserTest extends \PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('PageLast', $metadata);
         $this->assertArrayHasKey('PageNumber', $metadata);
     }
+
+    /**
+     * Dieser Testcase wurde aus der ursprünglichen Implementierung übernommen.
+     */
+    public function testProcessor()
+    {
+        $bibtex = "@misc{Nobody06,\n       author = \"Nobody, Jr\",\n       title = \"My Article\",\n       year = \"2006\"}";
+        $hashFunction = AbstractMappingConfiguration::HASH_FUNCTION;
+        $bibtexHash = $hashFunction($bibtex);
+
+        $processor = new Processor();
+        $bibtexArray = [
+            'type' => 'misc',
+            'citation-key' => 'Nobody06',
+            'author' => 'Nobody, Jr',
+            'title' => 'My Article',
+            'year' => '2006',
+            '_original' => $bibtex
+        ];
+
+        $opus = [
+            'BelongsToBibliography' => '0',
+            'PublishedYear' => '2006',
+            'Language' => 'eng',
+            'Type' => 'misc',
+            'TitleMain' => [[
+                'Language' => 'eng',
+                'Value' => 'My Article',
+                'Type' => 'main'
+            ]],
+            'Person' => [[
+                'FirstName' => 'Jr',
+                'LastName' => 'Nobody',
+                'Role' => 'author'
+            ]],
+            'Enrichment' => [
+                [
+                    'KeyName' => AbstractMappingConfiguration::SOURCE_DATA_KEY,
+                    'Value' => $bibtex
+                ], [
+                    'KeyName' => AbstractMappingConfiguration::SOURCE_DATA_HASH_KEY,
+                    'Value' => $hashFunction . ':' . $bibtexHash
+                ]
+            ]
+        ];
+
+        $metadata = [];
+        $processor->handleRecord($bibtexArray, $metadata);
+        $this->assertEquals($opus, $metadata);
+    }
 }

@@ -50,13 +50,14 @@ class DefaultMappingConfiguration extends AbstractMappingConfiguration
             // auf Basis des BibTeX-Types (die Zeichenkette nach @) zu umgehen
             // ist im BibTeX-Record kein Feld ptype vorhanden, so wird der Typ aus der Zeichenkette nach @ abgeleitet
             ->appendRule(new SimpleRule(
-            'ptype',
-            'Type',
-            function ($value) {
-                if (array_key_exists($value, DocumentTypeMapping::$MAPPING)) {
-                    return DocumentTypeMapping::$MAPPING[$value];
+                'ptype',
+                'Type',
+                function ($value) {
+                    if (array_key_exists($value, DocumentTypeMapping::$MAPPING)) {
+                        return DocumentTypeMapping::$MAPPING[$value];
+                    }
                 }
-            }))
+            ))
             ->appendRule(new SimpleRule(
                 'type',
                 'Type',
@@ -159,7 +160,7 @@ class DefaultMappingConfiguration extends AbstractMappingConfiguration
                         $type = 'arxiv';
                         // URL-Präfix abschneiden, so dass nur die ArXiv-ID übrigbleibt
                         $value = preg_replace('#https?://arxiv.org/abs/#i', '', $value);
-                    } else if (strtolower(substr($value, 0, 6)) === 'arxiv:') {
+                    } elseif (strtolower(substr($value, 0, 6)) === 'arxiv:') {
                         $type = 'arxiv';
                         $value = substr($value, 6); // Präfix 'arxiv:' abschneiden
                     }

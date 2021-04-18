@@ -45,8 +45,8 @@ class SimpleRule implements IRule
     protected $fn;
 
     /**
-     * @param $bibtexFieldName Name des auszuwertenden BibTeX-Felds
-     * @param $opusFieldName Name des zu befüllenden OPUS4-Metadatenfelds
+     * @param string $bibtexFieldName Name des auszuwertenden BibTeX-Felds
+     * @param string $opusFieldName Name des zu befüllenden OPUS4-Metadatenfelds
      * @param null $fn optionale Funktion, die verwendet wird, um den Feldwert für das OPUS4-Metadatenfelds zu bestimmen
      */
     public function __construct($bibtexFieldName, $opusFieldName, $fn = null)
