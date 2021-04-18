@@ -34,7 +34,13 @@
 namespace Opus\Bibtex\Import\Rules;
 
 /**
- * Eine Regel, die gleichzeitig auf mehrere BibTeX-Felder zugreift.
+ * Eine Regel, die gleichzeitig auf mehrere BibTeX-Felder zugreift. Im Konstruktor muss die Liste der Feldnamen im
+ * BibTeX-Record übergeben werden, auf die in der Regelausführung zugegriffen werden soll. Auf andere Felder kann
+ * bei der Regelausführung nicht zugegriffen werden.
+ *
+ * Wird im Konstruktor keine Feldliste (oder eine leere Feldliste) übergeben, so kann die Regel auch dazu genutzt
+ * werden, um auf alle in den Dokumentmetadaten gespeicherten Felder zugreifen und neue Felder in den Dokumentmetadaten
+ * hinzufügen.
  */
 class ComplexRule implements IRule
 {
@@ -42,21 +48,23 @@ class ComplexRule implements IRule
 
     protected $fieldsEvaluated;
 
-    public function __construct($fieldsEvaluated, $fn)
+    public function __construct($fn, $fieldsEvaluated = null)
     {
-        $this->fieldsEvaluated = $fieldsEvaluated;
         $this->fn = $fn;
+        $this->fieldsEvaluated = $fieldsEvaluated;
     }
 
     public function apply($bibtexRecord, &$documentMetadata)
     {
         $fieldValues = [];
-        foreach ($this->fieldsEvaluated as $fieldName) {
-            if (array_key_exists($fieldName, $bibtexRecord)) {
-                $fieldValues[$fieldName] = $bibtexRecord[$fieldName];
-            } else {
-                // Feld existiert nicht im BibTeX-Record und kann daher nicht ausgewertet werden
-                unset($this->fieldsEvaluated[$fieldName]);
+        if (! is_null($this->fieldsEvaluated)) {
+            foreach ($this->fieldsEvaluated as $fieldName) {
+                if (array_key_exists($fieldName, $bibtexRecord)) {
+                    $fieldValues[$fieldName] = $bibtexRecord[$fieldName];
+                } else {
+                    // Feld existiert nicht im BibTeX-Record und kann daher nicht ausgewertet werden
+                    unset($this->fieldsEvaluated[$fieldName]);
+                }
             }
         }
         // FIXME wir können nicht wirklich sicherstellen, dass beim Aufruf von $this->fn tatsächlich auf die in
@@ -67,6 +75,6 @@ class ComplexRule implements IRule
 
     public function getEvaluatedBibTexField()
     {
-        return $this->fieldsEvaluated;
+        return is_null($this->fieldsEvaluated) ? [] : $this->fieldsEvaluated;
     }
 }

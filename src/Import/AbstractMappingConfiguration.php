@@ -160,4 +160,22 @@ abstract class AbstractMappingConfiguration
         }
         return $result;
     }
+
+    /**
+     * Behandlung von Umlauten (siehe OPUSVIER-4216) bzw. Beispiel in specialchars-invalid.bib.
+     *
+     * @param $value
+     * @return array
+     */
+    protected function convertUmlauts($value)
+    {
+        if (! preg_match('#"[a, o, u]#i', $value)) {
+            return false;
+        }
+        return str_replace(
+            ['"a', '"A', '"o', '"O', '"u', '"U'],
+            ['ä', 'Ä', 'ö', 'Ö', 'ü', 'Ü'],
+            $value
+        );
+    }
 }

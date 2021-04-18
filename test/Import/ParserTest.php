@@ -47,9 +47,9 @@ use Opus\Bibtex\Import\Rules\DocumentTypeMapping;
  *
  * TODO Tests sortieren - wo gehören sie wirklich hin?
  */
-class ImprovedParserTest extends \PHPUnit_Framework_TestCase
+class ParserTest extends \PHPUnit_Framework_TestCase
 {
-    public function testProcessFile()
+    public function testProcessFileSpecialchars()
     {
         $testfile = __DIR__ . '/resources/specialchars.bib';
 
@@ -61,6 +61,28 @@ class ImprovedParserTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('My Article', $bibTexRecord['title']);
         $this->assertEquals('2006', $bibTexRecord['year']);
         $this->assertEquals('misc', $bibTexRecord['type']);
+    }
+
+    public function testProcessFileSpecialcharsInvalid()
+    {
+        $testfile = __DIR__ . '/resources/specialchars-invalid.bib';
+
+        $parser = new Parser($testfile);
+        $result = $parser->parse();
+        $this->assertCount(1, $result);
+        $bibTexRecord = $result[0];
+        $this->assertEquals('M"ullerß, J.', $bibTexRecord['author']);
+        $this->assertEquals('Möllerß, J.', $bibTexRecord['editor']);
+        $this->assertEquals('Ää Öö Üü ß - "A"a "O"o "U"u', $bibTexRecord['title']);
+        $this->assertEquals('2006', $bibTexRecord['year']);
+        $this->assertEquals('misc', $bibTexRecord['type']);
+
+        $metadata = [];
+        $proc = new Processor();
+        $proc->handleRecord($bibTexRecord, $metadata);
+        $this->assertPerson('author', 'J.', 'Müllerß', $metadata['Person'][0]);
+        $this->assertPerson('editor', 'J.', 'Möllerß', $metadata['Person'][1]);
+        $this->assertTitle('main', 'Ää Öö Üü ß - Ää Öö Üü', $metadata['TitleMain'][0]);
     }
 
     public function testProcesInvalidFile()
@@ -204,6 +226,13 @@ class ImprovedParserTest extends \PHPUnit_Framework_TestCase
         } else {
             $this->assertEquals($firstName, $person['FirstName']);
         }
+    }
+
+    private function assertTitle($titleType, $titleValue, $title)
+    {
+        $this->assertEquals($titleType, $title['Type']);
+        $this->assertEquals($titleValue, $title['Value']);
+        $this->assertEquals('eng', $title['Language']);
     }
 
     private function assertSubject($value, $subject)
@@ -850,12 +879,12 @@ class ImprovedParserTest extends \PHPUnit_Framework_TestCase
         $bibTexRecords = $parser->parse();
 
         $complexRule = new ComplexRule(
-            ['firstpage', 'lastpage'],
             function ($fieldValues, &$documentMetadata) {
                 $documentMetadata['PageFirst'] = $fieldValues['firstpage'];
                 $documentMetadata['PageLast'] = $fieldValues['lastpage'];
                 $documentMetadata['PageNumber'] = intval($documentMetadata['PageLast']) - intval($documentMetadata['PageFirst']);
-            }
+            },
+            ['firstpage', 'lastpage']
         );
         $mappingConfiguration = new DefaultMappingConfiguration();
         $mappingConfiguration->resetRules();

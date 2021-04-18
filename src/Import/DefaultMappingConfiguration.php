@@ -34,6 +34,7 @@
 namespace Opus\Bibtex\Import;
 
 use Opus\Bibtex\Import\Rules\ArrayRule;
+use Opus\Bibtex\Import\Rules\ComplexRule;
 use Opus\Bibtex\Import\Rules\ConstantValueRule;
 use Opus\Bibtex\Import\Rules\DocumentTypeMapping;
 use Opus\Bibtex\Import\Rules\SimpleRule;
@@ -333,6 +334,34 @@ class DefaultMappingConfiguration extends AbstractMappingConfiguration
                 function () {
                     return '0';
                 }
-            ));
+            ))
+            ->appendRule(new ComplexRule(
+                function ($fieldValues, &$documentMetadata) {
+                    // behandelt Umlaute, die im BibTeX-File nicht korrekt angegeben wurden (siehe OPUSVIER-4216)
+                    foreach ($documentMetadata as $fieldName => $fieldValue) {
+                        if (is_array($fieldValue)) {
+                            foreach ($fieldValue as $subFieldIndex => $subFieldValue) {
+                                if ($fieldName === 'Enrichment' &&
+                                    ($subFieldValue['KeyName'] === AbstractMappingConfiguration::SOURCE_DATA_HASH_KEY ||
+                                        $subFieldValue['KeyName'] === AbstractMappingConfiguration::SOURCE_DATA_KEY)) {
+                                    continue; // der Original-BibTeX-Record soll nicht verändert werden
+                                }
+                                foreach ($subFieldValue as $name => $value) {
+                                    $convertedFieldValue = $this->convertUmlauts($value);
+                                    if ($convertedFieldValue !== false) {
+                                        $documentMetadata[$fieldName][$subFieldIndex][$name] = $convertedFieldValue;
+                                    }
+                                }
+                            }
+                        } else {
+                            $convertedFieldValue = $this->convertUmlauts($fieldValue);
+                            if ($convertedFieldValue !== false) {
+                                $documentMetadata[$fieldName] = $convertedFieldValue;
+                            }
+                        }
+                    }
+                }
+            ))
+        ;
     }
 }
