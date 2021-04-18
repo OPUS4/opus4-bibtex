@@ -58,7 +58,8 @@ class ParserTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(1, $result);
         $bibTexRecord = $result[0];
         $this->assertEquals('Müller, J.', $bibTexRecord['author']);
-        $this->assertEquals('My Article', $bibTexRecord['title']);
+        $this->assertEquals('Müller, E.', $bibTexRecord['editor']);
+        $this->assertEquals('Title Ä', $bibTexRecord['title']);
         $this->assertEquals('2006', $bibTexRecord['year']);
         $this->assertEquals('misc', $bibTexRecord['type']);
     }
