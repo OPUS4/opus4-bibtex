@@ -39,7 +39,7 @@ use Opus\Bibtex\Import\Parser;
 use Opus\Bibtex\Import\Processor;
 use Opus\Bibtex\Import\ParserException;
 use Opus\Bibtex\Import\Rules\ComplexRule;
-use Opus\Bibtex\Import\Rules\DocumentTypeMapping;
+use Opus\Bibtex\Import\Rules\DocumentType\DefaultDocumentTypeMapping;
 
 /**
  * Class ParserTest
@@ -450,7 +450,9 @@ class ParserTest extends \PHPUnit_Framework_TestCase
         $proc = new Processor();
         $metadata = [];
         $proc->handleRecord($bibTexRecords[0], $metadata);
-        $this->assertEquals(DocumentTypeMapping::$DEFAULT_OPUS_TYPE, $metadata['Type']);
+
+        $documentTypeMapping = new DefaultDocumentTypeMapping();
+        $this->assertEquals($documentTypeMapping->getDefaultType(), $metadata['Type']);
     }
 
     public function testDocumentTypeHandling1()
@@ -466,7 +468,9 @@ class ParserTest extends \PHPUnit_Framework_TestCase
         $proc = new Processor();
         $metadata = [];
         $proc->handleRecord($bibTexRecords[0], $metadata);
-        $this->assertEquals(DocumentTypeMapping::$MAPPING['mastersthesis'], $metadata['Type']);
+
+        $documentTypeMapping = new DefaultDocumentTypeMapping();
+        $this->assertEquals($documentTypeMapping->getMapping('mastersthesis'), $metadata['Type']);
     }
 
     public function testDocumentTypeHandling2()
@@ -482,7 +486,9 @@ class ParserTest extends \PHPUnit_Framework_TestCase
         $proc = new Processor();
         $metadata = [];
         $proc->handleRecord($bibTexRecords[0], $metadata);
-        $this->assertEquals(DocumentTypeMapping::$MAPPING['mastersthesis'], $metadata['Type']);
+
+        $documentTypeMapping = new DefaultDocumentTypeMapping();
+        $this->assertEquals($documentTypeMapping->getMapping('mastersthesis'), $metadata['Type']);
     }
 
     public function testDocumentTypeHandling3()
@@ -497,8 +503,10 @@ class ParserTest extends \PHPUnit_Framework_TestCase
 
         $proc = new Processor();
         $metadata = [];
-        $docMetadata = $proc->handleRecord($bibTexRecords[0], $metadata);
-        $this->assertEquals(DocumentTypeMapping::$MAPPING['journal'], $metadata['Type']);
+        $proc->handleRecord($bibTexRecords[0], $metadata);
+
+        $documentTypeMapping = new DefaultDocumentTypeMapping();
+        $this->assertEquals($documentTypeMapping->getMapping('journal'), $metadata['Type']);
     }
 
     public function testPagesHandling()

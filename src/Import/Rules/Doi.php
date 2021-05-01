@@ -33,7 +33,7 @@
 
 namespace Opus\Bibtex\Import\Rules;
 
-class Doi extends Identifier
+class Doi extends ArrayRule
 {
     public function __construct()
     {

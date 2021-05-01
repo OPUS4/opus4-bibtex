@@ -25,39 +25,38 @@
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
  * @category    BibTeX
- * @package     Opus\Bibtex\Import\Rules
+ * @package     Opus\Bibtex\Import\Rules\DocumentType
  * @author      Sascha Szott <opus-repository@saschaszott.de>
  * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace Opus\Bibtex\Import\Rules;
+namespace Opus\Bibtex\Import\Rules\DocumentType;
 
-class DocumentTypeMapping
+class DefaultDocumentTypeMapping extends AbstractDocumentTypeMapping
 {
-    public static $MAPPING = [
-        'article' => 'article',
-        'book' => 'book',
-        'booklet' => 'bookpart',
-        'conference' => 'conferenceobject',
-        'inbook' => 'bookpart',
-        'incollection' => 'bookpart',
-        'inproceedings' => 'article',
-        'manual' => 'article',
-        'mastersthesis' => 'masterthesis',
-        'misc' => 'misc',
-        'phdthesis' => 'doctoralthesis',
-        'proceedings' => 'conferenceobject',
-        'techreport' => 'report',
-        'unpublished' => 'workingpaper',
+    public function __construct()
+    {
+        // dieser OPUS-Dokumenttyp wird immer dann verwendet, wenn kein Mapping für den aus dem BibTeX-Record
+        // abgeleiteten Record-Typ vorliegt.
+        $this->setDefaultType('misc');
 
-        // Mapping von nicht Standard BibTeX-Typen
-        'journal' => 'article'
-    ];
-
-    /**
-     * Dieser Typ wird immer dann verwendet, wenn in $MAPPING kein Mapping für den
-     * aus dem BibTeX-Record abgeleiteten Record-Typ vorliegt.
-     */
-    public static $DEFAULT_OPUS_TYPE = 'misc';
+        $this
+            ->setMapping('article', 'article')
+            ->setMapping('book', 'book')
+            ->setMapping('booklet', 'bookpart')
+            ->setMapping('conference', 'conferenceobject')
+            ->setMapping('inbook', 'bookpart')
+            ->setMapping('incollection', 'bookpart')
+            ->setMapping('inproceedings', 'article')
+            ->setMapping('manual', 'article')
+            ->setMapping('mastersthesis', 'masterthesis')
+            ->setMapping('misc', 'misc')
+            ->setMapping('phdthesis', 'doctoralthesis')
+            ->setMapping('proceedings', 'conferenceobject')
+            ->setMapping('techreport', 'report')
+            ->setMapping('unpublished', 'workingpaper')
+            // Mapping von nicht Standard BibTeX-Typen
+            ->setMapping('journal', 'article');
+    }
 }

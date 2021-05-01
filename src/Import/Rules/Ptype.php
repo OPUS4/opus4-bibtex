@@ -33,6 +33,8 @@
 
 namespace Opus\Bibtex\Import\Rules;
 
+use Opus\Bibtex\Import\Rules\DocumentType\DefaultDocumentTypeMapping;
+
 /**
  * ptype ist kein Standard-BibTeX-Feld: das Feld ptype kann genutzt werden, um das Typ-Mapping auf Basis des
  * BibTeX-Types (die Zeichenkette nach @) zu umgehen
@@ -41,15 +43,21 @@ namespace Opus\Bibtex\Import\Rules;
  */
 class Ptype extends SimpleRule
 {
-    public function __construct()
+    protected $documentTypeMapping;
+
+    public function __construct($documentTypeMapping = null)
     {
+        if (is_null($documentTypeMapping)) {
+            $documentTypeMapping = new DefaultDocumentTypeMapping();
+        }
+        $this->documentTypeMapping = $documentTypeMapping;
+        $this->documentTypeMapping->setDefaultType(null); // Default-Type soll nicht zur Anwendung kommen
+
         return parent::__construct(
             'ptype',
             'Type',
             function ($value) {
-                if (array_key_exists($value, DocumentTypeMapping::$MAPPING)) {
-                    return DocumentTypeMapping::$MAPPING[$value];
-                }
+                return $this->documentTypeMapping->getMapping($value);
             }
         );
     }
