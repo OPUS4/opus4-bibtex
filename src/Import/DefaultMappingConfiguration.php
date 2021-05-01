@@ -62,12 +62,12 @@ class DefaultMappingConfiguration extends AbstractMappingConfiguration
         $this->description = 'Default BibTeX Mapping Configuration';
         $this
             ->addRule(
-                'ptype',
-                new Ptype()
-            )
-            ->addRule(
                 'type',
                 new Type()
+            )
+            ->addRule(
+                'ptype',
+                new Ptype()
             )
             ->addRule(
                 'issue',

@@ -35,12 +35,42 @@ namespace Opus\Bibtex\Import;
 
 abstract class AbstractMappingConfiguration
 {
+    /**
+     * Name des Enrichments, das zur Speicherung des importierten (unveränderten) BibTeX-Record verwendet wird
+     */
     const SOURCE_DATA_KEY = 'opus.import.data';
+
+    /**
+     * Name des Enrichments, in dem der Hashwert (auf Basis der Hashfunktion HASH_FUNCTION) des importierten
+     * BibTeX-Records gespeichert wird
+     */
     const SOURCE_DATA_HASH_KEY = 'opus.import.dataHash';
+
+    /**
+     * Name der Hashfunktion, die zur Bestimmung des Hashwerts verwendet werden soll.
+     */
     const HASH_FUNCTION = 'md5';
 
+    /**
+     * Eindeutiger Name der Regelkonfiguration für die Auswahl.
+     *
+     * @var string
+     */
     protected $name;
+
+    /**
+     * Textuelle Beschreibung der Regelkonfiguration, z.B. für die Anzeige im Frontend.
+     *
+     * @var string
+     */
     protected $description;
+
+    /**
+     * Liste der anzuwendenden Regeln. Die Liste kann durch entsprechende Methoden verändert werden.
+     * Jede Regel ist über einen eindeutigen Namen referenzierbar.
+     *
+     * @var array
+     */
     private $ruleList = [];
 
     /**
@@ -77,26 +107,54 @@ abstract class AbstractMappingConfiguration
     }
 
     /**
-     * Fügt die übergebene Regel am Ende der Regelliste hinzu, d.h. die übergebene Regel
-     * wird erst nach der Ausführung aller anderen Regeln ausgeführt.
+     * Fügt die übergebene Regel am Anfang der Regelliste hinzu, d.h. die übergebene Regel
+     * wird vor der Ausführung aller anderen Regeln ausgeführt.
      *
+     * @param $name Name der Regel
      * @param $rule die hinzuzufügende Regel
      */
-    public function prependRule($rule)
+    public function prependRule($name, $rule)
     {
-        array_unshift($this->ruleList, $rule);
+        $this->ruleList = array_merge([ $name => $rule ], $this->ruleList);
         return $this;
     }
 
     /**
-     * Fügt die übergebene Regel am Anfang der Regelliste hinzu, d.h. die übergebene Regel
-     * wird vor der Ausführung aller anderen Regeln ausgeführt.
+     * Fügt die übergebene Regel am Ende der Regelliste hinzu, d.h. die übergebene Regel
+     * wird erst nach der Ausführung aller anderen Regeln ausgeführt.
      *
+     * @param $name Name der Regel
      * @param $rule die hinzuzufügende Regel
      */
-    public function appendRule($rule)
+    public function addRule($name, $rule)
     {
-        $this->ruleList[] = $rule;
+        $this->ruleList[$name] = $rule;
+        return $this;
+    }
+
+    /**
+     * Überschreibt die unter dem Namen registrierte Regel oder fügt die Regel am Ende der Regelliste hinzu, falls
+     * unter dem übergebenen Namen noch keine Regel existiert.
+     *
+     * @param $name Name der Regel
+     * @param $rule die zu ersetzende (oder hinzuzufügende Regel)
+     */
+    public function updateRule($name, $rule)
+    {
+        $this->ruleList[$name] = $rule;
+        return $this;
+    }
+
+    /**
+     * Entfernt die unter dem übergebenen Namen abgelegte Regel, sofern eine solche Regel existiert.
+     *
+     * @param $name Name der Regel
+     */
+    public function removeRule($name)
+    {
+        if (array_key_exists($name, $this->ruleList)) {
+            unset($this->ruleList[$name]);
+        }
         return $this;
     }
 
@@ -106,76 +164,5 @@ abstract class AbstractMappingConfiguration
     public function resetRules()
     {
         $this->ruleList = [];
-    }
-
-    protected function deleteBrace($value)
-    {
-        if (strlen($value) >= 2 && substr($value, 0, 1) == '{' && substr($value, -1, 1) == '}') {
-            $value = substr($value, 1, -1);
-        }
-        return trim($value);
-    }
-
-    protected function extractNameParts($name)
-    {
-        $name = trim($name);
-        $posFirstComma = strpos($name, ',');
-        if ($posFirstComma !== false) {
-            // Nachname getrennt durch Komma mit Vorname(n)
-            // alles nach dem ersten Komma wird hierbei als Vorname interpretiert
-            $result = [
-                'LastName' => trim(substr($name, 0, $posFirstComma))
-            ];
-            if ($posFirstComma < strlen($name) - 1) {
-                $result['FirstName'] = trim(substr($name, $posFirstComma + 1));
-            }
-            return $result;
-        }
-
-        // mehrere Namensbestandteile sind nicht durch Komma getrennt
-        // alles nach dem ersten Leerzeichen wird als Nachname aufgefasst
-        // kommt kein Leerzeichen wird, so wurde vermutlich nur der Nachname angegeben
-        $posFirstSpace = strpos($name, ' ');
-        if ($posFirstSpace === false) {
-            return [
-                'LastName' => $name
-            ];
-        }
-
-        $posLastPeriod = strrpos($name, '.');
-        if ($posLastPeriod === false) {
-            // letztes Zeichen kann kein Leerzeichen sein, daher kein Vergleich der Länge von $name mit $posFirstSpace
-            return [
-                'FirstName' => trim(substr($name, 0, $posFirstSpace)),
-                'LastName' => trim(substr($name, $posFirstSpace + 1))
-            ];
-        }
-
-        // falls Namensbestandteile abgekürzt werden, so betrachte alles nach dem letzten Punkt als Nachnamen
-        $result = [
-            'FirstName' => trim(substr($name, 0, $posLastPeriod + 1)),
-        ];
-        if ($posLastPeriod < strlen($name) - 1) {
-            $result['LastName'] = trim(substr($name, $posLastPeriod + 1));
-        }
-        return $result;
-    }
-
-    /**
-     * Behandlung von Umlauten (siehe OPUSVIER-4216) bzw. Beispiel in specialchars-invalid.bib.
-     *
-     * @param $value
-     * @return array
-     */
-    protected function convertUmlauts($value)
-    {
-        if (! preg_match('#"[a, o, u]#i', $value)) {
-            return false;
-        }
-        return str_replace(
-            ['"a', '"A', '"o', '"O', '"u', '"U'],
-            ['ä', 'Ä', 'ö', 'Ö', 'ü', 'Ü'],
-            $value
-        );
     }
 }

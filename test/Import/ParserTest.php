@@ -853,17 +853,17 @@ class ParserTest extends \PHPUnit_Framework_TestCase
         $proc = new Processor();
         $metadata = [];
         $fieldsEvaluated = $proc->handleRecord($bibTexRecords[0], $metadata);
-        $this->assertCount(2, $fieldsEvaluated);
-        $this->assertContains('ptype', $fieldsEvaluated);
-        $this->assertContains('author', $fieldsEvaluated);
+        $this->assertCount(3, $fieldsEvaluated);
+        $this->assertEquals('type', $fieldsEvaluated[0]);
+        $this->assertEquals('ptype', $fieldsEvaluated[1]);
+        $this->assertEquals('author', $fieldsEvaluated[2]);
 
         $bibTexFields = $parser->getBibTexFieldNames($bibTexRecords[0]);
         $unusedFields = array_diff($bibTexFields, $fieldsEvaluated);
-        $this->assertCount(4, $unusedFields);
+        $this->assertCount(3, $unusedFields);
         $this->assertContains('unused', $unusedFields);
         $this->assertContains('unusedAlt', $unusedFields);
         $this->assertContains('citation-key', $unusedFields);
-        $this->assertContains('type', $unusedFields);
     }
 
     public function testComplexRule()

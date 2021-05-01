@@ -74,5 +74,4 @@ class Processor
         }
         return $bibtexFieldsEvaluated;
     }
-
 }

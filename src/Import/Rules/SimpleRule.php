@@ -60,17 +60,14 @@ class SimpleRule implements IRule
     public function apply($bibtexRecord, &$documentMetadata)
     {
         $result = false;
-        // Mehrfachausführung der Regel auf einem OPUS-Metadatenfeld soll vermieden werden
-        if (! array_key_exists($this->opusFieldName, $documentMetadata)) {
-            if (array_key_exists($this->bibtexFieldName, $bibtexRecord)) {
-                $value = $bibtexRecord[$this->bibtexFieldName];
-                if (! is_null($this->fn)) {
-                    $value = ($this->fn)($value);
-                }
-                if (! is_null($value)) {
-                    $documentMetadata[$this->opusFieldName] = $value;
-                    $result = true;
-                }
+        if (array_key_exists($this->bibtexFieldName, $bibtexRecord)) {
+            $value = $bibtexRecord[$this->bibtexFieldName];
+            if (! is_null($this->fn)) {
+                $value = ($this->fn)($value);
+            }
+            if (! is_null($value)) {
+                $documentMetadata[$this->opusFieldName] = $value;
+                $result = true;
             }
         }
         return $result;

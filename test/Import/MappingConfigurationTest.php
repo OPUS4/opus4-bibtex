@@ -139,7 +139,6 @@ class MappingConfigurationTest extends \PHPUnit_Framework_TestCase
     public function testPrependRule()
     {
         $mappingConf = new DefaultMappingConfiguration();
-
         $proc = new Processor($mappingConf);
         $metadata = [];
         $proc->handleRecord(['Year' => '2019'], $metadata);
@@ -150,7 +149,13 @@ class MappingConfigurationTest extends \PHPUnit_Framework_TestCase
             'secondRule',
             (new ConstantValueRule())->setOpusFieldName('PublishedYear')->setValue('1970')
         );
+        $proc = new Processor($mappingConf);
+        $metadata = [];
+        $proc->handleRecord(['Year' => '2019'], $metadata);
 
+        $this->assertEquals('2019', $metadata['PublishedYear']);
+
+        $mappingConf->removeRule('publishedYear');
         $proc = new Processor($mappingConf);
         $metadata = [];
         $proc->handleRecord(['Year' => '2019'], $metadata);
@@ -161,19 +166,17 @@ class MappingConfigurationTest extends \PHPUnit_Framework_TestCase
             'firstRule',
             (new ConstantValueRule())->setOpusFieldName('PublishedYear')->setValue('1870')
         );
-
-        $proc = new Processor($mappingConf);
-        $metadata = [];
-        $proc->handleRecord(['Year' => '2019'], $metadata);
-
-        $this->assertEquals('1870', $metadata['PublishedYear']);
-
-        $mappingConf->removeRule('firstRule');
-
         $proc = new Processor($mappingConf);
         $metadata = [];
         $proc->handleRecord(['Year' => '2019'], $metadata);
 
         $this->assertEquals('1970', $metadata['PublishedYear']);
+
+        $mappingConf->removeRule('secondRule');
+        $proc = new Processor($mappingConf);
+        $metadata = [];
+        $proc->handleRecord(['Year' => '2019'], $metadata);
+
+        $this->assertEquals('1870', $metadata['PublishedYear']);
     }
 }

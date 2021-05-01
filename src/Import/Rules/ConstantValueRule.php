@@ -67,15 +67,12 @@ class ConstantValueRule implements IRule
     public function apply($bibtexRecord, &$documentMetadata)
     {
         $result = false;
-        // Mehrfachausführung der Regel auf einem OPUS-Metadatenfeld soll vermieden werden
-        if (! array_key_exists($this->opusFieldName, $documentMetadata)) {
-            // der BibTeX-Record wird zur Bestimmung des Metadatenfelds nicht verwendet
-            // d.h. Metadatenfeldwert wird hier auf eine Konstante gesetzt oder Bestimmung des Feldinhalts auf Basis
-            // von anderen Metadatenfeldern
-            if (! is_null($this->value)) {
-                $documentMetadata[$this->opusFieldName] = $this->value;
-                $result = true;
-            }
+        // der BibTeX-Record wird zur Bestimmung des Metadatenfelds nicht verwendet
+        // d.h. Metadatenfeldwert wird hier auf eine Konstante gesetzt oder Bestimmung des Feldinhalts auf Basis
+        // von anderen Metadatenfeldern
+        if (! is_null($this->value)) {
+            $documentMetadata[$this->opusFieldName] = $this->value;
+            $result = true;
         }
         return $result;
     }
