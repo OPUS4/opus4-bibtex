@@ -25,50 +25,33 @@
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
  * @category    Tests
- * @package     OpusTest\Bibtex\Import
+ * @package     OpusTest\Bibtex\Import\Rules
  * @author      Sascha Szott <opus-repository@saschaszott.de>
  * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace OpusTest\Bibtex\Import;
+namespace OpusTest\Bibtex\Import\Rules;
 
 use Opus\Bibtex\Import\Processor;
 
-class TitleTest extends \PHPUnit_Framework_TestCase
+class YearTest extends \PHPUnit_Framework_TestCase
 {
-    public function dataProvider()
-    {
-        return [
-            [['title' => 'My Article'], 'My Article'],
-            [['title' => '{My Article}'], 'My Article']
-        ];
-    }
-
-    /**
-     * Test title-rule.
-     *
-     * @param mixed $arg Value to check given by the data provider
-     * @param $res expected mapping-result
-     * @return void
-     *
-     * @dataProvider dataProvider
-     */
-    public function testProcess($arg, $res)
+    public function testProcess()
     {
         $proc = new Processor();
         $metadata = [];
-        $proc->handleRecord($arg, $metadata);
+        $proc->handleRecord(['Year' => '2019'], $metadata);
 
-        $this->assertEquals(
-            [
-                [
-                    'Language' => 'eng',
-                    'Value' => $res,
-                    'Type' => 'main'
-                ]
-            ],
-            $metadata['TitleMain']
-        );
+        $this->assertEquals('2019', $metadata['PublishedYear']);
+    }
+
+    public function testYearPlus()
+    {
+        $proc = new Processor();
+        $metadata = [];
+        $proc->handleRecord(['Year' => '2017+'], $metadata);
+
+        $this->assertEquals('2017', $metadata['PublishedYear']);
     }
 }

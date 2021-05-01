@@ -25,44 +25,76 @@
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
  * @category    Tests
- * @package     OpusTest\Bibtex\Import
+ * @package     OpusTest\Bibtex\Import\Rules
  * @author      Sascha Szott <opus-repository@saschaszott.de>
  * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace OpusTest\Bibtex\Import;
+namespace OpusTest\Bibtex\Import\Rules;
 
+use Opus\Bibtex\Import\Parser;
 use Opus\Bibtex\Import\Processor;
 
-class IdentifierTest extends \PHPUnit_Framework_TestCase
+class PersonsTest extends \PHPUnit_Framework_TestCase
 {
-    public function testProcess()
+    public function testProcessAuthors()
     {
         $proc = new Processor();
         $metadata = [];
         $bibtexBlock = [
-            'arxiv' => 'http://papers.ssrn.com/sol3/papers.cfm?abstract_id=9999999',
-            'doi' => '10.2222/j.jbankfin.2222.32.001',
-            'issn' => '1100-0011'
+            'Author' => 'Wang, Y. and Xie and Steffen, S.',
+            'Editor' => 'Ming, J.'
         ];
         $proc->handleRecord($bibtexBlock, $metadata);
 
-        $expected = [
+        $this->assertEquals(
             [
-                'Value' => 'http://papers.ssrn.com/sol3/papers.cfm?abstract_id=9999999',
-                'Type' => 'url'
+                [
+                    'FirstName' => 'Y.',
+                    'LastName' => 'Wang',
+                    'Role' => 'author'
+                ],
+                [
+                    'LastName' => 'Xie',
+                    'Role' => 'author'
+                ],
+                [
+                    'FirstName' => 'S.',
+                    'LastName' => 'Steffen',
+                    'Role' => 'author'
+                ],
+                [
+                    'FirstName' => 'J.',
+                    'LastName' => 'Ming',
+                    'Role' => 'editor'
+                ]
             ],
-            [
-                'Value' => '10.2222/j.jbankfin.2222.32.001',
-                'Type' => 'doi'
-            ],
-            [
-                'Value' => '1100-0011',
-                'Type' => 'issn'
-            ]
-        ];
+            $metadata['Person']
+        );
+    }
 
-        $this->assertEquals(ksort($expected), ksort($metadata['Identifier']));
+    public function testProcessSpecialCharacters()
+    {
+        $parser = new Parser('@misc{test, author = {M{\"u}ller, Michael}}');
+        $bibtexRecord = $parser->parse();
+
+        $proc = new Processor();
+        $metadata = [];
+        $proc->handleRecord(
+            $bibtexRecord[0],
+            $metadata
+        );
+
+        $this->assertEquals(
+            [
+                [
+                    'FirstName' => 'Michael',
+                    'LastName' => 'Müller',
+                    'Role' => 'author'
+                ]
+            ],
+            $metadata['Person']
+        );
     }
 }

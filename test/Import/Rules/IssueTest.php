@@ -25,24 +25,24 @@
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
  * @category    Tests
- * @package     OpusTest\Bibtex\Import
+ * @package     OpusTest\Bibtex\Import\Rules
  * @author      Sascha Szott <opus-repository@saschaszott.de>
  * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace OpusTest\Bibtex\Import;
+namespace OpusTest\Bibtex\Import\Rules;
 
 use Opus\Bibtex\Import\Processor;
 
-class VolumeTest extends \PHPUnit_Framework_TestCase
+class IssueTest extends \PHPUnit_Framework_TestCase
 {
     public function testProcess()
     {
         $proc = new Processor();
         $metadata = [];
-        $proc->handleRecord(['Volume' => '3'], $metadata);
+        $proc->handleRecord(['Number' => '3'], $metadata);
 
-        $this->assertEquals('3', $metadata['Volume']);
+        $this->assertEquals('3', $metadata['Issue']);
     }
 }

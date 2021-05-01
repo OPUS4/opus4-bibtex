@@ -25,23 +25,49 @@
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
  * @category    Tests
- * @package     OpusTest\Bibtex\Import
+ * @package     OpusTest\Bibtex\Import\Rules
  * @author      Sascha Szott <opus-repository@saschaszott.de>
  * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace OpusTest\Bibtex\Import;
+namespace OpusTest\Bibtex\Import\Rules;
 
 use Opus\Bibtex\Import\Processor;
 
-class LastPageTest extends \PHPUnit_Framework_TestCase
+class ParentTitleTest extends \PHPUnit_Framework_TestCase
 {
-    public function testProcess()
+    public function dataProvider()
+    {
+        return [
+            [['journal' => 'My Journal'], 'My Journal'],
+            [['journal' => '{My Journal}'], 'My Journal'],
+            [['booktitle' => 'My Book'], 'My Book']
+        ];
+    }
+
+    /**
+     * Test Mapping of Publication-types.
+     *
+     * @param mixed $arg Value to check given by the data provider
+     * @param $res expected mapping-result
+     * @return void
+     *
+     * @dataProvider dataProvider
+     */
+    public function testProcess($arg, $res)
     {
         $proc = new Processor();
         $metadata = [];
-        $proc->handleRecord(['Pages' => '1--10'], $metadata);
-        $this->assertEquals('10', $metadata['PageLast']);
+        $proc->handleRecord($arg, $metadata);
+
+        $this->assertEquals(
+            [[
+                'Language' => 'eng',
+                'Value' => $res,
+                'Type' => 'parent'
+            ]],
+            $metadata['TitleParent']
+        );
     }
 }

@@ -25,33 +25,23 @@
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
  * @category    Tests
- * @package     OpusTest\Bibtex\Import
+ * @package     OpusTest\Bibtex\Import\Rules
  * @author      Sascha Szott <opus-repository@saschaszott.de>
  * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace OpusTest\Bibtex\Import;
+namespace OpusTest\Bibtex\Import\Rules;
 
 use Opus\Bibtex\Import\Processor;
 
-class YearTest extends \PHPUnit_Framework_TestCase
+class FirstPageTest extends \PHPUnit_Framework_TestCase
 {
     public function testProcess()
     {
         $proc = new Processor();
         $metadata = [];
-        $proc->handleRecord(['Year' => '2019'], $metadata);
-
-        $this->assertEquals('2019', $metadata['PublishedYear']);
-    }
-
-    public function testYearPlus()
-    {
-        $proc = new Processor();
-        $metadata = [];
-        $proc->handleRecord(['Year' => '2017+'], $metadata);
-
-        $this->assertEquals('2017', $metadata['PublishedYear']);
+        $proc->handleRecord(['Pages' => '1--10'], $metadata);
+        $this->assertEquals('1', $metadata['PageFirst']);
     }
 }

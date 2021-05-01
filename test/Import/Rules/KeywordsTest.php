@@ -25,23 +25,30 @@
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
  * @category    Tests
- * @package     OpusTest\Bibtex\Import
+ * @package     OpusTest\Bibtex\Import\Rules
  * @author      Sascha Szott <opus-repository@saschaszott.de>
  * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace OpusTest\Bibtex\Import;
+namespace OpusTest\Bibtex\Import\Rules;
 
 use Opus\Bibtex\Import\Processor;
 
-class FirstPageTest extends \PHPUnit_Framework_TestCase
+class KeywordsTest extends \PHPUnit_Framework_TestCase
 {
     public function testProcess()
     {
         $proc = new Processor();
         $metadata = [];
-        $proc->handleRecord(['Pages' => '1--10'], $metadata);
-        $this->assertEquals('1', $metadata['PageFirst']);
+        $proc->handleRecord(['Keywords' => 'test, check'], $metadata);
+
+        $this->assertEquals(
+            [
+                ['Language' => 'eng', 'Type' => 'uncontrolled', 'Value' => 'test'],
+                ['Language' => 'eng', 'Type' => 'uncontrolled', 'Value' => 'check']
+            ],
+            $metadata['Subject']
+        );
     }
 }

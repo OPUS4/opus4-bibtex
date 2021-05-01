@@ -25,76 +25,55 @@
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
  * @category    Tests
- * @package     OpusTest\Bibtex\Import
+ * @package     OpusTest\Bibtex\Import\Rules
  * @author      Sascha Szott <opus-repository@saschaszott.de>
  * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace OpusTest\Bibtex\Import;
+namespace OpusTest\Bibtex\Import\Rules;
 
-use Opus\Bibtex\Import\Parser;
 use Opus\Bibtex\Import\Processor;
 
-class PersonsTest extends \PHPUnit_Framework_TestCase
+class DocumentTypeTest extends \PHPUnit_Framework_TestCase
 {
-    public function testProcessAuthors()
-    {
-        $proc = new Processor();
-        $metadata = [];
-        $bibtexBlock = [
-            'Author' => 'Wang, Y. and Xie and Steffen, S.',
-            'Editor' => 'Ming, J.'
-        ];
-        $proc->handleRecord($bibtexBlock, $metadata);
 
-        $this->assertEquals(
-            [
-                [
-                    'FirstName' => 'Y.',
-                    'LastName' => 'Wang',
-                    'Role' => 'author'
-                ],
-                [
-                    'LastName' => 'Xie',
-                    'Role' => 'author'
-                ],
-                [
-                    'FirstName' => 'S.',
-                    'LastName' => 'Steffen',
-                    'Role' => 'author'
-                ],
-                [
-                    'FirstName' => 'J.',
-                    'LastName' => 'Ming',
-                    'Role' => 'editor'
-                ]
-            ],
-            $metadata['Person']
-        );
+    public function dataProvider()
+    {
+        return [
+            [['ptype' => 'conference'], 'conferenceobject'],
+            [['ptype' => 'journal'], 'article'],
+            [['type' => 'article'], 'article']
+        ];
     }
 
-    public function testProcessSpecialCharacters()
+    /**
+     * Test Mapping of document types.
+     *
+     * @param mixed $arg Value to check given by the data provider
+     * @param $res expected mapping-result
+     * @return void
+     *
+     * @dataProvider dataProvider
+     */
+    public function testProcessMapping($arg, $res)
     {
-        $parser = new Parser('@misc{test, author = {M{\"u}ller, Michael}}');
-        $bibtexRecord = $parser->parse();
+        $proc = new Processor();
+        $metadata = [];
+        $proc->handleRecord($arg, $metadata);
+        $this->assertEquals($res, $metadata['Type']);
+    }
+
+    public function testProcessTwoInfos()
+    {
+        $bibtexBlock = [
+            'ptype' => 'conference',
+            'type' => 'article'
+        ];
 
         $proc = new Processor();
         $metadata = [];
-        $proc->handleRecord(
-            $bibtexRecord[0],
-            $metadata
-        );
-
-        $this->assertEquals(
-            [
-                [
-                    'FirstName' => 'Michael',
-                    'LastName' => 'Müller',
-                    'Role' => 'author'
-                ]
-            ],
-            $metadata['Person']
-        );
+        $proc->handleRecord($bibtexBlock, $metadata);
+        $this->assertEquals('conferenceobject', $metadata['Type']);
     }
 }
