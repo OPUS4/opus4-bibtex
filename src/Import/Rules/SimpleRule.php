@@ -54,6 +54,7 @@ class SimpleRule implements IRule
         $this->bibtexFieldName = $bibtexFieldName;
         $this->opusFieldName = ucfirst($opusFieldName);
         $this->fn = $fn;
+        return $this;
     }
 
     public function apply($bibtexRecord, &$documentMetadata)
@@ -78,5 +79,19 @@ class SimpleRule implements IRule
     public function getEvaluatedBibTexField()
     {
         return [$this->bibtexFieldName];
+    }
+
+    public function setBibtexFieldName($bibtexFieldName)
+    {
+        $this->bibtexFieldName = $bibtexFieldName;
+        return $this;
+    }
+
+    protected function deleteBrace($value)
+    {
+        if (strlen($value) >= 2 && substr($value, 0, 1) == '{' && substr($value, -1, 1) == '}') {
+            $value = substr($value, 1, -1);
+        }
+        return trim($value);
     }
 }

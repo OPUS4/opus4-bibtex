@@ -33,11 +33,26 @@
 
 namespace Opus\Bibtex\Import;
 
-use Opus\Bibtex\Import\Rules\ArrayRule;
-use Opus\Bibtex\Import\Rules\ComplexRule;
+use Opus\Bibtex\Import\Rules\Arxiv;
 use Opus\Bibtex\Import\Rules\ConstantValueRule;
-use Opus\Bibtex\Import\Rules\DocumentTypeMapping;
+use Opus\Bibtex\Import\Rules\Doi;
+use Opus\Bibtex\Import\Rules\Isbn;
+use Opus\Bibtex\Import\Rules\Issn;
+use Opus\Bibtex\Import\Rules\Note;
+use Opus\Bibtex\Import\Rules\PageFirst;
+use Opus\Bibtex\Import\Rules\PageLast;
+use Opus\Bibtex\Import\Rules\PageNumber;
+use Opus\Bibtex\Import\Rules\Person;
+use Opus\Bibtex\Import\Rules\Ptype;
+use Opus\Bibtex\Import\Rules\PublishedYear;
 use Opus\Bibtex\Import\Rules\SimpleRule;
+use Opus\Bibtex\Import\Rules\SourceData;
+use Opus\Bibtex\Import\Rules\SourceDataHash;
+use Opus\Bibtex\Import\Rules\Subject;
+use Opus\Bibtex\Import\Rules\TitleMain;
+use Opus\Bibtex\Import\Rules\TitleParent;
+use Opus\Bibtex\Import\Rules\Type;
+use Opus\Bibtex\Import\Rules\Umlauts;
 
 class DefaultMappingConfiguration extends AbstractMappingConfiguration
 {
@@ -46,323 +61,121 @@ class DefaultMappingConfiguration extends AbstractMappingConfiguration
         $this->name = 'default';
         $this->description = 'Default BibTeX Mapping Configuration';
         $this
-            // ptype ist kein Standard-BibTeX-Feld: das Feld ptype kann genutzt werden, um das Typ-Mapping
-            // auf Basis des BibTeX-Types (die Zeichenkette nach @) zu umgehen
-            // ist im BibTeX-Record kein Feld ptype vorhanden, so wird der Typ aus der Zeichenkette nach @ abgeleitet
-            ->appendRule(new SimpleRule(
+            ->addRule(
                 'ptype',
-                'Type',
-                function ($value) {
-                    if (array_key_exists($value, DocumentTypeMapping::$MAPPING)) {
-                        return DocumentTypeMapping::$MAPPING[$value];
-                    }
-                }
-            ))
-            ->appendRule(new SimpleRule(
+                new Ptype()
+            )
+            ->addRule(
                 'type',
-                'Type',
-                function ($value) {
-                    if (array_key_exists($value, DocumentTypeMapping::$MAPPING)) {
-                        return DocumentTypeMapping::$MAPPING[$value];
-                    } else {
-                        return DocumentTypeMapping::$DEFAULT_OPUS_TYPE;
-                    }
-                }
-            ))
-            ->appendRule(new SimpleRule('number', 'Issue'))
-            ->appendRule(new SimpleRule('volume', 'Volume'))
-            ->appendRule(new SimpleRule(
-                'pages',
-                'PageFirst',
-                function ($value) {
-                    $value = str_replace(['--', '––', '–'], '-', $value);
-                    $parts = explode('-', $value, 2);
-                    return trim($parts[0]);
-                }
-            ))
-            ->appendRule(new SimpleRule(
-                'pages',
-                'PageLast',
-                function ($value) {
-                    $value = str_replace(['--', '––', '–'], '-', $value);
-                    $parts = explode('-', $value, 2);
-                    if (count($parts) == 2) {
-                        return trim($parts[1]);
-                    }
-                    return trim($parts[0]);
-                }
-            ))
-            ->appendRule(new ConstantValueRule(
-                'PageNumber',
-                function ($documentMetadata) {
-                    $pageFirst =
-                        array_key_exists('PageFirst', $documentMetadata) ? intval($documentMetadata['PageFirst']) : 0;
-                    $pageLast =
-                        array_key_exists('PageLast', $documentMetadata) ? intval($documentMetadata['PageLast']) : 0;
-                    if ($pageFirst > 0 && $pageLast > 0 && $pageLast >= $pageFirst) {
-                        return 1 + $pageLast - $pageFirst;
-                    }
-                }
-            ))
-            ->appendRule(new SimpleRule(
-                'year',
-                'PublishedYear',
-                function ($value) {
-                    $value = preg_replace('/[^0-9]/', '', $value);
-                    if (strlen($value) == 4) {
-                        return $value;
-                    }
-                }
-            ))
-            ->appendRule(new ArrayRule(
+                new Type()
+            )
+            ->addRule(
+                'issue',
+                new SimpleRule('number', 'Issue')
+            )
+            ->addRule(
+                'volume',
+                new SimpleRule('volume', 'Volume')
+            )
+            ->addRule(
+                'pageFirst',
+                new PageFirst()
+            )
+            ->addRule(
+                'pageLast',
+                new PageLast()
+            )
+            ->addRule(
+                'pageNumber',
+                new PageNumber()
+            )
+            ->addRule(
+                'publishedYear',
+                new PublishedYear()
+            )
+            ->addRule(
                 'issn',
-                'Identifier',
-                function ($value) {
-                    return [
-                        'Value' => $value,
-                        'Type' => 'issn'
-                    ];
-                }
-            ))
-            ->appendRule(new ArrayRule(
+                new Issn()
+            )
+            ->addRule(
                 'isbn',
-                'Identifier',
-                function ($value) {
-                    return [
-                        'Value' => $value,
-                        'Type' => 'isbn'
-                    ];
-                }
-            ))
-            ->appendRule(new ArrayRule(
+                new Isbn()
+            )
+            ->addRule(
                 'doi',
-                'Identifier',
-                function ($value) {
-                    if (strtolower(substr($value, 0, 4)) === 'doi:') {
-                        $value = trim(substr($value, 4)); // Präfix doi: abschneiden
-                    }
-                    return [
-                        'Value' => $value,
-                        'Type' => 'doi'
-                    ];
-                }
-            ))
-            ->appendRule(new ArrayRule(
+                new Doi()
+            )
+            ->addRule(
                 'arxiv',
-                'Identifier',
-                function ($value) {
-                    $type = 'url';
-
-                    $baseUrl1 = 'http://arxiv.org/abs/';
-                    $baseUrl2 = 'https://arxiv.org/abs/';
-                    if (substr($value, 0, strlen($baseUrl1)) == $baseUrl1 ||
-                        substr($value, 0, strlen($baseUrl2)) == $baseUrl2) {
-                        $type = 'arxiv';
-                        // URL-Präfix abschneiden, so dass nur die ArXiv-ID übrigbleibt
-                        $value = preg_replace('#https?://arxiv.org/abs/#i', '', $value);
-                    } elseif (strtolower(substr($value, 0, 6)) === 'arxiv:') {
-                        $type = 'arxiv';
-                        $value = substr($value, 6); // Präfix 'arxiv:' abschneiden
-                    }
-
-                    return [
-                        'Value' => $value,
-                        'Type' => $type
-                    ];
-                }
-            ))
-            ->appendRule(new ArrayRule(
-                'title',
-                'TitleMain',
-                function ($value) {
-                    return [
-                        'Language' => 'eng',
-                        'Value' => $this->deleteBrace($value),
-                        'Type' => 'main'
-                    ];
-                }
-            ))
-            ->appendRule(new ArrayRule(
-                'journal',
-                'TitleParent',
-                function ($value) {
-                    return [
-                        'Language' => 'eng',
-                        'Value' => $this->deleteBrace($value),
-                        'Type' => 'parent'
-                    ];
-                }
-            ))
-            ->appendRule(new ArrayRule(
-                'booktitle',
-                'TitleParent',
-                function ($value) {
-                    return [
-                        'Language' => 'eng',
-                        'Value' => $this->deleteBrace($value),
-                        'Type' => 'parent'
-                    ];
-                }
-            ))
-            ->appendRule(new ArrayRule(
-                'keywords',
-                'Subject',
-                function ($value) {
-                    $keywords = explode(', ', $value);
-                    $result = [];
-                    foreach ($keywords as $keyword) {
-                        $result[] = [
-                            'Language' => 'eng',
-                            'Type' => 'uncontrolled',
-                            'Value' => $this->deleteBrace($keyword)
-                        ];
-                    }
-                    return $result;
-                }
-            ))
-            ->appendRule(new ArrayRule(
-                'pdfurl',
-                'Note',
-                function ($value) {
-                    return [
-                        'Visibility' => 'public',
-                        'Message' => 'URL of the PDF: ' . $value
-                    ];
-                }
-            ))
-            ->appendRule(new ArrayRule(
+                new Arxiv()
+            )
+            ->addRule(
+                'titleMain',
+                new TitleMain()
+            )
+            ->addRule(
+                'journalTitle',
+                (new TitleParent())->setBibtexFieldName('journal')
+            )
+            ->addRule(
+                'bookTitle',
+                (new TitleParent())->setBibtexFieldName('booktitle')
+            )
+            ->addRule(
+                'subject',
+                new Subject()
+            )
+            ->addRule(
+                'pdfUrl',
+                (new Note())->setBibtexFieldName('pdfurl')->setMessagePrefix('URL of the PDF: ')
+            )
+            ->addRule(
                 'slides',
-                'Note',
-                function ($value) {
-                    return [
-                        'Visibility' => 'public',
-                        'Message' => 'URL of the Slides: ' . $value
-                    ];
-                }
-            ))
-            ->appendRule(new ArrayRule(
+                (new Note())->setBibtexFieldName('slides')->setMessagePrefix('URL of the Slides: ')
+            )
+            ->addRule(
                 'annote',
-                'Note',
-                function ($value) {
-                    return [
-                        'Visibility' => 'public',
-                        'Message' => 'Additional Note: ' . $value
-                    ];
-                }
-            ))
-            ->appendRule(new ArrayRule(
+                (new Note())->setBibtexFieldName('annote')->setMessagePrefix('Additional Note: ')
+            )
+            ->addRule(
                 'summary',
-                'Note',
-                function ($value) {
-                    return [
-                        'Visibility' => 'public',
-                        'Message' => 'URL of the Abstract: ' . $value
-                    ];
-                }
-            ))
-            ->appendRule(new ArrayRule(
+                (new Note())->setBibtexFieldName('summary')->setMessagePrefix('URL of the Abstract: ')
+            )
+            ->addRule(
                 'code',
-                'Note',
-                function ($value) {
-                    return [
-                        'Visibility' => 'public',
-                        'Message' => 'URL of the Code: ' . $value
-                    ];
-                }
-            ))
-            ->appendRule(new ArrayRule(
+                (new Note())->setBibtexFieldName('code')->setMessagePrefix('URL of the Code: ')
+            )
+            ->addRule(
                 'poster',
-                'Note',
-                function ($value) {
-                    return [
-                        'Visibility' => 'public',
-                        'Message' => 'URL of the Poster: ' . $value
-                    ];
-                }
-            ))
-            ->appendRule(new ArrayRule(
+                (new Note())->setBibtexFieldName('poster')->setMessagePrefix('URL of the Poster: ')
+            )
+            ->addRule(
                 'author',
-                'Person',
-                function ($value) {
-                    $persons = explode(' and ', $value);
-                    $result = [];
-                    foreach ($persons as $person) {
-                        $result[] = array_merge(['Role' => 'author'], $this->extractNameParts($person));
-                    }
-                    return $result;
-                }
-            ))
-            ->appendRule(new ArrayRule(
+                (new Person())->setBibtexFieldName('author')
+            )
+            ->addRule(
                 'editor',
-                'Person',
-                function ($value) {
-                    $persons = explode(' and ', $value);
-                    $result = [];
-                    foreach ($persons as $person) {
-                        $result[] = array_merge(['Role' => 'editor'], $this->extractNameParts($person));
-                    }
-                    return $result;
-                }
-            ))
-            ->appendRule(new ArrayRule(
-                '_original',
-                'Enrichment',
-                function ($value) {
-                    return [
-                        'KeyName' => self::SOURCE_DATA_KEY,
-                        'Value' => $value
-                    ];
-                }
-            ))
-            ->appendRule(new ArrayRule(
-                '_original',
-                'Enrichment',
-                function ($value) {
-                    return [
-                        'KeyName' => self::SOURCE_DATA_HASH_KEY,
-                        'Value' => self::HASH_FUNCTION . ':' . (self::HASH_FUNCTION)($value)
-                    ];
-                }
-            ))
-            ->appendRule(new ConstantValueRule(
-                'Language',
-                function () {
-                    return 'eng';
-                }
-            ))
-            ->appendRule(new ConstantValueRule(
-                'BelongsToBibliography',
-                function () {
-                    return '0';
-                }
-            ))
-            ->appendRule(new ComplexRule(
-                function ($fieldValues, &$documentMetadata) {
-                    // behandelt Umlaute, die im BibTeX-File nicht korrekt angegeben wurden (siehe OPUSVIER-4216)
-                    foreach ($documentMetadata as $fieldName => $fieldValue) {
-                        if (is_array($fieldValue)) {
-                            foreach ($fieldValue as $subFieldIndex => $subFieldValue) {
-                                if ($fieldName === 'Enrichment' &&
-                                    ($subFieldValue['KeyName'] === AbstractMappingConfiguration::SOURCE_DATA_HASH_KEY ||
-                                        $subFieldValue['KeyName'] === AbstractMappingConfiguration::SOURCE_DATA_KEY)) {
-                                    continue; // der Original-BibTeX-Record soll nicht verändert werden
-                                }
-                                foreach ($subFieldValue as $name => $value) {
-                                    $convertedFieldValue = $this->convertUmlauts($value);
-                                    if ($convertedFieldValue !== false) {
-                                        $documentMetadata[$fieldName][$subFieldIndex][$name] = $convertedFieldValue;
-                                    }
-                                }
-                            }
-                        } else {
-                            $convertedFieldValue = $this->convertUmlauts($fieldValue);
-                            if ($convertedFieldValue !== false) {
-                                $documentMetadata[$fieldName] = $convertedFieldValue;
-                            }
-                        }
-                    }
-                }
-            ))
-        ;
+                (new Person())->setBibtexFieldName('editor')
+            )
+            ->addRule(
+                'sourceData',
+                new SourceData()
+            )
+            ->addRule(
+                'sourceDataHash',
+                new SourceDataHash()
+            )
+            ->addRule(
+                'language',
+                (new ConstantValueRule())->setOpusFieldName('Language')->setValue('eng')
+            )
+            ->addRule(
+                'belongsToBibliography',
+                (new ConstantValueRule())->setOpusFieldName('BelongsToBibliography')->setValue('0')
+            )
+            ->addRule(
+                'umlauts',
+                new Umlauts()
+            );
     }
 }

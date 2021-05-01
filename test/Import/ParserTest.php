@@ -25,7 +25,7 @@
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
  * @category    Tests
- * @package     Test
+ * @package     OpusTest\Bibtex\Import
  * @author      Sascha Szott <opus-repository@saschaszott.de>
  * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
@@ -888,7 +888,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
         );
         $mappingConfiguration = new DefaultMappingConfiguration();
         $mappingConfiguration->resetRules();
-        $mappingConfiguration->appendRule($complexRule);
+        $mappingConfiguration->addRule('newRule', $complexRule);
         $proc = new Processor($mappingConfiguration);
         $metadata = [];
         $fieldsEvaluated = $proc->handleRecord($bibTexRecords[0], $metadata);

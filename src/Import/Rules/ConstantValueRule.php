@@ -40,16 +40,28 @@ class ConstantValueRule implements IRule
 {
     protected $opusFieldName;
 
-    protected $fn;
+    protected $value;
 
     /**
-     * @param $opusFieldName Name des zu befüllenden OPUS4-Metadatenfelds
-     * @param null $fn optionale Funktion, die verwendet wird, um den Feldwert für das OPUS4-Metadatenfelds zu bestimmen
+     * Setzt den Namen des zu befüllenden OPUS4-Metadatenfelds.
+     *
+     * @param string $opusFieldName
      */
-    public function __construct($opusFieldName, $fn = null)
+    public function setOpusFieldName($opusFieldName)
     {
         $this->opusFieldName = ucfirst($opusFieldName);
-        $this->fn = $fn;
+        return $this;
+    }
+
+    /**
+     * Setzt den Feldwert für das OPUS4-Metadatenfeld (Konstante).
+     *
+     * @param $value
+     */
+    public function setValue($value)
+    {
+        $this->value = $value;
+        return $this;
     }
 
     public function apply($bibtexRecord, &$documentMetadata)
@@ -60,12 +72,9 @@ class ConstantValueRule implements IRule
             // der BibTeX-Record wird zur Bestimmung des Metadatenfelds nicht verwendet
             // d.h. Metadatenfeldwert wird hier auf eine Konstante gesetzt oder Bestimmung des Feldinhalts auf Basis
             // von anderen Metadatenfeldern
-            if (! is_null($this->fn)) {
-                $value = ($this->fn)($documentMetadata);
-                if (! is_null($value)) {
-                    $documentMetadata[$this->opusFieldName] = $value;
-                    $result = true;
-                }
+            if (! is_null($this->value)) {
+                $documentMetadata[$this->opusFieldName] = $this->value;
+                $result = true;
             }
         }
         return $result;
