@@ -58,6 +58,23 @@ class DocumentTypeMappingTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('defaultType', $metadata['Type']);
     }
 
+    public function testUnsetDefaultMapping()
+    {
+        $typeMapping = new DefaultDocumentTypeMapping();
+        $typeMapping->setDefaultType(null);
+
+        $mappingConf = new DefaultMappingConfiguration();
+        $mappingConf->resetRules();
+        $mappingConf->addRule('type', new Type($typeMapping));
+
+        $processor = new Processor($mappingConf);
+        $metadata = [];
+        $processor->handleRecord(['type' => 'unknownType'], $metadata);
+
+        $this->assertArrayNotHasKey('Type', $metadata);
+        $this->assertNull($typeMapping->getDefaultType());
+    }
+
     public function testMapping()
     {
         $typeMapping = new DefaultDocumentTypeMapping();
@@ -93,5 +110,64 @@ class DocumentTypeMappingTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($typeMapping->getMapping('foo'), $metadata['Type']);
         $this->assertEquals('baz', $metadata['Type']);
+    }
+
+    public function testRemoveUnkownMapping()
+    {
+        $typeMapping = new DefaultDocumentTypeMapping();
+        $typeMapping->setDefaultType('defaultType');
+        $typeMapping->setMapping('foo', 'bar');
+        $typeMapping->removeMapping('baz');
+
+        $mappingConf = new DefaultMappingConfiguration();
+        $mappingConf->resetRules();
+        $mappingConf->addRule('type', new Type($typeMapping));
+
+        $processor = new Processor($mappingConf);
+        $metadata = [];
+        $processor->handleRecord(['type' => 'foo'], $metadata);
+
+        $this->assertEquals($typeMapping->getMapping('foo'), $metadata['Type']);
+        $this->assertEquals('bar', $metadata['Type']);
+    }
+
+    public function testRemoveMapping()
+    {
+        $typeMapping = new DefaultDocumentTypeMapping();
+        $typeMapping->setDefaultType('defaultType');
+        $typeMapping->setMapping('foo', 'bar');
+        $typeMapping->removeMapping('foo');
+
+        $mappingConf = new DefaultMappingConfiguration();
+        $mappingConf->resetRules();
+        $mappingConf->addRule('type', new Type($typeMapping));
+
+        $processor = new Processor($mappingConf);
+        $metadata = [];
+        $processor->handleRecord(['type' => 'foo'], $metadata);
+
+        $this->assertEquals($typeMapping->getMapping('foo'), $metadata['Type']);
+        $this->assertEquals($typeMapping->getDefaultType(), $metadata['Type']);
+        $this->assertEquals('defaultType', $metadata['Type']);
+    }
+
+    public function testClearMapping()
+    {
+        $typeMapping = new DefaultDocumentTypeMapping();
+        $typeMapping->setDefaultType('defaultType');
+        $typeMapping->setMapping('foo', 'bar');
+        $typeMapping->clearMapping();
+
+        $mappingConf = new DefaultMappingConfiguration();
+        $mappingConf->resetRules();
+        $mappingConf->addRule('type', new Type($typeMapping));
+
+        $processor = new Processor($mappingConf);
+        $metadata = [];
+        $processor->handleRecord(['type' => 'foo'], $metadata);
+
+        $this->assertEquals($typeMapping->getMapping('foo'), $metadata['Type']);
+        $this->assertEquals($typeMapping->getDefaultType(), $metadata['Type']);
+        $this->assertEquals('defaultType', $metadata['Type']);
     }
 }

@@ -64,6 +64,27 @@ class AbstractDocumentTypeMapping
     }
 
     /**
+     * Erlaubt das Entfernen des Typ-Mappings für den übergebenen BibTeX-Typ. Der Versuch des Entfernens eines nicht
+     * vorhandenen Mappings wird ignoriert.
+     *
+     * @param $bibtexType Name des BibTeX-Typs
+     */
+    public function removeMapping($bibtexType)
+    {
+        if (array_key_exists($bibtexType, $this->typeMap)) {
+            unset($this->typeMap[$bibtexType]);
+        }
+    }
+
+    /**
+     * Setzt das Typ-Mapping zurück.
+     */
+    public function clearMapping()
+    {
+        $this->typeMap = [];
+    }
+
+    /**
      * Erlaubt das Setzen eines OPUS-Dokumenttyp, der immer dann zurückgegeben wird, wenn für einen BibTeX-Typ kein
      * Mapping-Eintrag existiert.
      *
