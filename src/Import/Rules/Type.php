@@ -33,25 +33,29 @@
 
 namespace Opus\Bibtex\Import\Rules;
 
-use Opus\Bibtex\Import\Rules\DocumentType\DefaultDocumentTypeMapping;
+use Opus\Bibtex\Import\Configuration\ConfigurationManager;
 
 class Type extends SimpleRule
 {
     protected $documentTypeMapping;
 
-    public function __construct($documentTypeMapping = null)
+    public function __construct()
     {
-        if (is_null($documentTypeMapping)) {
-            $documentTypeMapping = new DefaultDocumentTypeMapping();
-        }
-        $this->documentTypeMapping = $documentTypeMapping;
+        $this->documentTypeMapping = ConfigurationManager::getTypeMapping();
 
-        return parent::__construct(
-            'type',
-            'Type',
+        $this->setBibtexFieldName('type');
+        $this->setOpusFieldName('Type');
+        $this->setFn(
             function ($value) {
                 return $this->documentTypeMapping->getMapping($value);
             }
         );
+        return $this;
+    }
+
+    public function setDocumentTypeMapping($documentTypeMapping)
+    {
+        $this->documentTypeMapping = $documentTypeMapping;
+        return $this;
     }
 }

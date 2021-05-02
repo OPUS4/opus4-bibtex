@@ -33,7 +33,7 @@
 
 namespace Opus\Bibtex\Import\Rules;
 
-use Opus\Bibtex\Import\Rules\DocumentType\DefaultDocumentTypeMapping;
+use Opus\Bibtex\Import\Configuration\ConfigurationManager;
 
 /**
  * ptype ist kein Standard-BibTeX-Feld: das Feld ptype kann genutzt werden, um das Typ-Mapping auf Basis des
@@ -45,20 +45,24 @@ class Ptype extends SimpleRule
 {
     protected $documentTypeMapping;
 
-    public function __construct($documentTypeMapping = null)
+    public function __construct()
     {
-        if (is_null($documentTypeMapping)) {
-            $documentTypeMapping = new DefaultDocumentTypeMapping();
-        }
-        $this->documentTypeMapping = $documentTypeMapping;
+        $this->documentTypeMapping = ConfigurationManager::getTypeMapping();
         $this->documentTypeMapping->setDefaultType(null); // Default-Type soll nicht zur Anwendung kommen
 
-        return parent::__construct(
-            'ptype',
-            'Type',
+        $this->setBibtexFieldName('ptype');
+        $this->setOpusFieldName('Type');
+        $this->setFn(
             function ($value) {
                 return $this->documentTypeMapping->getMapping($value);
             }
         );
+        return $this;
+    }
+
+    public function setDocumentTypeMapping($documentTypeMapping)
+    {
+        $this->documentTypeMapping = $documentTypeMapping;
+        return $this;
     }
 }

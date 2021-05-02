@@ -33,9 +33,10 @@
 
 namespace OpusTest\Bibtex\Import\Rules\DocumentType;
 
-use Opus\Bibtex\Import\DefaultMappingConfiguration;
+use Opus\Bibtex\Import\Configuration\ConfigurationManager;
+use Opus\Bibtex\Import\Configuration\DocumentTypeMapping;
+use Opus\Bibtex\Import\Configuration\FieldMapping;
 use Opus\Bibtex\Import\Processor;
-use Opus\Bibtex\Import\Rules\DocumentType\DefaultDocumentTypeMapping;
 use Opus\Bibtex\Import\Rules\Type;
 
 class DocumentTypeMappingTest extends \PHPUnit_Framework_TestCase
@@ -43,12 +44,11 @@ class DocumentTypeMappingTest extends \PHPUnit_Framework_TestCase
 
     public function testDefaultMapping()
     {
-        $typeMapping = new DefaultDocumentTypeMapping();
+        $typeMapping = new DocumentTypeMapping();
         $typeMapping->setDefaultType('defaultType');
 
-        $mappingConf = new DefaultMappingConfiguration();
-        $mappingConf->resetRules();
-        $mappingConf->addRule('type', new Type($typeMapping));
+        $mappingConf = new FieldMapping();
+        $mappingConf->addRule('type', (new Type())->setDocumentTypeMapping($typeMapping));
 
         $processor = new Processor($mappingConf);
         $metadata = [];
@@ -60,12 +60,13 @@ class DocumentTypeMappingTest extends \PHPUnit_Framework_TestCase
 
     public function testUnsetDefaultMapping()
     {
-        $typeMapping = new DefaultDocumentTypeMapping();
+        $typeMapping = new DocumentTypeMapping();
         $typeMapping->setDefaultType(null);
 
-        $mappingConf = new DefaultMappingConfiguration();
-        $mappingConf->resetRules();
-        $mappingConf->addRule('type', new Type($typeMapping));
+        $mappingConf = new FieldMapping();
+        $mappingConf
+            ->resetRules()
+            ->addRule('type', (new Type())->setDocumentTypeMapping($typeMapping));
 
         $processor = new Processor($mappingConf);
         $metadata = [];
@@ -77,13 +78,15 @@ class DocumentTypeMappingTest extends \PHPUnit_Framework_TestCase
 
     public function testMapping()
     {
-        $typeMapping = new DefaultDocumentTypeMapping();
-        $typeMapping->setDefaultType('defaultType');
-        $typeMapping->setMapping('foo', 'bar');
+        $typeMapping = new DocumentTypeMapping();
+        $typeMapping
+            ->setDefaultType('defaultType')
+            ->setMapping('foo', 'bar');
 
-        $mappingConf = new DefaultMappingConfiguration();
-        $mappingConf->resetRules();
-        $mappingConf->addRule('type', new Type($typeMapping));
+        $mappingConf = new FieldMapping();
+        $mappingConf
+            ->resetRules()
+            ->addRule('type', (new Type())->setDocumentTypeMapping($typeMapping));
 
         $processor = new Processor($mappingConf);
         $metadata = [];
@@ -95,14 +98,16 @@ class DocumentTypeMappingTest extends \PHPUnit_Framework_TestCase
 
     public function testMappingTwice()
     {
-        $typeMapping = new DefaultDocumentTypeMapping();
-        $typeMapping->setDefaultType('defaultType');
-        $typeMapping->setMapping('foo', 'bar');
-        $typeMapping->setMapping('foo', 'baz'); // Mapping wird überschrieben
+        $typeMapping = new DocumentTypeMapping();
+        $typeMapping
+            ->setDefaultType('defaultType')
+            ->setMapping('foo', 'bar')
+            ->setMapping('foo', 'baz'); // Mapping wird überschrieben
 
-        $mappingConf = new DefaultMappingConfiguration();
-        $mappingConf->resetRules();
-        $mappingConf->addRule('type', new Type($typeMapping));
+        $mappingConf = new FieldMapping();
+        $mappingConf
+            ->resetRules()
+            ->addRule('type', (new Type())->setDocumentTypeMapping($typeMapping));
 
         $processor = new Processor($mappingConf);
         $metadata = [];
@@ -114,14 +119,16 @@ class DocumentTypeMappingTest extends \PHPUnit_Framework_TestCase
 
     public function testRemoveUnkownMapping()
     {
-        $typeMapping = new DefaultDocumentTypeMapping();
-        $typeMapping->setDefaultType('defaultType');
-        $typeMapping->setMapping('foo', 'bar');
-        $typeMapping->removeMapping('baz');
+        $typeMapping = new DocumentTypeMapping();
+        $typeMapping
+            ->setDefaultType('defaultType')
+            ->setMapping('foo', 'bar')
+            ->removeMapping('baz');
 
-        $mappingConf = new DefaultMappingConfiguration();
-        $mappingConf->resetRules();
-        $mappingConf->addRule('type', new Type($typeMapping));
+        $mappingConf = new FieldMapping();
+        $mappingConf
+            ->resetRules()
+            ->addRule('type', (new Type())->setDocumentTypeMapping($typeMapping));
 
         $processor = new Processor($mappingConf);
         $metadata = [];
@@ -133,14 +140,16 @@ class DocumentTypeMappingTest extends \PHPUnit_Framework_TestCase
 
     public function testRemoveMapping()
     {
-        $typeMapping = new DefaultDocumentTypeMapping();
-        $typeMapping->setDefaultType('defaultType');
-        $typeMapping->setMapping('foo', 'bar');
-        $typeMapping->removeMapping('foo');
+        $typeMapping = new DocumentTypeMapping();
+        $typeMapping
+            ->setDefaultType('defaultType')
+            ->setMapping('foo', 'bar')
+            ->removeMapping('foo');
 
-        $mappingConf = new DefaultMappingConfiguration();
-        $mappingConf->resetRules();
-        $mappingConf->addRule('type', new Type($typeMapping));
+        $mappingConf = new FieldMapping();
+        $mappingConf
+            ->resetRules()
+            ->addRule('type', (new Type())->setDocumentTypeMapping($typeMapping));
 
         $processor = new Processor($mappingConf);
         $metadata = [];
@@ -153,14 +162,16 @@ class DocumentTypeMappingTest extends \PHPUnit_Framework_TestCase
 
     public function testClearMapping()
     {
-        $typeMapping = new DefaultDocumentTypeMapping();
-        $typeMapping->setDefaultType('defaultType');
-        $typeMapping->setMapping('foo', 'bar');
-        $typeMapping->clearMapping();
+        $typeMapping = new DocumentTypeMapping();
+        $typeMapping
+            ->setDefaultType('defaultType')
+            ->setMapping('foo', 'bar')
+            ->clearMapping();
 
-        $mappingConf = new DefaultMappingConfiguration();
-        $mappingConf->resetRules();
-        $mappingConf->addRule('type', new Type($typeMapping));
+        $mappingConf = new FieldMapping();
+        $mappingConf
+            ->resetRules()
+            ->addRule('type', (new Type())->setDocumentTypeMapping($typeMapping));
 
         $processor = new Processor($mappingConf);
         $metadata = [];
@@ -169,5 +180,35 @@ class DocumentTypeMappingTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($typeMapping->getMapping('foo'), $metadata['Type']);
         $this->assertEquals($typeMapping->getDefaultType(), $metadata['Type']);
         $this->assertEquals('defaultType', $metadata['Type']);
+    }
+
+    public function testGetTypeMapping()
+    {
+        $documentTypeMapping = new DocumentTypeMapping();
+        $documentTypeMapping
+            // dieser OPUS-Dokumenttyp wird immer dann verwendet, wenn kein Mapping für den aus dem BibTeX-Record
+            // abgeleiteten Record-Typ vorliegt.
+            ->setDefaultType('misc')
+
+            ->setMapping('article', 'article')
+            ->setMapping('book', 'book')
+            ->setMapping('booklet', 'bookpart')
+            ->setMapping('conference', 'conferenceobject')
+            ->setMapping('inbook', 'bookpart')
+            ->setMapping('incollection', 'bookpart')
+            ->setMapping('inproceedings', 'article')
+            ->setMapping('manual', 'article')
+            ->setMapping('mastersthesis', 'masterthesis')
+            ->setMapping('misc', 'misc')
+            ->setMapping('phdthesis', 'doctoralthesis')
+            ->setMapping('proceedings', 'conferenceobject')
+            ->setMapping('techreport', 'report')
+            ->setMapping('unpublished', 'workingpaper')
+            // Mapping von nicht Standard BibTeX-Typen
+            ->setMapping('journal', 'article');
+
+        $documentTypeMappingFromConfig = ConfigurationManager::getTypeMapping();
+        $this->assertEquals($documentTypeMapping->getDefaultType(), $documentTypeMappingFromConfig->getDefaultType());
+        $this->assertEquals($documentTypeMapping->getMappings(), $documentTypeMappingFromConfig->getMappings());
     }
 }

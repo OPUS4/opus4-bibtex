@@ -37,9 +37,9 @@ class Doi extends ArrayRule
 {
     public function __construct()
     {
-        return parent::__construct(
-            'doi',
-            'Identifier',
+        $this->setBibtexFieldName('doi');
+        $this->setOpusFieldName('Identifier');
+        $this->setFn(
             function ($value) {
                 if (strtolower(substr($value, 0, 4)) === 'doi:') {
                     $value = trim(substr($value, 4)); // Präfix doi: abschneiden
@@ -50,5 +50,6 @@ class Doi extends ArrayRule
                 ];
             }
         );
+        return $this;
     }
 }

@@ -25,18 +25,19 @@
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
  * @category    BibTeX
- * @package     Opus\Bibtex\Import\Rules\DocumentType
+ * @package     Opus\Bibtex\Import\Configuration
  * @author      Sascha Szott <opus-repository@saschaszott.de>
  * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace Opus\Bibtex\Import\Rules\DocumentType;
+namespace Opus\Bibtex\Import\Configuration;
 
-class AbstractDocumentTypeMapping
+class DocumentTypeMapping
 {
     /**
-     * Map von BibTeX-Typen auf OPUS-Dokumenttypen, wobei ein BibTeX-Typ nur einem OPUS-Dokumenttyp zugeordnet sein kann.
+     * Mapping (assoziatives Array) von BibTeX-Typen auf OPUS-Dokumenttypen, wobei ein BibTeX-Typ nur einem
+     * OPUS-Dokumenttyp zugeordnet sein kann.
      *
      * @var array
      */
@@ -118,5 +119,14 @@ class AbstractDocumentTypeMapping
             return $this->typeMap[$bibtexType];
         }
         return $this->defaultType;
+    }
+
+    /**
+     * Gibt die aktuelle Typmapping-Konfiguration zurück
+     * @return array
+     */
+    public function getMappings()
+    {
+        return $this->typeMap;
     }
 }

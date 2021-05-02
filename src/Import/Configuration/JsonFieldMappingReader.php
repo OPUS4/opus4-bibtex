@@ -25,38 +25,36 @@
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
  * @category    BibTeX
- * @package     Opus\Bibtex\Import\Rules\DocumentType
+ * @package     Opus\Bibtex\Import\Configuration
  * @author      Sascha Szott <opus-repository@saschaszott.de>
  * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace Opus\Bibtex\Import\Rules\DocumentType;
+namespace Opus\Bibtex\Import\Configuration;
 
-class DefaultDocumentTypeMapping extends AbstractDocumentTypeMapping
+class JsonFieldMappingReader
 {
-    public function __construct()
+    /**
+     * @param $fileName
+     * @return FieldMapping
+     * @throws \Exception
+     */
+    public function getMappingConfigurationFromFile($fileName)
     {
-        // dieser OPUS-Dokumenttyp wird immer dann verwendet, wenn kein Mapping für den aus dem BibTeX-Record
-        // abgeleiteten Record-Typ vorliegt.
-        $this->setDefaultType('misc');
+        $json = file_get_contents($fileName);
+        if ($json === false) {
+            throw new \Exception("could not read file $fileName");
+        }
 
-        $this
-            ->setMapping('article', 'article')
-            ->setMapping('book', 'book')
-            ->setMapping('booklet', 'bookpart')
-            ->setMapping('conference', 'conferenceobject')
-            ->setMapping('inbook', 'bookpart')
-            ->setMapping('incollection', 'bookpart')
-            ->setMapping('inproceedings', 'article')
-            ->setMapping('manual', 'article')
-            ->setMapping('mastersthesis', 'masterthesis')
-            ->setMapping('misc', 'misc')
-            ->setMapping('phdthesis', 'doctoralthesis')
-            ->setMapping('proceedings', 'conferenceobject')
-            ->setMapping('techreport', 'report')
-            ->setMapping('unpublished', 'workingpaper')
-            // Mapping von nicht Standard BibTeX-Typen
-            ->setMapping('journal', 'article');
+        $jsonArr = json_decode($json, true);
+        if (is_null($jsonArr)) {
+            throw new \Exception("could not decode JSON file $fileName");
+        }
+
+        return (new FieldMapping())
+            ->setName($jsonArr['name'])
+            ->setDescription($jsonArr['description'])
+            ->setRules($jsonArr['rules']);
     }
 }

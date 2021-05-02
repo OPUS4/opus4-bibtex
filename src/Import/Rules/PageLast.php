@@ -37,9 +37,9 @@ class PageLast extends SimpleRule
 {
     public function __construct()
     {
-        return parent::__construct(
-            'pages',
-            'PageLast',
+        $this->setBibtexFieldName('pages');
+        $this->setOpusFieldName('PageLast');
+        $this->setFn(
             function ($value) {
                 $value = str_replace(['--', '––', '–'], '-', $value);
                 $parts = explode('-', $value, 2);
@@ -49,5 +49,6 @@ class PageLast extends SimpleRule
                 return trim($parts[0]);
             }
         );
+        return $this;
     }
 }

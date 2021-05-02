@@ -25,31 +25,35 @@
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
  * @category    Tests
- * @package     OpusTest\Bibtex\Import
+ * @package     OpusTest\Bibtex\Import\Configuration
  * @author      Sascha Szott <opus-repository@saschaszott.de>
  * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace OpusTest\Bibtex\Import;
+namespace OpusTest\Bibtex\Import\Configuration;
 
-use Opus\Bibtex\Import\DefaultMappingConfiguration;
+use Opus\Bibtex\Import\Configuration\FieldMapping;
 use Opus\Bibtex\Import\Processor;
 use Opus\Bibtex\Import\Rules\ConstantValueRule;
 use Opus\Bibtex\Import\Rules\SimpleRule;
 
 class MappingConfigurationTest extends \PHPUnit_Framework_TestCase
 {
-
     public function testUpdateRule()
     {
-        $mappingConf = new DefaultMappingConfiguration();
-        $mappingConf->updateRule(
-            'publishedYear',
-            new SimpleRule('year', 'completedYear')
-        );
+        $fieldMapping = new FieldMapping();
+        $fieldMapping
+            ->addRule(
+                'publishedYear',
+                new SimpleRule('year', 'publishedYear')
+            )
+            ->updateRule(
+                'publishedYear',
+                new SimpleRule('year', 'completedYear')
+            );
 
-        $proc = new Processor($mappingConf);
+        $proc = new Processor($fieldMapping);
         $metadata = [];
         $proc->handleRecord(['Year' => '2019'], $metadata);
 
@@ -59,13 +63,18 @@ class MappingConfigurationTest extends \PHPUnit_Framework_TestCase
 
     public function testAddRuleOverwrite()
     {
-        $mappingConf = new DefaultMappingConfiguration();
-        $mappingConf->addRule(
-            'publishedYear',
-            new SimpleRule('year', 'completedYear')
-        );
+        $fieldMapping = new FieldMapping();
+        $fieldMapping
+            ->addRule(
+                'publishedYear',
+                new SimpleRule('year', 'publishedYear')
+            )
+            ->addRule(
+                'publishedYear',
+                new SimpleRule('year', 'completedYear')
+            );
 
-        $proc = new Processor($mappingConf);
+        $proc = new Processor($fieldMapping);
         $metadata = [];
         $proc->handleRecord(['Year' => '2019'], $metadata);
 
@@ -75,13 +84,18 @@ class MappingConfigurationTest extends \PHPUnit_Framework_TestCase
 
     public function testAddRule()
     {
-        $mappingConf = new DefaultMappingConfiguration();
-        $mappingConf->addRule(
-            'completedYear',
-            new SimpleRule('year', 'completedYear')
-        );
+        $fieldMapping = new FieldMapping();
+        $fieldMapping
+            ->addRule(
+                'publishedYear',
+                new SimpleRule('year', 'publishedYear')
+            )
+            ->addRule(
+                'completedYear',
+                new SimpleRule('year', 'completedYear')
+            );
 
-        $proc = new Processor($mappingConf);
+        $proc = new Processor($fieldMapping);
         $metadata = [];
         $proc->handleRecord(['Year' => '2019'], $metadata);
 
@@ -91,14 +105,19 @@ class MappingConfigurationTest extends \PHPUnit_Framework_TestCase
 
     public function testResetRule()
     {
-        $mappingConf = new DefaultMappingConfiguration();
-        $mappingConf->resetRules();
-        $mappingConf->addRule(
-            'completedYear',
-            new SimpleRule('year', 'completedYear')
-        );
+        $fieldMapping = new FieldMapping();
+        $fieldMapping
+            ->addRule(
+                'publishedYear',
+                new SimpleRule('year', 'publishedYear')
+            )
+            ->resetRules()
+            ->addRule(
+                'completedYear',
+                new SimpleRule('year', 'completedYear')
+            );
 
-        $proc = new Processor($mappingConf);
+        $proc = new Processor($fieldMapping);
         $metadata = [];
         $proc->handleRecord(['Year' => '2019'], $metadata);
 
@@ -108,27 +127,33 @@ class MappingConfigurationTest extends \PHPUnit_Framework_TestCase
 
     public function testRemoveRule()
     {
-        $mappingConf = new DefaultMappingConfiguration();
-        $mappingConf->removeRule('publishedYear');
-        $mappingConf->addRule(
-            'completedYear',
-            new SimpleRule('year', 'completedYear')
-        );
+        $fieldMapping = new FieldMapping();
+        $fieldMapping
+            ->addRule(
+                'publishedYear',
+                new SimpleRule('year', 'publishedYear')
+            )
+            ->removeRule('publishedYear')
+            ->addRule(
+                'completedYear',
+                new SimpleRule('year', 'completedYear')
+            );
 
-        $proc = new Processor($mappingConf);
+        $proc = new Processor($fieldMapping);
         $metadata = [];
         $proc->handleRecord(['Year' => '2019'], $metadata);
 
         $this->assertEquals('2019', $metadata['CompletedYear']);
         $this->assertArrayNotHasKey('PublishedYear', $metadata);
 
-        $mappingConf->removeRule('completedYear');
-        $mappingConf->updateRule(
-            'publishedYear',
-            new SimpleRule('year', 'publishedYear')
-        );
+        $fieldMapping
+            ->removeRule('completedYear')
+            ->updateRule(
+                'publishedYear',
+                new SimpleRule('year', 'publishedYear')
+            );
 
-        $proc = new Processor($mappingConf);
+        $proc = new Processor($fieldMapping);
         $metadata = [];
         $proc->handleRecord(['Year' => '2019'], $metadata);
 
@@ -138,42 +163,47 @@ class MappingConfigurationTest extends \PHPUnit_Framework_TestCase
 
     public function testPrependRule()
     {
-        $mappingConf = new DefaultMappingConfiguration();
-        $proc = new Processor($mappingConf);
+        $fieldMapping = new FieldMapping();
+        $proc = new Processor($fieldMapping);
         $metadata = [];
         $proc->handleRecord(['Year' => '2019'], $metadata);
 
-        $this->assertEquals('2019', $metadata['PublishedYear']);
+        $this->assertArrayNotHasKey('PublishedYear', $metadata);
 
-        $mappingConf->prependRule(
+        $fieldMapping->prependRule(
             'secondRule',
             (new ConstantValueRule())->setOpusFieldName('PublishedYear')->setValue('1970')
         );
-        $proc = new Processor($mappingConf);
-        $metadata = [];
-        $proc->handleRecord(['Year' => '2019'], $metadata);
-
-        $this->assertEquals('2019', $metadata['PublishedYear']);
-
-        $mappingConf->removeRule('publishedYear');
-        $proc = new Processor($mappingConf);
+        $proc = new Processor($fieldMapping);
         $metadata = [];
         $proc->handleRecord(['Year' => '2019'], $metadata);
 
         $this->assertEquals('1970', $metadata['PublishedYear']);
 
-        $mappingConf->prependRule(
-            'firstRule',
-            (new ConstantValueRule())->setOpusFieldName('PublishedYear')->setValue('1870')
-        );
-        $proc = new Processor($mappingConf);
+        $fieldMapping->removeRule('secondRule');
+        $proc = new Processor($fieldMapping);
+        $metadata = [];
+        $proc->handleRecord(['Year' => '2019'], $metadata);
+
+        $this->assertArrayNotHasKey('PublishedYear', $metadata);
+
+        $fieldMapping
+            ->addRule(
+                'secondRule',
+                (new ConstantValueRule())->setOpusFieldName('PublishedYear')->setValue('1970')
+            )
+            ->prependRule(
+                'firstRule',
+                (new ConstantValueRule())->setOpusFieldName('PublishedYear')->setValue('1870')
+            );
+        $proc = new Processor($fieldMapping);
         $metadata = [];
         $proc->handleRecord(['Year' => '2019'], $metadata);
 
         $this->assertEquals('1970', $metadata['PublishedYear']);
 
-        $mappingConf->removeRule('secondRule');
-        $proc = new Processor($mappingConf);
+        $fieldMapping->removeRule('secondRule');
+        $proc = new Processor($fieldMapping);
         $metadata = [];
         $proc->handleRecord(['Year' => '2019'], $metadata);
 

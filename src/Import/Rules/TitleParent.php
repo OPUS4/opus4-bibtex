@@ -37,9 +37,9 @@ class TitleParent extends ArrayRule
 {
     public function __construct()
     {
-        return parent::__construct(
-            'journal',
-            'TitleParent',
+        $this->setBibtexFieldName('journal');
+        $this->setOpusFieldName('TitleParent');
+        $this->setFn(
             function ($value) {
                 return [
                     'Language' => 'eng',
@@ -48,5 +48,6 @@ class TitleParent extends ArrayRule
                 ];
             }
         );
+        return $this;
     }
 }

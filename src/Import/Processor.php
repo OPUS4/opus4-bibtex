@@ -33,17 +33,20 @@
 
 namespace Opus\Bibtex\Import;
 
+use Opus\Bibtex\Import\Configuration\FieldMapping;
+use Opus\Bibtex\Import\Configuration\ConfigurationManager;
+
 class Processor
 {
-    private $mappingConfiguration;
+    private $fieldMapping;
 
-    public function __construct($mappingConfiguration = null)
+    public function __construct($fieldMapping = null)
     {
-        // Liste von Regeln für das Mapping der BibTeX-Felder auf die OPUS4-Metddatenfelder
-        if (is_null($mappingConfiguration)) {
-            $mappingConfiguration = new DefaultMappingConfiguration();
+        if (! is_null($fieldMapping) || $fieldMapping instanceof FieldMapping) {
+            $this->fieldMapping = $fieldMapping;
+        } else {
+            $this->fieldMapping = ConfigurationManager::getFieldMapping($fieldMapping);
         }
-        $this->mappingConfiguration = $mappingConfiguration;
     }
 
     /**
@@ -55,7 +58,7 @@ class Processor
     {
         $bibtexRecord = array_change_key_case($bibtexRecord);
         $bibtexFieldsEvaluated = [];
-        foreach ($this->mappingConfiguration->getRuleList() as $name => $rule) {
+        foreach ($this->fieldMapping->getRules() as $name => $rule) {
             $ruleResult = $rule->apply($bibtexRecord, $opusMetadata);
             if ($ruleResult) {
                 // Regel wurde erfolgreich angewendet und das Ziel-Metadatenfeld wurde mit einem Inhalt befüllt

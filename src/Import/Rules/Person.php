@@ -37,9 +37,8 @@ class Person extends ArrayRule
 {
     public function __construct()
     {
-        return parent::__construct(
-            null,
-            'Person',
+        $this->setOpusFieldName('Person');
+        $this->setFn(
             function ($value) {
                 $persons = explode(' and ', $value);
                 $result = [];
@@ -49,6 +48,7 @@ class Person extends ArrayRule
                 return $result;
             }
         );
+        return $this;
     }
 
     protected function extractNameParts($name)

@@ -37,9 +37,9 @@ class Subject extends ArrayRule
 {
     public function __construct()
     {
-        return parent::__construct(
-            'keywords',
-            'Subject',
+        $this->setBibtexFieldName('keywords');
+        $this->setOpusFieldName('Subject');
+        $this->setFn(
             function ($value) {
                 $keywords = explode(', ', $value);
                 $result = [];
@@ -53,5 +53,6 @@ class Subject extends ArrayRule
                 return $result;
             }
         );
+        return $this;
     }
 }

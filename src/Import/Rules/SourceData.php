@@ -33,21 +33,22 @@
 
 namespace Opus\Bibtex\Import\Rules;
 
-use Opus\Bibtex\Import\AbstractMappingConfiguration;
+use Opus\Bibtex\Import\Configuration\FieldMapping;
 
 class SourceData extends ArrayRule
 {
     public function __construct()
     {
-        return parent::__construct(
-            '_original',
-            'Enrichment',
+        $this->setBibtexFieldName('_original');
+        $this->setOpusFieldName('Enrichment');
+        $this->setFn(
             function ($value) {
                 return [
-                    'KeyName' => AbstractMappingConfiguration::SOURCE_DATA_KEY,
+                    'KeyName' => FieldMapping::SOURCE_DATA_KEY,
                     'Value' => $value
                 ];
             }
         );
+        return $this;
     }
 }

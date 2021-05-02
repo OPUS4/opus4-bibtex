@@ -37,9 +37,9 @@ class Issn extends ArrayRule
 {
     public function __construct()
     {
-        return parent::__construct(
-            'issn',
-            'Identifier',
+        $this->setBibtexFieldName('issn');
+        $this->setOpusFieldName('Identifier');
+        $this->setFn(
             function ($value) {
                 return [
                     'Value' => $value,
@@ -47,5 +47,6 @@ class Issn extends ArrayRule
                 ];
             }
         );
+        return $this;
     }
 }

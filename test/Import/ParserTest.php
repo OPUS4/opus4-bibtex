@@ -33,13 +33,12 @@
 
 namespace OpusTest\Bibtex\Import;
 
-use Opus\Bibtex\Import\AbstractMappingConfiguration;
-use Opus\Bibtex\Import\DefaultMappingConfiguration;
+use Opus\Bibtex\Import\Configuration\FieldMapping;
+use Opus\Bibtex\Import\Configuration\ConfigurationManager;
 use Opus\Bibtex\Import\Parser;
 use Opus\Bibtex\Import\Processor;
 use Opus\Bibtex\Import\ParserException;
 use Opus\Bibtex\Import\Rules\ComplexRule;
-use Opus\Bibtex\Import\Rules\DocumentType\DefaultDocumentTypeMapping;
 
 /**
  * Class ParserTest
@@ -200,13 +199,13 @@ class ParserTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(2, $enrichments);
         $bibtexRecord = $result[0]['_original'];
         $this->assertEnrichment(
-            AbstractMappingConfiguration::SOURCE_DATA_KEY,
+            FieldMapping::SOURCE_DATA_KEY,
             $bibtexRecord,
             $enrichments[0]
         );
         $this->assertEnrichment(
-            AbstractMappingConfiguration::SOURCE_DATA_HASH_KEY,
-            AbstractMappingConfiguration::HASH_FUNCTION . ':' . (AbstractMappingConfiguration::HASH_FUNCTION)($bibtexRecord),
+            FieldMapping::SOURCE_DATA_HASH_KEY,
+            FieldMapping::HASH_FUNCTION . ':' . (FieldMapping::HASH_FUNCTION)($bibtexRecord),
             $enrichments[1]
         );
     }
@@ -288,7 +287,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(2, $bibTexRecords);
 
         $entries = $this->splitBibtex(file_get_contents($testfile));
-        $hashFn = AbstractMappingConfiguration::HASH_FUNCTION;
+        $hashFn = FieldMapping::HASH_FUNCTION;
 
         $expectedDoc = [
             'BelongsToBibliography' => '0',
@@ -310,10 +309,10 @@ class ParserTest extends \PHPUnit_Framework_TestCase
                 'Role' => 'author'
             ]],
             'Enrichment' => [[
-                'KeyName' => AbstractMappingConfiguration::SOURCE_DATA_KEY,
+                'KeyName' => FieldMapping::SOURCE_DATA_KEY,
                 'Value' => $entries[0]
             ], [
-                'KeyName' => AbstractMappingConfiguration::SOURCE_DATA_HASH_KEY,
+                'KeyName' => FieldMapping::SOURCE_DATA_HASH_KEY,
                 'Value' => $hashFn . ':' . $hashFn($entries[0])
             ]]
         ];
@@ -329,10 +328,10 @@ class ParserTest extends \PHPUnit_Framework_TestCase
             ]],
             'Type' => 'article',
             'Enrichment' => [[
-                'KeyName' => AbstractMappingConfiguration::SOURCE_DATA_KEY,
+                'KeyName' => FieldMapping::SOURCE_DATA_KEY,
                 'Value' => $entries[1]
             ], [
-                'KeyName' => AbstractMappingConfiguration::SOURCE_DATA_HASH_KEY,
+                'KeyName' => FieldMapping::SOURCE_DATA_HASH_KEY,
                 'Value' => $hashFn . ':' . $hashFn($entries[1])
             ]],
             'Issue' => '1',
@@ -451,7 +450,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
         $metadata = [];
         $proc->handleRecord($bibTexRecords[0], $metadata);
 
-        $documentTypeMapping = new DefaultDocumentTypeMapping();
+        $documentTypeMapping = ConfigurationManager::getTypeMapping();
         $this->assertEquals($documentTypeMapping->getDefaultType(), $metadata['Type']);
     }
 
@@ -469,7 +468,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
         $metadata = [];
         $proc->handleRecord($bibTexRecords[0], $metadata);
 
-        $documentTypeMapping = new DefaultDocumentTypeMapping();
+        $documentTypeMapping = ConfigurationManager::getTypeMapping();
         $this->assertEquals($documentTypeMapping->getMapping('mastersthesis'), $metadata['Type']);
     }
 
@@ -487,7 +486,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
         $metadata = [];
         $proc->handleRecord($bibTexRecords[0], $metadata);
 
-        $documentTypeMapping = new DefaultDocumentTypeMapping();
+        $documentTypeMapping = ConfigurationManager::getTypeMapping();
         $this->assertEquals($documentTypeMapping->getMapping('mastersthesis'), $metadata['Type']);
     }
 
@@ -505,7 +504,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
         $metadata = [];
         $proc->handleRecord($bibTexRecords[0], $metadata);
 
-        $documentTypeMapping = new DefaultDocumentTypeMapping();
+        $documentTypeMapping = ConfigurationManager::getTypeMapping();
         $this->assertEquals($documentTypeMapping->getMapping('journal'), $metadata['Type']);
     }
 
@@ -574,7 +573,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
 
         $proc = new Processor();
         $metadata = [];
-        $docMetadata = $proc->handleRecord($bibTexRecords[0], $metadata);
+        $proc->handleRecord($bibTexRecords[0], $metadata);
         $this->assertEquals(42, $metadata['PageFirst']);
         $this->assertEquals(41, $metadata['PageLast']);
         $this->assertArrayNotHasKey('PageNumber', $metadata);
@@ -894,7 +893,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
             },
             ['firstpage', 'lastpage']
         );
-        $mappingConfiguration = new DefaultMappingConfiguration();
+        $mappingConfiguration = ConfigurationManager::getFieldMapping();
         $mappingConfiguration->resetRules();
         $mappingConfiguration->addRule('newRule', $complexRule);
         $proc = new Processor($mappingConfiguration);
@@ -924,7 +923,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
     public function testProcessor()
     {
         $bibtex = "@misc{Nobody06,\n       author = \"Nobody, Jr\",\n       title = \"My Article\",\n       year = \"2006\"}";
-        $hashFunction = AbstractMappingConfiguration::HASH_FUNCTION;
+        $hashFunction = FieldMapping::HASH_FUNCTION;
         $bibtexHash = $hashFunction($bibtex);
 
         $processor = new Processor();
@@ -954,10 +953,10 @@ class ParserTest extends \PHPUnit_Framework_TestCase
             ]],
             'Enrichment' => [
                 [
-                    'KeyName' => AbstractMappingConfiguration::SOURCE_DATA_KEY,
+                    'KeyName' => FieldMapping::SOURCE_DATA_KEY,
                     'Value' => $bibtex
                 ], [
-                    'KeyName' => AbstractMappingConfiguration::SOURCE_DATA_HASH_KEY,
+                    'KeyName' => FieldMapping::SOURCE_DATA_HASH_KEY,
                     'Value' => $hashFunction . ':' . $bibtexHash
                 ]
             ]

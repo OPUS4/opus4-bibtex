@@ -1,0 +1,180 @@
+{
+  "name": "default",
+  "description": "Default BibTeX Mapping Configuration.",
+  "rules": [
+    {
+      "name": "type",
+      "class": "Type"
+    },
+    {
+      "name": "ptype",
+      "class": "Ptype"
+    },
+    {
+      "name": "issue",
+      "class": "SimpleRule",
+      "properties": {
+        "bibtexFieldName": "number",
+        "opusFieldName": "Issue"
+      }
+    },
+    {
+      "name": "volume",
+      "class": "SimpleRule",
+      "properties": {
+        "bibtexFieldName": "volume",
+        "opusFieldName": "Volume"
+      }
+    },
+    {
+      "name": "pageFirst",
+      "class": "PageFirst"
+    },
+    {
+      "name": "pageLast",
+      "class": "PageLast"
+    },
+    {
+      "name": "pageNumber",
+      "class": "PageNumber"
+    },
+    {
+      "name": "publishedYear",
+      "class": "PublishedYear"
+    },
+    {
+      "name": "issn",
+      "class": "Issn"
+    },
+    {
+      "name": "isbn",
+      "class": "Isbn"
+    },
+    {
+      "name": "doi",
+      "class": "Doi"
+    },
+    {
+      "name": "arxiv",
+      "class": "Arxiv"
+    },
+    {
+      "name": "titleMain",
+      "class": "TitleMain"
+    },
+    {
+      "name": "journalTitle",
+      "class": "TitleParent",
+      "properties": {
+        "bibtexFieldName": "journal"
+      }
+    },
+    {
+      "name": "bookTitle",
+      "class": "TitleParent",
+      "properties": {
+        "bibtexFieldName": "booktitle"
+      }
+    },
+    {
+      "name": "subject",
+      "class": "Subject"
+    },
+    {
+      "name": "pdfUrl",
+      "class": "Note",
+      "properties": {
+        "bibtexFieldName": "pdfurl",
+        "messagePrefix": "URL of the PDF: ",
+        "visibility": "public"
+      }
+    },
+    {
+      "name": "slides",
+      "class": "Note",
+      "properties": {
+        "bibtexFieldName": "slides",
+        "messagePrefix": "URL of the Slides: ",
+        "visibility": "public"
+      }
+    },
+    {
+      "name": "annote",
+      "class": "Note",
+      "properties": {
+        "bibtexFieldName": "annote",
+        "messagePrefix": "Additional Note: ",
+        "visibility": "public"
+      }
+    },
+    {
+      "name": "summary",
+      "class": "Note",
+      "properties": {
+        "bibtexFieldName": "summary",
+        "messagePrefix": "URL of the Abstract: ",
+        "visibility": "public"
+      }
+    },
+    {
+      "name": "code",
+      "class": "Note",
+      "properties": {
+        "bibtexFieldName": "code",
+        "messagePrefix": "URL of the Code: ",
+        "visibility": "public"
+      }
+    },
+    {
+      "name": "poster",
+      "class": "Note",
+      "properties": {
+        "bibtexFieldName": "poster",
+        "messagePrefix": "URL of the Poster: ",
+        "visibility": "public"
+      }
+    },
+    {
+      "name": "author",
+      "class": "Person",
+      "properties": {
+        "bibtexFieldName": "author"
+      }
+    },
+    {
+      "name": "editor",
+      "class": "Person",
+      "properties": {
+        "bibtexFieldName": "editor"
+      }
+    },
+    {
+      "name": "sourceData",
+      "class": "SourceData"
+    },
+    {
+      "name": "sourceDataHash",
+      "class": "SourceDataHash"
+    },
+    {
+      "name": "language",
+      "class": "ConstantValueRule",
+      "properties": {
+        "opusFieldName": "Language",
+        "value": "eng"
+      }
+    },
+    {
+      "name": "belongsToBibliography",
+      "class": "ConstantValueRule",
+      "properties": {
+        "opusFieldName": "BelongsToBibliography",
+        "value": "0"
+      }
+    },
+    {
+      "name": "umlauts",
+      "class": "Umlauts"
+    }
+  ]
+}

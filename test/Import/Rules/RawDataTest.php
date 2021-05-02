@@ -33,7 +33,7 @@
 
 namespace OpusTest\Bibtex\Import\Rules;
 
-use Opus\Bibtex\Import\AbstractMappingConfiguration;
+use Opus\Bibtex\Import\Configuration\FieldMapping;
 use Opus\Bibtex\Import\Processor;
 
 class RawDataTest extends \PHPUnit_Framework_TestCase
@@ -45,12 +45,12 @@ class RawDataTest extends \PHPUnit_Framework_TestCase
         $metadata = [];
         $proc->handleRecord(['_original' => '@article{...}'], $metadata);
 
-        $hashFunction = AbstractMappingConfiguration::HASH_FUNCTION;
+        $hashFunction = FieldMapping::HASH_FUNCTION;
         $hashValue = $hashFunction('@article{...}');
         $this->assertEquals(
             [
-                ['KeyName' => AbstractMappingConfiguration::SOURCE_DATA_KEY, 'Value' => '@article{...}'],
-                ['KeyName' => AbstractMappingConfiguration::SOURCE_DATA_HASH_KEY, 'Value' => $hashFunction . ':' . $hashValue]
+                ['KeyName' => FieldMapping::SOURCE_DATA_KEY, 'Value' => '@article{...}'],
+                ['KeyName' => FieldMapping::SOURCE_DATA_HASH_KEY, 'Value' => $hashFunction . ':' . $hashValue]
             ],
             $metadata['Enrichment']
         );

@@ -33,21 +33,22 @@
 
 namespace Opus\Bibtex\Import\Rules;
 
-use Opus\Bibtex\Import\AbstractMappingConfiguration;
+use Opus\Bibtex\Import\Configuration\FieldMapping;
 
 class SourceDataHash extends ArrayRule
 {
     public function __construct()
     {
-        return parent::__construct(
-            '_original',
-            'Enrichment',
+        $this->setBibtexFieldName('_original');
+        $this->setOpusFieldName('Enrichment');
+        $this->setFn(
             function ($value) {
                 return [
-                    'KeyName' => AbstractMappingConfiguration::SOURCE_DATA_HASH_KEY,
-                    'Value' => AbstractMappingConfiguration::HASH_FUNCTION . ':' . (AbstractMappingConfiguration::HASH_FUNCTION)($value)
+                    'KeyName' => FieldMapping::SOURCE_DATA_HASH_KEY,
+                    'Value' => FieldMapping::HASH_FUNCTION . ':' . (FieldMapping::HASH_FUNCTION)($value)
                 ];
             }
         );
+        return $this;
     }
 }

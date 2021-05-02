@@ -33,7 +33,7 @@
 
 namespace Opus\Bibtex\Import\Rules;
 
-use Opus\Bibtex\Import\AbstractMappingConfiguration;
+use Opus\Bibtex\Import\Configuration\FieldMapping;
 
 /**
  * Behandlung von Umlauten, die im BibTeX-File nicht korrekt angegeben wurden (siehe OPUSVIER-4216).
@@ -50,8 +50,8 @@ class Umlauts extends ComplexRule
                     if (is_array($fieldValue)) {
                         foreach ($fieldValue as $subFieldIndex => $subFieldValue) {
                             if ($fieldName === 'Enrichment' &&
-                                ($subFieldValue['KeyName'] === AbstractMappingConfiguration::SOURCE_DATA_HASH_KEY ||
-                                    $subFieldValue['KeyName'] === AbstractMappingConfiguration::SOURCE_DATA_KEY)) {
+                                ($subFieldValue['KeyName'] === FieldMapping::SOURCE_DATA_HASH_KEY ||
+                                    $subFieldValue['KeyName'] === FieldMapping::SOURCE_DATA_KEY)) {
                                 continue; // der Original-BibTeX-Record soll nicht verändert werden
                             }
                             foreach ($subFieldValue as $name => $value) {

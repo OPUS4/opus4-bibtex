@@ -37,9 +37,9 @@ class Arxiv extends ArrayRule
 {
     public function __construct()
     {
-        return parent::__construct(
-            'arxiv',
-            'Identifier',
+        $this->setBibtexFieldName('arxiv');
+        $this->setOpusFieldName('Identifier');
+        $this->setFn(
             function ($value) {
                 $type = 'url';
 
@@ -61,5 +61,6 @@ class Arxiv extends ArrayRule
                 ];
             }
         );
+        return $this;
     }
 }

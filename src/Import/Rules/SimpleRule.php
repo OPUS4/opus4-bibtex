@@ -38,22 +38,29 @@ namespace Opus\Bibtex\Import\Rules;
  */
 class SimpleRule implements IRule
 {
+    /**
+     * @var string Name des auszuwertenden BibTeX-Felds
+     */
     protected $bibtexFieldName;
 
+    /**
+     * @var string Name des zu befüllenden OPUS4-Metadatenfelds
+     */
     protected $opusFieldName;
 
+    /**
+     * @var optionale Funktion, die verwendet wird, um den Feldwert für das OPUS4-Metadatenfelds zu bestimmen
+     */
     protected $fn;
 
     /**
      * @param string $bibtexFieldName Name des auszuwertenden BibTeX-Felds
      * @param string $opusFieldName Name des zu befüllenden OPUS4-Metadatenfelds
-     * @param null $fn optionale Funktion, die verwendet wird, um den Feldwert für das OPUS4-Metadatenfelds zu bestimmen
      */
-    public function __construct($bibtexFieldName, $opusFieldName, $fn = null)
+    public function __construct($bibtexFieldName = null, string $opusFieldName = null)
     {
-        $this->bibtexFieldName = $bibtexFieldName;
-        $this->opusFieldName = ucfirst($opusFieldName);
-        $this->fn = $fn;
+        $this->setBibtexFieldName($bibtexFieldName);
+        $this->setOpusFieldName($opusFieldName);
         return $this;
     }
 
@@ -82,6 +89,16 @@ class SimpleRule implements IRule
     {
         $this->bibtexFieldName = $bibtexFieldName;
         return $this;
+    }
+
+    public function setOpusFieldName($opusFieldName)
+    {
+        $this->opusFieldName = ucfirst($opusFieldName);
+    }
+
+    public function setFn($fn)
+    {
+        $this->fn = $fn;
     }
 
     protected function deleteBrace($value)

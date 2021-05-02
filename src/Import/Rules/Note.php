@@ -37,13 +37,10 @@ class Note extends ArrayRule
 {
     private $messagePrefix = '';
 
-    private $visibility = 'public';
-
     public function __construct()
     {
-        return parent::__construct(
-            null,
-            'Note',
+        $this->setOpusFieldName('Note');
+        $this->setFn(
             function ($value) {
                 return [
                     'Visibility' => $this->visibility,
@@ -51,6 +48,7 @@ class Note extends ArrayRule
                 ];
             }
         );
+        return $this;
     }
 
     public function setMessagePrefix($messagePrefix)

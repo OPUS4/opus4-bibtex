@@ -25,15 +25,15 @@
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
  * @category    BibTeX
- * @package     Opus\Bibtex\Import
+ * @package     Opus\Bibtex\Import\Configuration
  * @author      Sascha Szott <opus-repository@saschaszott.de>
  * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace Opus\Bibtex\Import;
+namespace Opus\Bibtex\Import\Configuration;
 
-abstract class AbstractMappingConfiguration
+class FieldMapping
 {
     /**
      * Name des Enrichments, das zur Speicherung des importierten (unveränderten) BibTeX-Record verwendet wird
@@ -56,14 +56,14 @@ abstract class AbstractMappingConfiguration
      *
      * @var string
      */
-    protected $name;
+    private $name;
 
     /**
      * Textuelle Beschreibung der Regelkonfiguration, z.B. für die Anzeige im Frontend.
      *
      * @var string
      */
-    protected $description;
+    private $description;
 
     /**
      * Liste der anzuwendenden Regeln. Die Liste kann durch entsprechende Methoden verändert werden.
@@ -71,7 +71,7 @@ abstract class AbstractMappingConfiguration
      *
      * @var array
      */
-    private $ruleList = [];
+    private $rules = [];
 
     /**
      * Liefert den Namen der Mapping-Konfiguration. Diese wird z.B. für die Auswahl der
@@ -82,6 +82,17 @@ abstract class AbstractMappingConfiguration
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * Setzt den Namen der Mapping-Konfiguration.
+     *
+     * @param $name Name der Mapping-Konfiguration
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+        return $this;
     }
 
     /**
@@ -97,13 +108,24 @@ abstract class AbstractMappingConfiguration
     }
 
     /**
+     * Setzt die Beschreibung der Mapping-Konfiguration.
+     *
+     * @param $description Beschreibung der Mapping-Konfiguration
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
+        return $this;
+    }
+
+    /**
      * Gibt die momentan konfigurierte Liste der Regeln zurück.
      *
      * @return array
      */
-    public function getRuleList()
+    public function getRules()
     {
-        return $this->ruleList;
+        return $this->rules;
     }
 
     /**
@@ -115,7 +137,7 @@ abstract class AbstractMappingConfiguration
      */
     public function prependRule($name, $rule)
     {
-        $this->ruleList = array_merge([ $name => $rule ], $this->ruleList);
+        $this->rules = array_merge([ $name => $rule ], $this->rules);
         return $this;
     }
 
@@ -128,7 +150,7 @@ abstract class AbstractMappingConfiguration
      */
     public function addRule($name, $rule)
     {
-        $this->ruleList[$name] = $rule;
+        $this->rules[$name] = $rule;
         return $this;
     }
 
@@ -141,7 +163,7 @@ abstract class AbstractMappingConfiguration
      */
     public function updateRule($name, $rule)
     {
-        $this->ruleList[$name] = $rule;
+        $this->rules[$name] = $rule;
         return $this;
     }
 
@@ -152,8 +174,8 @@ abstract class AbstractMappingConfiguration
      */
     public function removeRule($name)
     {
-        if (array_key_exists($name, $this->ruleList)) {
-            unset($this->ruleList[$name]);
+        if (array_key_exists($name, $this->rules)) {
+            unset($this->rules[$name]);
         }
         return $this;
     }
@@ -163,6 +185,31 @@ abstract class AbstractMappingConfiguration
      */
     public function resetRules()
     {
-        $this->ruleList = [];
+        $this->rules = [];
+        return $this;
+    }
+
+    /**
+     * Erlaubt das Setzen von Regeln auf Basis des übergebenen Konfigurationsarrays.
+     * @param array $rules
+     */
+    public function setRules($rules)
+    {
+        $this->resetRules();
+        foreach ($rules as $rule) {
+            $name = $rule['name'];
+            $className = 'Opus\Bibtex\Import\Rules\\' . $rule['class'];
+            if (class_exists($className)) {
+                $class = new $className;
+            }
+            $this->addRule($name, $class);
+            if (array_key_exists('properties', $rule)) {
+                foreach ($rule['properties'] as $propName => $propValue) {
+                    $setter = 'set' . ucfirst($propName);
+                    $class->$setter($propValue);
+                }
+            }
+        }
+        return $this;
     }
 }

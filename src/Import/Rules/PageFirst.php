@@ -37,14 +37,15 @@ class PageFirst extends SimpleRule
 {
     public function __construct()
     {
-        return parent::__construct(
-            'pages',
-            'PageFirst',
+        $this->setBibtexFieldName('pages');
+        $this->setOpusFieldName('PageFirst');
+        $this->setFn(
             function ($value) {
                 $value = str_replace(['--', '––', '–'], '-', $value);
                 $parts = explode('-', $value, 2);
                 return trim($parts[0]);
             }
         );
+        return $this;
     }
 }

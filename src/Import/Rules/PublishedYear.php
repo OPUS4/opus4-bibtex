@@ -37,9 +37,9 @@ class PublishedYear extends SimpleRule
 {
     public function __construct()
     {
-        return parent::__construct(
-            'year',
-            'PublishedYear',
+        $this->setBibtexFieldName('year');
+        $this->setOpusFieldName('PublishedYear');
+        $this->setFn(
             function ($value) {
                 $value = preg_replace('/[^0-9]/', '', $value);
                 if (strlen($value) == 4) {
@@ -47,5 +47,6 @@ class PublishedYear extends SimpleRule
                 }
             }
         );
+        return $this;
     }
 }

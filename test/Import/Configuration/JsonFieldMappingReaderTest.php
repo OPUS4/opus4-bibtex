@@ -24,15 +24,17 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * @category    BibTeX
- * @package     Opus\Bibtex\Import
+ * @category    Tests
+ * @package     OpusTest\Bibtex\Import\Configuration
  * @author      Sascha Szott <opus-repository@saschaszott.de>
  * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace Opus\Bibtex\Import;
+namespace OpusTest\Bibtex\Import\Configuration;
 
+use Opus\Bibtex\Import\Configuration\FieldMapping;
+use Opus\Bibtex\Import\Configuration\ConfigurationManager;
 use Opus\Bibtex\Import\Rules\Arxiv;
 use Opus\Bibtex\Import\Rules\ConstantValueRule;
 use Opus\Bibtex\Import\Rules\Doi;
@@ -54,13 +56,24 @@ use Opus\Bibtex\Import\Rules\TitleParent;
 use Opus\Bibtex\Import\Rules\Type;
 use Opus\Bibtex\Import\Rules\Umlauts;
 
-class DefaultMappingConfiguration extends AbstractMappingConfiguration
+class JsonFieldMappingReaderTest extends \PHPUnit_Framework_TestCase
 {
-    public function __construct()
+    public function testGetFieldMappingConfiguration()
     {
-        $this->name = 'default';
-        $this->description = 'Default BibTeX Mapping Configuration';
-        $this
+        $mappingConfig = ConfigurationManager::getFieldMapping();
+
+        $defaultMapping = $this->createMappingConfiguration();
+
+        $this->assertEquals($defaultMapping->getName(), $mappingConfig->getName());
+        $this->assertEquals($defaultMapping->getDescription(), $mappingConfig->getDescription());
+        $this->assertEquals($defaultMapping->getRules(), $mappingConfig->getRules());
+    }
+
+    private function createMappingConfiguration()
+    {
+        return (new FieldMapping())
+            ->setName('default')
+            ->setDescription('Default BibTeX Mapping Configuration.')
             ->addRule(
                 'type',
                 new Type()
@@ -127,27 +140,45 @@ class DefaultMappingConfiguration extends AbstractMappingConfiguration
             )
             ->addRule(
                 'pdfUrl',
-                (new Note())->setBibtexFieldName('pdfurl')->setMessagePrefix('URL of the PDF: ')
+                (new Note())
+                    ->setBibtexFieldName('pdfurl')
+                    ->setMessagePrefix('URL of the PDF: ')
+                    ->setVisibility('public')
             )
             ->addRule(
                 'slides',
-                (new Note())->setBibtexFieldName('slides')->setMessagePrefix('URL of the Slides: ')
+                (new Note())
+                    ->setBibtexFieldName('slides')
+                    ->setMessagePrefix('URL of the Slides: ')
+                    ->setVisibility('public')
             )
             ->addRule(
                 'annote',
-                (new Note())->setBibtexFieldName('annote')->setMessagePrefix('Additional Note: ')
+                (new Note())
+                    ->setBibtexFieldName('annote')
+                    ->setMessagePrefix('Additional Note: ')
+                    ->setVisibility('public')
             )
             ->addRule(
                 'summary',
-                (new Note())->setBibtexFieldName('summary')->setMessagePrefix('URL of the Abstract: ')
+                (new Note())
+                    ->setBibtexFieldName('summary')
+                    ->setMessagePrefix('URL of the Abstract: ')
+                    ->setVisibility('public')
             )
             ->addRule(
                 'code',
-                (new Note())->setBibtexFieldName('code')->setMessagePrefix('URL of the Code: ')
+                (new Note())
+                    ->setBibtexFieldName('code')
+                    ->setMessagePrefix('URL of the Code: ')
+                    ->setVisibility('public')
             )
             ->addRule(
                 'poster',
-                (new Note())->setBibtexFieldName('poster')->setMessagePrefix('URL of the Poster: ')
+                (new Note())
+                    ->setBibtexFieldName('poster')
+                    ->setMessagePrefix('URL of the Poster: ')
+                    ->setVisibility('public')
             )
             ->addRule(
                 'author',
