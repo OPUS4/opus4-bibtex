@@ -24,77 +24,86 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * @category    BibTex
- * @package     Opus
- * @author      Maximilian Salomon <salomon@zib.de>
- * @copyright   Copyright (c) 2020, OPUS 4 development team
+ * @category    BibTeX
+ * @package     Opus\Bibtex\Import
+ * @author      Sascha Szott <opus-repository@saschaszott.de>
+ * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
 namespace Opus\Bibtex\Import;
 
-use Opus\Bibtex\Import\Processor\Processor;
+use RenanBr\BibTexParser\Exception\ParserException;
+use RenanBr\BibTexParser\Exception\ProcessorException;
 use RenanBr\BibTexParser\Listener;
 use RenanBr\BibTexParser\Processor\LatexToUnicodeProcessor;
 
 class Parser
 {
-    private $bibtexFormat = [];
-    private $opusFormat = [];
+    private $bibtex;
 
-    public function fileToArray($file)
+    /**
+     * Parser constructor.
+     * @param $bibtex plain BibTeX string or path to BibTeX file
+     */
+    public function __construct($bibtex)
+    {
+        $this->bibtex = $bibtex;
+    }
+
+    /**
+     * @return array
+     * @throws \Opus\Bibtex\Import\ParserException
+     */
+    public function parse()
     {
         $parser = new \RenanBr\BibTexParser\Parser();
 
         $listener = new Listener();
-
-        $latexProcessor = new LatexToUnicodeProcessor();
-        $latexProcessor->setTagCoverage([
-            'Author',
-            'Editor',
-            'Title'
-        ]);
-
-        $listener->addProcessor($latexProcessor);
+        $listener->addProcessor(new LatexToUnicodeProcessor()); // behandelt alle Felder (weil leere Blacklist)
+        // LTUProcessor schneidet führende und abschließende Leerzeichen in den Feldinhalten ab
         $parser->addListener($listener);
-        $parser->parseFile($file);
-        $this->bibtexFormat = $listener->export();
-    }
 
-    public function stringToArray($bibtex)
-    {
-        $parser = new \RenanBr\BibTexParser\Parser();
-
-        $listener = new Listener();
-
-        $latexProcessor = new LatexToUnicodeProcessor();
-        $latexProcessor->setTagCoverage([
-            'Author',
-            'Editor',
-            'Title'
-        ]);
-
-        $listener->addProcessor($latexProcessor);
-        $parser->addListener($listener);
-        $parser->parseString($bibtex);
-        $this->bibtexFormat = $listener->export();
-    }
-
-    public function convert()
-    {
-        $processor = new Processor();
-        foreach ($this->bibtexFormat as $block) {
-            array_push($this->opusFormat, $processor->convertBibtexToOpus($block));
+        try {
+            if (is_file($this->bibtex)) {
+                $parser->parseFile($this->bibtex);
+            } else {
+                $parser->parseString($this->bibtex);
+            }
+        } catch (ParserException $e) {
+            // Fehler beim Parsen des BibTeX
+            throw new \Opus\Bibtex\Import\ParserException();
+        } catch (\ErrorException $e) {
+            // Fehler beim Einlesen der übergebenen Datei
+            throw new \Opus\Bibtex\Import\ParserException();
         }
+
+        try {
+            $result = $listener->export();
+        } catch (ProcessorException $e) {
+            // im Feldinhalt eines Felds befindet sich ein unerwartetes Zeichen
+            throw new \Opus\Bibtex\Import\ParserException();
+        }
+        return $result;
     }
 
-    public function getOpusFormat()
+    /**
+     * Ermittelt die Namen aller Felder aus dem übergebenen BibTeX-Record. Hierbei werden
+     * interne Felder des BibTeX-Parsers ignoriert.
+     *
+     * @param $bibTexRecord BibTeX-Record
+     * @return array Namen der BibTeX-Felder des übergebenen BibTeX-Record
+     */
+    public function getBibTexFieldNames($bibTexRecord)
     {
-        return $this->opusFormat;
-    }
-
-    public function getBibtexFormat()
-    {
-        return $this->bibtexFormat;
+        $result = [];
+        foreach (array_keys($bibTexRecord) as $fieldName) {
+            if (substr($fieldName, 0, 1) === '_') {
+                // interne Spezialfelder des BibTeX-Parsers ignorieren
+                continue;
+            }
+            $result[] = $fieldName;
+        }
+        return $result;
     }
 }
