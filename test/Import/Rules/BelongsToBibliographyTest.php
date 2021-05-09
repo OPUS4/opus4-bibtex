@@ -24,30 +24,47 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * @category    BibTeX
- * @package     Opus\Bibtex\Import\Rules
+ * @category    Tests
+ * @package     OpusTest\Bibtex\Import\Rules
  * @author      Sascha Szott <opus-repository@saschaszott.de>
  * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace Opus\Bibtex\Import\Rules;
+namespace OpusTest\Bibtex\Import\Rules;
 
-class TitleParent extends ArrayRule
+use Opus\Bibtex\Import\Rules\BelongsToBibliography;
+
+class BelongsToBibliographyTest extends \PHPUnit_Framework_TestCase
 {
-    public function __construct()
-    {
-        $this->setBibtexField('journal');
-        $this->setOpusField('TitleParent');
-        return $this;
-    }
 
-    protected function getValue($value)
+    public function dataProvider()
     {
         return [
-            'Language' => 'eng',
-            'Value' => $this->deleteBrace($value),
-            'Type' => 'parent'
+            ['on', true],
+            ['off', false],
+            ['true', true],
+            ['false', false],
+            [true, true],
+            [false, false],
+            ['1', true],
+            ['0', false],
+            [1, true],
+            [0, false]
         ];
+    }
+
+    /**
+     * @dataProvider dataProvider
+     */
+    public function testProcess($arg, $res)
+    {
+        $belongsToBibliographyRule = new BelongsToBibliography();
+        $belongsToBibliographyRule->setValue($arg);
+
+        $metadata = [];
+        $belongsToBibliographyRule->apply([], $metadata);
+
+        $this->assertEquals($res, $metadata['BelongsToBibliography']);
     }
 }

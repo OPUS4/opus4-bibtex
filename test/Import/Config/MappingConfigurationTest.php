@@ -31,18 +31,18 @@
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace OpusTest\Bibtex\Import\Configuration;
+namespace OpusTest\Bibtex\Import\Config;
 
-use Opus\Bibtex\Import\Configuration\FieldMapping;
+use Opus\Bibtex\Import\Config\BibtexMapping;
 use Opus\Bibtex\Import\Processor;
-use Opus\Bibtex\Import\Rules\ConstantValueRule;
+use Opus\Bibtex\Import\Rules\ConstantValue;
 use Opus\Bibtex\Import\Rules\SimpleRule;
 
 class MappingConfigurationTest extends \PHPUnit_Framework_TestCase
 {
     public function testUpdateRule()
     {
-        $fieldMapping = new FieldMapping();
+        $fieldMapping = new BibtexMapping();
         $fieldMapping
             ->addRule(
                 'publishedYear',
@@ -63,7 +63,7 @@ class MappingConfigurationTest extends \PHPUnit_Framework_TestCase
 
     public function testAddRuleOverwrite()
     {
-        $fieldMapping = new FieldMapping();
+        $fieldMapping = new BibtexMapping();
         $fieldMapping
             ->addRule(
                 'publishedYear',
@@ -84,7 +84,7 @@ class MappingConfigurationTest extends \PHPUnit_Framework_TestCase
 
     public function testAddRule()
     {
-        $fieldMapping = new FieldMapping();
+        $fieldMapping = new BibtexMapping();
         $fieldMapping
             ->addRule(
                 'publishedYear',
@@ -105,7 +105,7 @@ class MappingConfigurationTest extends \PHPUnit_Framework_TestCase
 
     public function testResetRule()
     {
-        $fieldMapping = new FieldMapping();
+        $fieldMapping = new BibtexMapping();
         $fieldMapping
             ->addRule(
                 'publishedYear',
@@ -127,7 +127,7 @@ class MappingConfigurationTest extends \PHPUnit_Framework_TestCase
 
     public function testRemoveRule()
     {
-        $fieldMapping = new FieldMapping();
+        $fieldMapping = new BibtexMapping();
         $fieldMapping
             ->addRule(
                 'publishedYear',
@@ -163,7 +163,7 @@ class MappingConfigurationTest extends \PHPUnit_Framework_TestCase
 
     public function testPrependRule()
     {
-        $fieldMapping = new FieldMapping();
+        $fieldMapping = new BibtexMapping();
         $proc = new Processor($fieldMapping);
         $metadata = [];
         $proc->handleRecord(['Year' => '2019'], $metadata);
@@ -172,7 +172,7 @@ class MappingConfigurationTest extends \PHPUnit_Framework_TestCase
 
         $fieldMapping->prependRule(
             'secondRule',
-            (new ConstantValueRule())->setOpusFieldName('PublishedYear')->setValue('1970')
+            (new ConstantValue())->setOpusField('PublishedYear')->setValue('1970')
         );
         $proc = new Processor($fieldMapping);
         $metadata = [];
@@ -190,11 +190,11 @@ class MappingConfigurationTest extends \PHPUnit_Framework_TestCase
         $fieldMapping
             ->addRule(
                 'secondRule',
-                (new ConstantValueRule())->setOpusFieldName('PublishedYear')->setValue('1970')
+                (new ConstantValue())->setOpusField('PublishedYear')->setValue('1970')
             )
             ->prependRule(
                 'firstRule',
-                (new ConstantValueRule())->setOpusFieldName('PublishedYear')->setValue('1870')
+                (new ConstantValue())->setOpusField('PublishedYear')->setValue('1870')
             );
         $proc = new Processor($fieldMapping);
         $metadata = [];

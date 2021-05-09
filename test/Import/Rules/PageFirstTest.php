@@ -24,61 +24,24 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * @category    BibTeX
- * @package     Opus\Bibtex\Import\Rules
+ * @category    Tests
+ * @package     OpusTest\Bibtex\Import\Rules
  * @author      Sascha Szott <opus-repository@saschaszott.de>
  * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace Opus\Bibtex\Import\Rules;
+namespace OpusTest\Bibtex\Import\Rules;
 
-/**
- * Eine Regel, um ein Metadatenfeld mit einer Konstante zu befüllen. Hierbei wird der BibTeX-Record nicht ausgewertet.
- */
-class ConstantValueRule implements IRule
+use Opus\Bibtex\Import\Processor;
+
+class PageFirstTest extends \PHPUnit_Framework_TestCase
 {
-    protected $opusFieldName;
-
-    protected $value;
-
-    /**
-     * Setzt den Namen des zu befüllenden OPUS4-Metadatenfelds.
-     *
-     * @param string $opusFieldName
-     */
-    public function setOpusFieldName($opusFieldName)
+    public function testProcess()
     {
-        $this->opusFieldName = ucfirst($opusFieldName);
-        return $this;
-    }
-
-    /**
-     * Setzt den Feldwert für das OPUS4-Metadatenfeld (Konstante).
-     *
-     * @param $value
-     */
-    public function setValue($value)
-    {
-        $this->value = $value;
-        return $this;
-    }
-
-    public function apply($bibtexRecord, &$documentMetadata)
-    {
-        $result = false;
-        // der BibTeX-Record wird zur Bestimmung des Metadatenfelds nicht verwendet
-        // d.h. Metadatenfeldwert wird hier auf eine Konstante gesetzt oder Bestimmung des Feldinhalts auf Basis
-        // von anderen Metadatenfeldern
-        if (! is_null($this->value)) {
-            $documentMetadata[$this->opusFieldName] = $this->value;
-            $result = true;
-        }
-        return $result;
-    }
-
-    public function getEvaluatedBibTexField()
-    {
-        return [];
+        $proc = new Processor();
+        $metadata = [];
+        $proc->handleRecord(['Pages' => '1--10'], $metadata);
+        $this->assertEquals('1', $metadata['PageFirst']);
     }
 }

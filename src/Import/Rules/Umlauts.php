@@ -33,45 +33,12 @@
 
 namespace Opus\Bibtex\Import\Rules;
 
-use Opus\Bibtex\Import\Configuration\FieldMapping;
-
 /**
  * Behandlung von Umlauten, die im BibTeX-File nicht korrekt angegeben wurden (siehe OPUSVIER-4216).
  * Ein Beispiel findet sich in specialchars-invalid.bib
  */
 class Umlauts extends ComplexRule
 {
-
-    public function __construct()
-    {
-        return parent::__construct(
-            function ($fieldValues, &$documentMetadata) {
-                foreach ($documentMetadata as $fieldName => $fieldValue) {
-                    if (is_array($fieldValue)) {
-                        foreach ($fieldValue as $subFieldIndex => $subFieldValue) {
-                            if ($fieldName === 'Enrichment' &&
-                                ($subFieldValue['KeyName'] === FieldMapping::SOURCE_DATA_HASH_KEY ||
-                                    $subFieldValue['KeyName'] === FieldMapping::SOURCE_DATA_KEY)) {
-                                continue; // der Original-BibTeX-Record soll nicht verändert werden
-                            }
-                            foreach ($subFieldValue as $name => $value) {
-                                $convertedFieldValue = $this->convertUmlauts($value);
-                                if ($convertedFieldValue !== false) {
-                                    $documentMetadata[$fieldName][$subFieldIndex][$name] = $convertedFieldValue;
-                                }
-                            }
-                        }
-                    } else {
-                        $convertedFieldValue = $this->convertUmlauts($fieldValue);
-                        if ($convertedFieldValue !== false) {
-                            $documentMetadata[$fieldName] = $convertedFieldValue;
-                        }
-                    }
-                }
-            }
-        );
-    }
-
     private function convertUmlauts($value)
     {
         if (! preg_match('#"[a, o, u]#i', $value)) {
@@ -82,5 +49,31 @@ class Umlauts extends ComplexRule
             ['ä', 'Ä', 'ö', 'Ö', 'ü', 'Ü'],
             $value
         );
+    }
+
+    protected function setFields($fieldValues, &$documentMetadata)
+    {
+        foreach ($documentMetadata as $fieldName => $fieldValue) {
+            if (is_array($fieldValue)) {
+                foreach ($fieldValue as $subFieldIndex => $subFieldValue) {
+                    if ($fieldName === 'Enrichment' &&
+                        ($subFieldValue['KeyName'] === SourceDataHash::SOURCE_DATA_HASH_KEY ||
+                            $subFieldValue['KeyName'] === SourceData::SOURCE_DATA_KEY)) {
+                        continue; // der Original-BibTeX-Record soll nicht verändert werden
+                    }
+                    foreach ($subFieldValue as $name => $value) {
+                        $convertedFieldValue = $this->convertUmlauts($value);
+                        if ($convertedFieldValue !== false) {
+                            $documentMetadata[$fieldName][$subFieldIndex][$name] = $convertedFieldValue;
+                        }
+                    }
+                }
+            } else {
+                $convertedFieldValue = $this->convertUmlauts($fieldValue);
+                if ($convertedFieldValue !== false) {
+                    $documentMetadata[$fieldName] = $convertedFieldValue;
+                }
+            }
+        }
     }
 }

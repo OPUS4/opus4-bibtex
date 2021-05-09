@@ -35,13 +35,13 @@ namespace OpusTest\Bibtex\Import\Rules;
 
 use Opus\Bibtex\Import\Processor;
 
-class FirstPageTest extends \PHPUnit_Framework_TestCase
+class PageLastTest extends \PHPUnit_Framework_TestCase
 {
     public function testProcess()
     {
         $proc = new Processor();
         $metadata = [];
         $proc->handleRecord(['Pages' => '1--10'], $metadata);
-        $this->assertEquals('1', $metadata['PageFirst']);
+        $this->assertEquals('10', $metadata['PageLast']);
     }
 }

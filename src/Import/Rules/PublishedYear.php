@@ -37,16 +37,17 @@ class PublishedYear extends SimpleRule
 {
     public function __construct()
     {
-        $this->setBibtexFieldName('year');
-        $this->setOpusFieldName('PublishedYear');
-        $this->setFn(
-            function ($value) {
-                $value = preg_replace('/[^0-9]/', '', $value);
-                if (strlen($value) == 4) {
-                    return $value;
-                }
-            }
-        );
+        $this->setBibtexField('year');
+        $this->setOpusField('PublishedYear');
         return $this;
+    }
+
+    protected function getValue($value)
+    {
+        $value = preg_replace('/[^0-9]/', '', $value);
+        if (strlen($value) == 4) {
+            return $value;
+        }
+        return null;
     }
 }

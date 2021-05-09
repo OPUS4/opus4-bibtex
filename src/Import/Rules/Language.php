@@ -33,21 +33,11 @@
 
 namespace Opus\Bibtex\Import\Rules;
 
-class TitleParent extends ArrayRule
+class Language extends ConstantValue
 {
     public function __construct()
     {
-        $this->setBibtexField('journal');
-        $this->setOpusField('TitleParent');
+        $this->setOpusField('Language');
         return $this;
-    }
-
-    protected function getValue($value)
-    {
-        return [
-            'Language' => 'eng',
-            'Value' => $this->deleteBrace($value),
-            'Type' => 'parent'
-        ];
     }
 }

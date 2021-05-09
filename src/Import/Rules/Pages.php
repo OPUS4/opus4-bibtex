@@ -25,36 +25,63 @@
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
  * @category    BibTeX
- * @package     Opus\Bibtex\Import\Configuration
+ * @package     Opus\Bibtex\Import\Rules
  * @author      Sascha Szott <opus-repository@saschaszott.de>
  * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace Opus\Bibtex\Import\Configuration;
+namespace Opus\Bibtex\Import\Rules;
 
-class JsonFieldMappingReader
+class Pages extends ComplexRule
 {
-    /**
-     * @param $fileName
-     * @return FieldMapping
-     * @throws \Exception
-     */
-    public function getMappingConfigurationFromFile($fileName)
+    public function __construct()
     {
-        $json = file_get_contents($fileName);
-        if ($json === false) {
-            throw new \Exception("could not read file $fileName");
-        }
+        parent::__construct(['pages']);
+        return $this;
+    }
 
-        $jsonArr = json_decode($json, true);
-        if (is_null($jsonArr)) {
-            throw new \Exception("could not decode JSON file $fileName");
+    protected function setFields($fieldValues, &$documentMetadata)
+    {
+        if (array_key_exists('pages', $fieldValues)) {
+            $pagesFieldValue = $fieldValues['pages'];
+            $documentMetadata['PageFirst'] = $this->getPageFirst($pagesFieldValue);
+            $documentMetadata['PageLast'] = $this->getPageLast($pagesFieldValue);
+            $pageNumber = $this->getPageNumber($documentMetadata);
+            if (! is_null($pageNumber)) {
+                $documentMetadata['PageNumber'] = $pageNumber;
+            }
+            return true;
         }
+        return false;
+    }
 
-        return (new FieldMapping())
-            ->setName($jsonArr['name'])
-            ->setDescription($jsonArr['description'])
-            ->setRules($jsonArr['rules']);
+    private function getPageFirst($value)
+    {
+        $value = str_replace(['--', '––', '–'], '-', $value);
+        $parts = explode('-', $value, 2);
+        return trim($parts[0]);
+    }
+
+    private function getPageLast($value)
+    {
+        $value = str_replace(['--', '––', '–'], '-', $value);
+        $parts = explode('-', $value, 2);
+        if (count($parts) == 2) {
+            return trim($parts[1]);
+        }
+        return trim($parts[0]);
+    }
+
+    private function getPageNumber($documentMetadata)
+    {
+        $pageFirst =
+            array_key_exists('PageFirst', $documentMetadata) ? intval($documentMetadata['PageFirst']) : 0;
+        $pageLast =
+            array_key_exists('PageLast', $documentMetadata) ? intval($documentMetadata['PageLast']) : 0;
+        if ($pageFirst > 0 && $pageLast > 0 && $pageLast >= $pageFirst) {
+            return 1 + $pageLast - $pageFirst;
+        }
+        return null;
     }
 }

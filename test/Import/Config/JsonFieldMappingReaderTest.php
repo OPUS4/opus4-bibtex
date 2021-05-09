@@ -31,21 +31,23 @@
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace OpusTest\Bibtex\Import\Configuration;
+namespace OpusTest\Bibtex\Import\Config;
 
-use Opus\Bibtex\Import\Configuration\FieldMapping;
-use Opus\Bibtex\Import\Configuration\ConfigurationManager;
+use Opus\Bibtex\Import\Config\BibtexMapping;
+use Opus\Bibtex\Import\Config\BibtexService;
 use Opus\Bibtex\Import\Rules\Arxiv;
-use Opus\Bibtex\Import\Rules\ConstantValueRule;
+use Opus\Bibtex\Import\Rules\BelongsToBibliography;
+use Opus\Bibtex\Import\Rules\ConstantValue;
 use Opus\Bibtex\Import\Rules\Doi;
 use Opus\Bibtex\Import\Rules\Isbn;
 use Opus\Bibtex\Import\Rules\Issn;
+use Opus\Bibtex\Import\Rules\Language;
 use Opus\Bibtex\Import\Rules\Note;
 use Opus\Bibtex\Import\Rules\PageFirst;
 use Opus\Bibtex\Import\Rules\PageLast;
 use Opus\Bibtex\Import\Rules\PageNumber;
 use Opus\Bibtex\Import\Rules\Person;
-use Opus\Bibtex\Import\Rules\Ptype;
+use Opus\Bibtex\Import\Rules\DocumentType;
 use Opus\Bibtex\Import\Rules\PublishedYear;
 use Opus\Bibtex\Import\Rules\SimpleRule;
 use Opus\Bibtex\Import\Rules\SourceData;
@@ -60,7 +62,8 @@ class JsonFieldMappingReaderTest extends \PHPUnit_Framework_TestCase
 {
     public function testGetFieldMappingConfiguration()
     {
-        $mappingConfig = ConfigurationManager::getFieldMapping();
+        $configService = BibtexService::getInstance();
+        $mappingConfig = $configService->getFieldMapping();
 
         $defaultMapping = $this->createMappingConfiguration();
 
@@ -71,16 +74,12 @@ class JsonFieldMappingReaderTest extends \PHPUnit_Framework_TestCase
 
     private function createMappingConfiguration()
     {
-        return (new FieldMapping())
+        return (new BibtexMapping())
             ->setName('default')
             ->setDescription('Default BibTeX Mapping Configuration.')
             ->addRule(
-                'type',
-                new Type()
-            )
-            ->addRule(
-                'ptype',
-                new Ptype()
+                'documentType',
+                (new DocumentType())->setBibtexField('ptype')
             )
             ->addRule(
                 'issue',
@@ -91,122 +90,103 @@ class JsonFieldMappingReaderTest extends \PHPUnit_Framework_TestCase
                 new SimpleRule('volume', 'Volume')
             )
             ->addRule(
-                'pageFirst',
-                new PageFirst()
+                'pages'
             )
             ->addRule(
-                'pageLast',
-                new PageLast()
+                'publishedYear'
             )
             ->addRule(
-                'pageNumber',
-                new PageNumber()
+                'issn'
             )
             ->addRule(
-                'publishedYear',
-                new PublishedYear()
+                'isbn'
             )
             ->addRule(
-                'issn',
-                new Issn()
+                'doi'
             )
             ->addRule(
-                'isbn',
-                new Isbn()
+                'arxiv'
             )
             ->addRule(
-                'doi',
-                new Doi()
-            )
-            ->addRule(
-                'arxiv',
-                new Arxiv()
-            )
-            ->addRule(
-                'titleMain',
-                new TitleMain()
+                'titleMain'
             )
             ->addRule(
                 'journalTitle',
-                (new TitleParent())->setBibtexFieldName('journal')
+                (new TitleParent())->setBibtexField('journal')
             )
             ->addRule(
                 'bookTitle',
-                (new TitleParent())->setBibtexFieldName('booktitle')
+                (new TitleParent())->setBibtexField('booktitle')
             )
             ->addRule(
-                'subject',
-                new Subject()
+                'subject'
             )
             ->addRule(
                 'pdfUrl',
                 (new Note())
-                    ->setBibtexFieldName('pdfurl')
+                    ->setBibtexField('pdfurl')
                     ->setMessagePrefix('URL of the PDF: ')
                     ->setVisibility('public')
             )
             ->addRule(
                 'slides',
                 (new Note())
-                    ->setBibtexFieldName('slides')
+                    ->setBibtexField('slides')
                     ->setMessagePrefix('URL of the Slides: ')
                     ->setVisibility('public')
             )
             ->addRule(
                 'annote',
                 (new Note())
-                    ->setBibtexFieldName('annote')
+                    ->setBibtexField('annote')
                     ->setMessagePrefix('Additional Note: ')
                     ->setVisibility('public')
             )
             ->addRule(
                 'summary',
                 (new Note())
-                    ->setBibtexFieldName('summary')
+                    ->setBibtexField('summary')
                     ->setMessagePrefix('URL of the Abstract: ')
                     ->setVisibility('public')
             )
             ->addRule(
                 'code',
                 (new Note())
-                    ->setBibtexFieldName('code')
+                    ->setBibtexField('code')
                     ->setMessagePrefix('URL of the Code: ')
                     ->setVisibility('public')
             )
             ->addRule(
                 'poster',
                 (new Note())
-                    ->setBibtexFieldName('poster')
+                    ->setBibtexField('poster')
                     ->setMessagePrefix('URL of the Poster: ')
                     ->setVisibility('public')
             )
             ->addRule(
                 'author',
-                (new Person())->setBibtexFieldName('author')
+                (new Person())->setBibtexField('author')
             )
             ->addRule(
                 'editor',
-                (new Person())->setBibtexFieldName('editor')
+                (new Person())->setBibtexField('editor')
             )
             ->addRule(
-                'sourceData',
-                new SourceData()
+                'sourceData'
             )
             ->addRule(
-                'sourceDataHash',
-                new SourceDataHash()
+                'sourceDataHash'
             )
             ->addRule(
                 'language',
-                (new ConstantValueRule())->setOpusFieldName('Language')->setValue('eng')
+                (new Language())->setValue('eng')
             )
             ->addRule(
                 'belongsToBibliography',
-                (new ConstantValueRule())->setOpusFieldName('BelongsToBibliography')->setValue('0')
+                (new BelongsToBibliography())->setValue(false)
             )
             ->addRule(
-                'umlauts',
-                new Umlauts()
+                'umlauts'
             );
     }
 }

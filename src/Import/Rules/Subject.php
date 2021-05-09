@@ -37,22 +37,22 @@ class Subject extends ArrayRule
 {
     public function __construct()
     {
-        $this->setBibtexFieldName('keywords');
-        $this->setOpusFieldName('Subject');
-        $this->setFn(
-            function ($value) {
-                $keywords = explode(', ', $value);
-                $result = [];
-                foreach ($keywords as $keyword) {
-                    $result[] = [
-                        'Language' => 'eng',
-                        'Type' => 'uncontrolled',
-                        'Value' => $this->deleteBrace($keyword)
-                    ];
-                }
-                return $result;
-            }
-        );
+        $this->setBibtexField('keywords');
+        $this->setOpusField('Subject');
         return $this;
+    }
+
+    protected function getValue($value)
+    {
+        $keywords = explode(', ', $value);
+        $result = [];
+        foreach ($keywords as $keyword) {
+            $result[] = [
+                'Language' => 'eng',
+                'Type' => 'uncontrolled',
+                'Value' => $this->deleteBrace($keyword)
+            ];
+        }
+        return $result;
     }
 }

@@ -33,10 +33,11 @@
 
 namespace OpusTest\Bibtex\Import\Rules\DocumentType;
 
-use Opus\Bibtex\Import\Configuration\ConfigurationManager;
-use Opus\Bibtex\Import\Configuration\DocumentTypeMapping;
-use Opus\Bibtex\Import\Configuration\FieldMapping;
+use Opus\Bibtex\Import\Config\BibtexService;
+use Opus\Bibtex\Import\Config\DocumentTypeMapping;
+use Opus\Bibtex\Import\Config\BibtexMapping;
 use Opus\Bibtex\Import\Processor;
+use Opus\Bibtex\Import\Rules\DocumentType;
 use Opus\Bibtex\Import\Rules\Type;
 
 class DocumentTypeMappingTest extends \PHPUnit_Framework_TestCase
@@ -47,8 +48,8 @@ class DocumentTypeMappingTest extends \PHPUnit_Framework_TestCase
         $typeMapping = new DocumentTypeMapping();
         $typeMapping->setDefaultType('defaultType');
 
-        $mappingConf = new FieldMapping();
-        $mappingConf->addRule('type', (new Type())->setDocumentTypeMapping($typeMapping));
+        $mappingConf = new BibtexMapping();
+        $mappingConf->addRule('type', (new DocumentType())->setDocumentTypeMapping($typeMapping));
 
         $processor = new Processor($mappingConf);
         $metadata = [];
@@ -63,10 +64,10 @@ class DocumentTypeMappingTest extends \PHPUnit_Framework_TestCase
         $typeMapping = new DocumentTypeMapping();
         $typeMapping->setDefaultType(null);
 
-        $mappingConf = new FieldMapping();
+        $mappingConf = new BibtexMapping();
         $mappingConf
             ->resetRules()
-            ->addRule('type', (new Type())->setDocumentTypeMapping($typeMapping));
+            ->addRule('type', (new DocumentType())->setDocumentTypeMapping($typeMapping));
 
         $processor = new Processor($mappingConf);
         $metadata = [];
@@ -83,16 +84,16 @@ class DocumentTypeMappingTest extends \PHPUnit_Framework_TestCase
             ->setDefaultType('defaultType')
             ->setMapping('foo', 'bar');
 
-        $mappingConf = new FieldMapping();
+        $mappingConf = new BibtexMapping();
         $mappingConf
             ->resetRules()
-            ->addRule('type', (new Type())->setDocumentTypeMapping($typeMapping));
+            ->addRule('type', (new DocumentType())->setDocumentTypeMapping($typeMapping));
 
         $processor = new Processor($mappingConf);
         $metadata = [];
         $processor->handleRecord(['type' => 'foo'], $metadata);
 
-        $this->assertEquals($typeMapping->getMapping('foo'), $metadata['Type']);
+        $this->assertEquals($typeMapping->getOpusType('foo'), $metadata['Type']);
         $this->assertEquals('bar', $metadata['Type']);
     }
 
@@ -104,16 +105,16 @@ class DocumentTypeMappingTest extends \PHPUnit_Framework_TestCase
             ->setMapping('foo', 'bar')
             ->setMapping('foo', 'baz'); // Mapping wird überschrieben
 
-        $mappingConf = new FieldMapping();
+        $mappingConf = new BibtexMapping();
         $mappingConf
             ->resetRules()
-            ->addRule('type', (new Type())->setDocumentTypeMapping($typeMapping));
+            ->addRule('type', (new DocumentType())->setDocumentTypeMapping($typeMapping));
 
         $processor = new Processor($mappingConf);
         $metadata = [];
         $processor->handleRecord(['type' => 'foo'], $metadata);
 
-        $this->assertEquals($typeMapping->getMapping('foo'), $metadata['Type']);
+        $this->assertEquals($typeMapping->getOpusType('foo'), $metadata['Type']);
         $this->assertEquals('baz', $metadata['Type']);
     }
 
@@ -125,16 +126,16 @@ class DocumentTypeMappingTest extends \PHPUnit_Framework_TestCase
             ->setMapping('foo', 'bar')
             ->removeMapping('baz');
 
-        $mappingConf = new FieldMapping();
+        $mappingConf = new BibtexMapping();
         $mappingConf
             ->resetRules()
-            ->addRule('type', (new Type())->setDocumentTypeMapping($typeMapping));
+            ->addRule('type', (new DocumentType())->setDocumentTypeMapping($typeMapping));
 
         $processor = new Processor($mappingConf);
         $metadata = [];
         $processor->handleRecord(['type' => 'foo'], $metadata);
 
-        $this->assertEquals($typeMapping->getMapping('foo'), $metadata['Type']);
+        $this->assertEquals($typeMapping->getOpusType('foo'), $metadata['Type']);
         $this->assertEquals('bar', $metadata['Type']);
     }
 
@@ -146,16 +147,16 @@ class DocumentTypeMappingTest extends \PHPUnit_Framework_TestCase
             ->setMapping('foo', 'bar')
             ->removeMapping('foo');
 
-        $mappingConf = new FieldMapping();
+        $mappingConf = new BibtexMapping();
         $mappingConf
             ->resetRules()
-            ->addRule('type', (new Type())->setDocumentTypeMapping($typeMapping));
+            ->addRule('type', (new DocumentType())->setDocumentTypeMapping($typeMapping));
 
         $processor = new Processor($mappingConf);
         $metadata = [];
         $processor->handleRecord(['type' => 'foo'], $metadata);
 
-        $this->assertEquals($typeMapping->getMapping('foo'), $metadata['Type']);
+        $this->assertEquals($typeMapping->getOpusType('foo'), $metadata['Type']);
         $this->assertEquals($typeMapping->getDefaultType(), $metadata['Type']);
         $this->assertEquals('defaultType', $metadata['Type']);
     }
@@ -168,16 +169,16 @@ class DocumentTypeMappingTest extends \PHPUnit_Framework_TestCase
             ->setMapping('foo', 'bar')
             ->clearMapping();
 
-        $mappingConf = new FieldMapping();
+        $mappingConf = new BibtexMapping();
         $mappingConf
             ->resetRules()
-            ->addRule('type', (new Type())->setDocumentTypeMapping($typeMapping));
+            ->addRule('type', (new DocumentType())->setDocumentTypeMapping($typeMapping));
 
         $processor = new Processor($mappingConf);
         $metadata = [];
         $processor->handleRecord(['type' => 'foo'], $metadata);
 
-        $this->assertEquals($typeMapping->getMapping('foo'), $metadata['Type']);
+        $this->assertEquals($typeMapping->getOpusType('foo'), $metadata['Type']);
         $this->assertEquals($typeMapping->getDefaultType(), $metadata['Type']);
         $this->assertEquals('defaultType', $metadata['Type']);
     }
@@ -207,7 +208,7 @@ class DocumentTypeMappingTest extends \PHPUnit_Framework_TestCase
             // Mapping von nicht Standard BibTeX-Typen
             ->setMapping('journal', 'article');
 
-        $documentTypeMappingFromConfig = ConfigurationManager::getTypeMapping();
+        $documentTypeMappingFromConfig = BibtexService::getInstance()->getTypeMapping();
         $this->assertEquals($documentTypeMapping->getDefaultType(), $documentTypeMappingFromConfig->getDefaultType());
         $this->assertEquals($documentTypeMapping->getMappings(), $documentTypeMappingFromConfig->getMappings());
     }

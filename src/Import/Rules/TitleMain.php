@@ -37,17 +37,17 @@ class TitleMain extends ArrayRule
 {
     public function __construct()
     {
-        $this->setBibtexFieldName('title');
-        $this->setOpusFieldName('TitleMain');
-        $this->setFn(
-            function ($value) {
-                return [
-                    'Language' => 'eng',
-                    'Value' => $this->deleteBrace($value),
-                    'Type' => 'main'
-                ];
-            }
-        );
+        $this->setBibtexField('title');
+        $this->setOpusField('TitleMain');
         return $this;
+    }
+
+    protected function getValue($value)
+    {
+        return [
+            'Language' => 'eng',
+            'Value' => $this->deleteBrace($value),
+            'Type' => 'main'
+        ];
     }
 }

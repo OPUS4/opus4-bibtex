@@ -42,15 +42,12 @@ namespace Opus\Bibtex\Import\Rules;
  * werden, um auf alle in den Dokumentmetadaten gespeicherten Felder zugreifen und neue Felder in den Dokumentmetadaten
  * hinzufügen.
  */
-class ComplexRule implements IRule
+abstract class ComplexRule implements IRule
 {
-    protected $fn;
-
     protected $fieldsEvaluated;
 
-    public function __construct($fn, $fieldsEvaluated = null)
+    public function __construct($fieldsEvaluated = null)
     {
-        $this->fn = $fn;
         $this->fieldsEvaluated = $fieldsEvaluated;
     }
 
@@ -67,14 +64,15 @@ class ComplexRule implements IRule
                 }
             }
         }
-        // FIXME wir können nicht wirklich sicherstellen, dass beim Aufruf von $this->fn tatsächlich auf die in
-        //       $this->fieldValues angegebenen Werte des BibTeX-Records zugegriffen wird
-        ($this->fn)($fieldValues, $documentMetadata);
-        return true;
+        // FIXME wir können nicht wirklich sicherstellen, dass beim Aufruf von setFields tatsächlich auf die in
+        //       $fieldValues angegebenen Werte des BibTeX-Records zugegriffen wird
+        return $this->setFields($fieldValues, $documentMetadata);
     }
 
     public function getEvaluatedBibTexField()
     {
         return is_null($this->fieldsEvaluated) ? [] : $this->fieldsEvaluated;
     }
+
+    abstract protected function setFields($fieldValues, &$documentMetadata);
 }

@@ -33,22 +33,27 @@
 
 namespace Opus\Bibtex\Import\Rules;
 
-use Opus\Bibtex\Import\Configuration\FieldMapping;
+use Opus\Bibtex\Import\Config\BibtexMapping;
 
 class SourceData extends ArrayRule
 {
+    /**
+     * Name des Enrichments, das zur Speicherung des importierten (unveränderten) BibTeX-Record verwendet wird
+     */
+    const SOURCE_DATA_KEY = 'opus.import.data';
+
     public function __construct()
     {
-        $this->setBibtexFieldName('_original');
-        $this->setOpusFieldName('Enrichment');
-        $this->setFn(
-            function ($value) {
-                return [
-                    'KeyName' => FieldMapping::SOURCE_DATA_KEY,
-                    'Value' => $value
-                ];
-            }
-        );
+        $this->setBibtexField('_original');
+        $this->setOpusField('Enrichment');
         return $this;
+    }
+
+    protected function getValue($value)
+    {
+        return [
+            'KeyName' => self::SOURCE_DATA_KEY,
+            'Value' => $value
+        ];
     }
 }

@@ -24,31 +24,34 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * @category    BibTeX
- * @package     Opus\Bibtex\Import\Rules
+ * @category    Tests
+ * @package     OpusTest\Bibtex\Import\Rules
  * @author      Sascha Szott <opus-repository@saschaszott.de>
  * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace Opus\Bibtex\Import\Rules;
+namespace OpusTest\Bibtex\Import\Rules;
 
-class PageLast extends SimpleRule
+use Opus\Bibtex\Import\Rules\ConstantValues;
+
+class ConstantValuesTest extends \PHPUnit_Framework_TestCase
 {
-    public function __construct()
+
+    public function testProcess()
     {
-        $this->setBibtexFieldName('pages');
-        $this->setOpusFieldName('PageLast');
-        $this->setFn(
-            function ($value) {
-                $value = str_replace(['--', '––', '–'], '-', $value);
-                $parts = explode('-', $value, 2);
-                if (count($parts) == 2) {
-                    return trim($parts[1]);
-                }
-                return trim($parts[0]);
-            }
+        $constantValuesRule = new ConstantValues();
+        $constantValuesRule->setOptions(
+            [
+                'language' => 'deu',
+                'belongsToBibliography' => 1
+            ]
         );
-        return $this;
+
+        $metadata = [];
+        $constantValuesRule->apply([], $metadata);
+
+        $this->assertEquals('deu', $metadata['Language']);
+        $this->assertTrue($metadata['BelongsToBibliography']);
     }
 }

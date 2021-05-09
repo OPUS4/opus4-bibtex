@@ -33,22 +33,33 @@
 
 namespace Opus\Bibtex\Import\Rules;
 
-use Opus\Bibtex\Import\Configuration\FieldMapping;
+use Opus\Bibtex\Import\Config\BibtexMapping;
 
 class SourceDataHash extends ArrayRule
 {
+    /**
+     * Name des Enrichments, in dem der Hashwert (auf Basis der Hashfunktion HASH_FUNCTION) des importierten
+     * BibTeX-Records gespeichert wird
+     */
+    const SOURCE_DATA_HASH_KEY = 'opus.import.dataHash';
+
+    /**
+     * Name der Hashfunktion, die zur Bestimmung des Hashwerts verwendet werden soll.
+     */
+    const HASH_FUNCTION = 'md5';
+
     public function __construct()
     {
-        $this->setBibtexFieldName('_original');
-        $this->setOpusFieldName('Enrichment');
-        $this->setFn(
-            function ($value) {
-                return [
-                    'KeyName' => FieldMapping::SOURCE_DATA_HASH_KEY,
-                    'Value' => FieldMapping::HASH_FUNCTION . ':' . (FieldMapping::HASH_FUNCTION)($value)
-                ];
-            }
-        );
+        $this->setBibtexField('_original');
+        $this->setOpusField('Enrichment');
         return $this;
+    }
+
+    protected function getValue($value)
+    {
+        return [
+            'KeyName' => self::SOURCE_DATA_HASH_KEY,
+            'Value' => self::HASH_FUNCTION . ':' . (self::HASH_FUNCTION)($value)
+        ];
     }
 }

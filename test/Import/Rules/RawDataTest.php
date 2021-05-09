@@ -33,8 +33,9 @@
 
 namespace OpusTest\Bibtex\Import\Rules;
 
-use Opus\Bibtex\Import\Configuration\FieldMapping;
 use Opus\Bibtex\Import\Processor;
+use Opus\Bibtex\Import\Rules\SourceData;
+use Opus\Bibtex\Import\Rules\SourceDataHash;
 
 class RawDataTest extends \PHPUnit_Framework_TestCase
 {
@@ -45,12 +46,12 @@ class RawDataTest extends \PHPUnit_Framework_TestCase
         $metadata = [];
         $proc->handleRecord(['_original' => '@article{...}'], $metadata);
 
-        $hashFunction = FieldMapping::HASH_FUNCTION;
+        $hashFunction = SourceDataHash::HASH_FUNCTION;
         $hashValue = $hashFunction('@article{...}');
         $this->assertEquals(
             [
-                ['KeyName' => FieldMapping::SOURCE_DATA_KEY, 'Value' => '@article{...}'],
-                ['KeyName' => FieldMapping::SOURCE_DATA_HASH_KEY, 'Value' => $hashFunction . ':' . $hashValue]
+                ['KeyName' => SourceData::SOURCE_DATA_KEY, 'Value' => '@article{...}'],
+                ['KeyName' => SourceDataHash::SOURCE_DATA_HASH_KEY, 'Value' => $hashFunction . ':' . $hashValue]
             ],
             $metadata['Enrichment']
         );

@@ -37,18 +37,17 @@ class Person extends ArrayRule
 {
     public function __construct()
     {
-        $this->setOpusFieldName('Person');
-        $this->setFn(
-            function ($value) {
-                $persons = explode(' and ', $value);
-                $result = [];
-                foreach ($persons as $person) {
-                    $result[] = array_merge(['Role' => $this->bibtexFieldName], $this->extractNameParts($person));
-                }
-                return $result;
-            }
-        );
-        return $this;
+        $this->setOpusField('Person');
+    }
+
+    protected function getValue($value)
+    {
+        $persons = explode(' and ', $value);
+        $result = [];
+        foreach ($persons as $person) {
+            $result[] = array_merge(['Role' => $this->bibtexField], $this->extractNameParts($person));
+        }
+        return $result;
     }
 
     protected function extractNameParts($name)

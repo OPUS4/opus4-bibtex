@@ -24,28 +24,28 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * @category    BibTeX
- * @package     Opus\Bibtex\Import\Rules
+ * @category    Tests
+ * @package     OpusTest\Bibtex\Import\Rules
  * @author      Sascha Szott <opus-repository@saschaszott.de>
  * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace Opus\Bibtex\Import\Rules;
+namespace OpusTest\Bibtex\Import\Rules;
 
-class PageFirst extends SimpleRule
+use Opus\Bibtex\Import\Rules\Language;
+
+class LanguageTest extends \PHPUnit_Framework_TestCase
 {
-    public function __construct()
+
+    public function testProcess()
     {
-        $this->setBibtexFieldName('pages');
-        $this->setOpusFieldName('PageFirst');
-        $this->setFn(
-            function ($value) {
-                $value = str_replace(['--', '––', '–'], '-', $value);
-                $parts = explode('-', $value, 2);
-                return trim($parts[0]);
-            }
-        );
-        return $this;
+        $languageRule = new Language();
+        $languageRule->setValue('eng');
+
+        $metadata = [];
+        $languageRule->apply([], $metadata);
+
+        $this->assertEquals('eng', $metadata['Language']);
     }
 }

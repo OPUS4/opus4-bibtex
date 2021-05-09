@@ -39,15 +39,7 @@ class Note extends ArrayRule
 
     public function __construct()
     {
-        $this->setOpusFieldName('Note');
-        $this->setFn(
-            function ($value) {
-                return [
-                    'Visibility' => $this->visibility,
-                    'Message' => $this->messagePrefix . $value
-                ];
-            }
-        );
+        $this->setOpusField('Note');
         return $this;
     }
 
@@ -61,5 +53,13 @@ class Note extends ArrayRule
     {
         $this->visibility = $visibility;
         return $this;
+    }
+
+    protected function getValue($value)
+    {
+        return [
+            'Visibility' => $this->visibility,
+            'Message' => $this->messagePrefix . $value
+        ];
     }
 }

@@ -31,36 +31,48 @@
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace Opus\Bibtex\Import\Configuration;
+namespace Opus\Bibtex\Import\Config;
 
-class ConfigurationManager
+class BibtexService
 {
     /**
      * Name der Konfigurationsdatei, in der Feld-Mappings sowie Dokumenttyp-Mappings angegeben werden.
      */
     const INI_FILE = 'import.ini';
 
+    private static $instance = null;
+
+    public static function getInstance()
+    {
+        if (self::$instance == null) {
+            self::$instance = new BibtexService();
+        }
+
+        return self::$instance;
+    }
+
     /**
      * Liefert das Feld-Mapping auf Basis der Feld-Mapping-Konfiguration mit dem übergebenen Namen zurück.
      *
      * @param string $mappingConfigName Name der Feld-Mapping-Konfiguration; ist dieser nicht gesetzt, so wird auf
      *                                  das Default-Mapping zurückgegriffen
-     * @return FieldMapping Feld-Mapping von BibTeX-Feldern auf OPUS-Metadatenfelder
+     * @return BibtexMapping Feld-Mapping von BibTeX-Feldern auf OPUS-Metadatenfelder
      * @throws \Exception
      */
-    public static function getFieldMapping($mappingConfigName = null)
+    public function getFieldMapping($mappingConfigName = null)
     {
         if (is_null($mappingConfigName)) {
             $mappingConfigName = 'default';
         }
 
-        $fieldMappings = self::getConfiguration('fieldMappings');
+        $fieldMappings = $this->getConfiguration('fieldMappings');
         foreach ($fieldMappings as $mapping) {
-            if (file_exists($mapping)) {
+            $mappingFile = $this->getPath($mapping);
+            if (file_exists($mappingFile)) {
                 // TODO weitere Konfigurationsformate unterstützen?
                 if (substr($mapping, -4) === 'json') {
-                    $jcr = new JsonFieldMappingReader();
-                    $mappingConf = $jcr->getMappingConfigurationFromFile($mapping);
+                    $jcr = new JsonBibtexMappingReader();
+                    $mappingConf = $jcr->getMappingConfigurationFromFile($mappingFile);
                     if ($mappingConf->getName() === $mappingConfigName) {
                         // es wurde eine Mapping-Konfiguration mit dem übergebenen Namen gefunden
                         return $mappingConf;
@@ -78,12 +90,12 @@ class ConfigurationManager
      * @return DocumentTypeMapping Dokumenttyp-Mapping
      * @throws \Exception
      */
-    public static function getTypeMapping()
+    public function getTypeMapping()
     {
         $documentTypeMapping = new DocumentTypeMapping();
-        $documentTypeMapping->setDefaultType(self::getConfiguration('defaultDocumentType'));
+        $documentTypeMapping->setDefaultType($this->getConfiguration('defaultDocumentType'));
 
-        $documentTypeMappingConf = self::getConfiguration('documentTypeMapping');
+        $documentTypeMappingConf = $this->getConfiguration('documentTypeMapping');
         foreach ($documentTypeMappingConf as $bibtexTypeName => $opusTypeName) {
             $documentTypeMapping->setMapping($bibtexTypeName, $opusTypeName);
         }
@@ -98,21 +110,28 @@ class ConfigurationManager
      * @return mixed
      * @throws \Exception falls INI-Datei nicht existent, nicht lesbar oder der Schlüsselname nicht existiert.
      */
-    private static function getConfiguration($keyName)
+    private function getConfiguration($keyName)
     {
-        if (! is_readable(self::INI_FILE)) {
-            throw new \Exception('could not find or read ini file ' . self::INI_FILE);
+        $fileName = $this->getPath(self::INI_FILE);
+
+        if (! is_readable($fileName)) {
+            throw new \Exception("could not find or read ini file $fileName");
         }
 
-        $conf = parse_ini_file(self::INI_FILE);
+        $conf = parse_ini_file($fileName);
         if ($conf === false) {
-            throw new \Exception('could not parse ini file ' . self::INI_FILE);
+            throw new \Exception("could not parse ini file $fileName");
         }
 
         if (! array_key_exists($keyName, $conf)) {
-            throw new \Exception('could not find configuration of fieldMappings in ini file ' . self::INI_FILE);
+            throw new \Exception("could not find configuration of fieldMappings in ini file $fileName");
         }
 
         return $conf[$keyName];
+    }
+
+    private function getPath($fileName)
+    {
+        return __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . $fileName;
     }
 }

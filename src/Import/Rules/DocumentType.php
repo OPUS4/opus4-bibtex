@@ -33,7 +33,7 @@
 
 namespace Opus\Bibtex\Import\Rules;
 
-use Opus\Bibtex\Import\Configuration\ConfigurationManager;
+use Opus\Bibtex\Import\Config\BibtexService;
 
 /**
  * ptype ist kein Standard-BibTeX-Feld: das Feld ptype kann genutzt werden, um das Typ-Mapping auf Basis des
@@ -41,22 +41,16 @@ use Opus\Bibtex\Import\Configuration\ConfigurationManager;
  *
  * Ist im BibTeX-Record kein Feld ptype vorhanden, so wird der Typ aus der Zeichenkette nach @ abgeleitet
  */
-class Ptype extends SimpleRule
+class DocumentType extends SimpleRule
 {
     protected $documentTypeMapping;
 
     public function __construct()
     {
-        $this->documentTypeMapping = ConfigurationManager::getTypeMapping();
-        $this->documentTypeMapping->setDefaultType(null); // Default-Type soll nicht zur Anwendung kommen
-
-        $this->setBibtexFieldName('ptype');
-        $this->setOpusFieldName('Type');
-        $this->setFn(
-            function ($value) {
-                return $this->documentTypeMapping->getMapping($value);
-            }
-        );
+        $configService = BibtexService::getInstance();
+        $this->documentTypeMapping = $configService->getTypeMapping();
+        $this->setBibtexField('type');
+        $this->setOpusField('Type');
         return $this;
     }
 
@@ -64,5 +58,31 @@ class Ptype extends SimpleRule
     {
         $this->documentTypeMapping = $documentTypeMapping;
         return $this;
+    }
+
+    protected function getValue($value)
+    {
+        if ($this->getBibtexField() !== 'type') {
+            $defaultType = $this->documentTypeMapping->getDefaultType();
+            $this->documentTypeMapping->setDefaultType(null);
+        }
+        $result = $this->documentTypeMapping->getOpusType($value);
+        if (isset($defaultType)) {
+            // Änderung am Default Type wieder rückgängig machen
+            $this->documentTypeMapping->setDefaultType($defaultType);
+        }
+        return $result;
+    }
+
+    public function apply($bibtexRecord, &$documentMetadata)
+    {
+        $result = parent::apply($bibtexRecord, $documentMetadata);
+        if (! $result) {
+            if ($this->getBibtexField() !== 'type') {
+                $this->setBibtexField('type');
+                $result = parent::apply($bibtexRecord, $documentMetadata);
+            }
+        }
+        return $result;
     }
 }

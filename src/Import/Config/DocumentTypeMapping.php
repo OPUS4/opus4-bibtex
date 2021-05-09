@@ -31,7 +31,7 @@
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace Opus\Bibtex\Import\Configuration;
+namespace Opus\Bibtex\Import\Config;
 
 class DocumentTypeMapping
 {
@@ -113,7 +113,7 @@ class DocumentTypeMapping
      *
      * @param $bibtexType Name des BibTeX-Typs
      */
-    public function getMapping($bibtexType)
+    public function getOpusType($bibtexType)
     {
         if (array_key_exists($bibtexType, $this->typeMap)) {
             return $this->typeMap[$bibtexType];

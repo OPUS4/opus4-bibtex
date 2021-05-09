@@ -37,16 +37,16 @@ class Isbn extends ArrayRule
 {
     public function __construct()
     {
-        $this->setBibtexFieldName('isbn');
-        $this->setOpusFieldName('Identifier');
-        $this->setFn(
-            function ($value) {
-                return [
-                    'Value' => $value,
-                    'Type' => 'isbn'
-                ];
-            }
-        );
+        $this->setBibtexField('isbn');
+        $this->setOpusField('Identifier');
         return $this;
+    }
+
+    protected function getValue($value)
+    {
+        return [
+            'Value' => $value,
+            'Type' => 'isbn'
+        ];
     }
 }

@@ -37,19 +37,19 @@ class Doi extends ArrayRule
 {
     public function __construct()
     {
-        $this->setBibtexFieldName('doi');
-        $this->setOpusFieldName('Identifier');
-        $this->setFn(
-            function ($value) {
-                if (strtolower(substr($value, 0, 4)) === 'doi:') {
-                    $value = trim(substr($value, 4)); // Präfix doi: abschneiden
-                }
-                return [
-                    'Value' => $value,
-                    'Type' => 'doi'
-                ];
-            }
-        );
+        $this->setBibtexField('doi');
+        $this->setOpusField('Identifier');
         return $this;
+    }
+
+    protected function getValue($value)
+    {
+        if (strtolower(substr($value, 0, 4)) === 'doi:') {
+            $value = trim(substr($value, 4)); // Präfix doi: abschneiden
+        }
+        return [
+            'Value' => $value,
+            'Type' => 'doi'
+        ];
     }
 }

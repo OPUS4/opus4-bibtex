@@ -33,21 +33,60 @@
 
 namespace Opus\Bibtex\Import\Rules;
 
-class TitleParent extends ArrayRule
+/**
+ * Eine Regel, um ein Metadatenfeld mit einer Konstante zu befüllen. Hierbei wird der BibTeX-Record nicht ausgewertet.
+ */
+class ConstantValue implements IRule
 {
-    public function __construct()
+    /**
+     * @var string Name des OPUS-Metadatenfelds
+     */
+    protected $opusField;
+
+    protected $value;
+
+    /**
+     * Setzt den Namen des zu befüllenden OPUS4-Metadatenfelds.
+     *
+     * @param string $opusField
+     */
+    public function setOpusField($opusField)
     {
-        $this->setBibtexField('journal');
-        $this->setOpusField('TitleParent');
+        $this->opusField = ucfirst($opusField);
         return $this;
     }
 
-    protected function getValue($value)
+    /**
+     * Setzt den Feldwert für das OPUS4-Metadatenfeld (Konstante).
+     *
+     * @param $value
+     */
+    public function setValue($value)
     {
-        return [
-            'Language' => 'eng',
-            'Value' => $this->deleteBrace($value),
-            'Type' => 'parent'
-        ];
+        $this->value = $value;
+        return $this;
+    }
+
+    /**
+     * @param array $bibtexRecord
+     * @param array $documentMetadata
+     * @return bool
+     */
+    public function apply($bibtexRecord, &$documentMetadata)
+    {
+        $result = false;
+        // der BibTeX-Record wird zur Bestimmung des Metadatenfelds nicht verwendet
+        // d.h. Metadatenfeldwert wird hier auf eine Konstante gesetzt oder Bestimmung des Feldinhalts auf Basis
+        // von anderen Metadatenfeldern
+        if (! is_null($this->value)) {
+            $documentMetadata[ucfirst($this->opusField)] = $this->value;
+            $result = true;
+        }
+        return $result;
+    }
+
+    public function getEvaluatedBibTexField()
+    {
+        return [];
     }
 }

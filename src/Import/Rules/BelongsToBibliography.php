@@ -33,24 +33,18 @@
 
 namespace Opus\Bibtex\Import\Rules;
 
-class PageNumber extends ConstantValueRule
+class BelongsToBibliography extends ConstantValue
 {
+
     public function __construct()
     {
-        $this->setOpusFieldName('PageNumber');
+        $this->setOpusField('BelongsToBibliography');
         return $this;
     }
 
-    public function apply($bibtexRecord, &$documentMetadata)
+    public function setValue($value)
     {
-        $pageFirst =
-            array_key_exists('PageFirst', $documentMetadata) ? intval($documentMetadata['PageFirst']) : 0;
-        $pageLast =
-            array_key_exists('PageLast', $documentMetadata) ? intval($documentMetadata['PageLast']) : 0;
-        if ($pageFirst > 0 && $pageLast > 0 && $pageLast >= $pageFirst) {
-            $this->setValue(1 + $pageLast - $pageFirst);
-            return parent::apply($bibtexRecord, $documentMetadata);
-        }
-        return false;
+        $this->value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
+        return $this;
     }
 }

@@ -25,37 +25,36 @@
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
  * @category    BibTeX
- * @package     Opus\Bibtex\Import\Rules
+ * @package     Opus\Bibtex\Import\Configuration
  * @author      Sascha Szott <opus-repository@saschaszott.de>
  * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace Opus\Bibtex\Import\Rules;
+namespace Opus\Bibtex\Import\Config;
 
-use Opus\Bibtex\Import\Configuration\ConfigurationManager;
-
-class Type extends SimpleRule
+class JsonBibtexMappingReader
 {
-    protected $documentTypeMapping;
-
-    public function __construct()
+    /**
+     * @param $fileName
+     * @return BibtexMapping
+     * @throws \Exception
+     */
+    public function getMappingConfigurationFromFile($fileName)
     {
-        $this->documentTypeMapping = ConfigurationManager::getTypeMapping();
+        $json = file_get_contents($fileName);
+        if ($json === false) {
+            throw new \Exception("could not read file $fileName");
+        }
 
-        $this->setBibtexFieldName('type');
-        $this->setOpusFieldName('Type');
-        $this->setFn(
-            function ($value) {
-                return $this->documentTypeMapping->getMapping($value);
-            }
-        );
-        return $this;
-    }
+        $jsonArr = json_decode($json, true);
+        if (is_null($jsonArr)) {
+            throw new \Exception("could not decode JSON file $fileName");
+        }
 
-    public function setDocumentTypeMapping($documentTypeMapping)
-    {
-        $this->documentTypeMapping = $documentTypeMapping;
-        return $this;
+        return (new BibtexMapping())
+            ->setName($jsonArr['name'])
+            ->setDescription($jsonArr['description'])
+            ->setRules($jsonArr['mapping']);
     }
 }

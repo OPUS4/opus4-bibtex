@@ -31,26 +31,12 @@
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace Opus\Bibtex\Import\Configuration;
+namespace Opus\Bibtex\Import\Config;
 
-class FieldMapping
+use Opus\Bibtex\Import\Rules\SimpleRule;
+
+class BibtexMapping
 {
-    /**
-     * Name des Enrichments, das zur Speicherung des importierten (unveränderten) BibTeX-Record verwendet wird
-     */
-    const SOURCE_DATA_KEY = 'opus.import.data';
-
-    /**
-     * Name des Enrichments, in dem der Hashwert (auf Basis der Hashfunktion HASH_FUNCTION) des importierten
-     * BibTeX-Records gespeichert wird
-     */
-    const SOURCE_DATA_HASH_KEY = 'opus.import.dataHash';
-
-    /**
-     * Name der Hashfunktion, die zur Bestimmung des Hashwerts verwendet werden soll.
-     */
-    const HASH_FUNCTION = 'md5';
-
     /**
      * Eindeutiger Name der Regelkonfiguration für die Auswahl.
      *
@@ -148,8 +134,11 @@ class FieldMapping
      * @param $name Name der Regel
      * @param $rule die hinzuzufügende Regel
      */
-    public function addRule($name, $rule)
+    public function addRule($name, $rule = null)
     {
+        if (is_null($rule)) {
+            $rule = $this->getRuleInstance(['name' => $name]);
+        }
         $this->rules[$name] = $rule;
         return $this;
     }
@@ -190,7 +179,7 @@ class FieldMapping
     }
 
     /**
-     * Erlaubt das Setzen von Regeln auf Basis des übergebenen Konfigurationsarrays.
+     * Erlaubt das Setzen von Mappingregeln auf Basis des übergebenen Konfigurationsarrays.
      * @param array $rules
      */
     public function setRules($rules)
@@ -198,18 +187,31 @@ class FieldMapping
         $this->resetRules();
         foreach ($rules as $rule) {
             $name = $rule['name'];
-            $className = 'Opus\Bibtex\Import\Rules\\' . $rule['class'];
-            if (class_exists($className)) {
-                $class = new $className;
-            }
-            $this->addRule($name, $class);
-            if (array_key_exists('properties', $rule)) {
-                foreach ($rule['properties'] as $propName => $propValue) {
+            $ruleInstance = $this->getRuleInstance($rule);
+            $this->addRule($name, $ruleInstance);
+            if (array_key_exists('options', $rule)) {
+                foreach ($rule['options'] as $propName => $propValue) {
                     $setter = 'set' . ucfirst($propName);
-                    $class->$setter($propValue);
+                    $ruleInstance->$setter($propValue);
                 }
             }
         }
         return $this;
+    }
+
+    private function getRuleInstance($rule)
+    {
+        if (array_key_exists('class', $rule)) {
+            $className = ucfirst($rule['class']);
+        } else {
+            $className = ucfirst($rule['name']);
+        }
+        if (strpos($className, '\\') === false) {
+            $className = "Opus\Bibtex\Import\Rules\\$className";
+        }
+        if (is_null($className) || ! class_exists($className)) {
+            return new SimpleRule();
+        }
+        return new $className;
     }
 }

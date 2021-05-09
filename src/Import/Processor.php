@@ -33,8 +33,8 @@
 
 namespace Opus\Bibtex\Import;
 
-use Opus\Bibtex\Import\Configuration\FieldMapping;
-use Opus\Bibtex\Import\Configuration\ConfigurationManager;
+use Opus\Bibtex\Import\Config\BibtexMapping;
+use Opus\Bibtex\Import\Config\BibtexService;
 
 class Processor
 {
@@ -42,10 +42,11 @@ class Processor
 
     public function __construct($fieldMapping = null)
     {
-        if (! is_null($fieldMapping) || $fieldMapping instanceof FieldMapping) {
+        if (! is_null($fieldMapping) || $fieldMapping instanceof BibtexMapping) {
             $this->fieldMapping = $fieldMapping;
         } else {
-            $this->fieldMapping = ConfigurationManager::getFieldMapping($fieldMapping);
+            $configService = BibtexService::getInstance();
+            $this->fieldMapping = $configService->getFieldMapping($fieldMapping);
         }
     }
 

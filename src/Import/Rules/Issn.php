@@ -37,16 +37,16 @@ class Issn extends ArrayRule
 {
     public function __construct()
     {
-        $this->setBibtexFieldName('issn');
-        $this->setOpusFieldName('Identifier');
-        $this->setFn(
-            function ($value) {
-                return [
-                    'Value' => $value,
-                    'Type' => 'issn'
-                ];
-            }
-        );
+        $this->setBibtexField('issn');
+        $this->setOpusField('Identifier');
         return $this;
+    }
+
+    protected function getValue($value)
+    {
+        return [
+            'Value' => $value,
+            'Type' => 'issn'
+        ];
     }
 }

@@ -24,24 +24,60 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * @category    Tests
- * @package     OpusTest\Bibtex\Import\Rules
+ * @category    BibTeX
+ * @package     Opus\Bibtex\Import\Rules
  * @author      Sascha Szott <opus-repository@saschaszott.de>
  * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace OpusTest\Bibtex\Import\Rules;
+namespace Opus\Bibtex\Import\Rules;
 
-use Opus\Bibtex\Import\Processor;
-
-class LastPageTest extends \PHPUnit_Framework_TestCase
+/**
+ * Eine Regel, um mehrere OPUS-Metadatenfelder mit Konstanten zu befüllen. Hierbei wird der Inhalt des BibTeX-Records
+ * nicht ausgewertet.
+ */
+class ConstantValues implements IRule
 {
-    public function testProcess()
+
+    private $options;
+
+    /**
+     * @param mixed $options
+     */
+    public function setOptions($options): void
     {
-        $proc = new Processor();
-        $metadata = [];
-        $proc->handleRecord(['Pages' => '1--10'], $metadata);
-        $this->assertEquals('10', $metadata['PageLast']);
+        $this->options = $options;
+    }
+
+    /**
+     * @param array $bibtexRecord
+     * @param array $documentMetadata
+     * @return bool
+     */
+    public function apply($bibtexRecord, &$documentMetadata)
+    {
+        $result = false;
+        // der BibTeX-Record wird zur Bestimmung des Metadatenfelds nicht verwendet
+        if (! is_null($this->options)) {
+            foreach ($this->options as $propName => $propValue) {
+                $propName = ucfirst($propName);
+                $className = 'Opus\Bibtex\Import\Rules\\' . $propName;
+                if (class_exists($className) and method_exists($className, 'setValue')) {
+                    $class = new $className;
+                    $class->setValue($propValue);
+                    $class->apply($bibtexRecord, $documentMetadata);
+                } else {
+                    $documentMetadata[ucfirst($propName)] = $propValue;
+                }
+                $result = true;
+            }
+        }
+        return $result;
+    }
+
+    public function getEvaluatedBibTexField()
+    {
+        return [];
     }
 }

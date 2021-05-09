@@ -36,23 +36,23 @@ namespace Opus\Bibtex\Import\Rules;
 /**
  * Eine Regel, die verwendet werden kann, um ein mehrwertiges Metadatenfeld (Feldwert ist hierbei ein Array) zu füllen.
  */
-class ArrayRule extends SimpleRule
+abstract class ArrayRule extends SimpleRule
 {
     public function apply($bibtexRecord, &$documentMetadata)
     {
         $result = false;
-        if (array_key_exists($this->bibtexFieldName, $bibtexRecord)) {
-            $fieldValue = ($this->fn)($bibtexRecord[$this->bibtexFieldName]);
+        if (array_key_exists($this->bibtexField, $bibtexRecord)) {
+            $fieldValue = $this->getValue($bibtexRecord[$this->bibtexField]);
             if (count($fieldValue) > 0) {
                 $result = true;
                 if (array_key_exists(0, $fieldValue) && is_array($fieldValue[0])) {
                     // $fieldValue ist ein mehrdimensionales Array
-                    if (! array_key_exists($this->opusFieldName, $documentMetadata)) {
-                        $documentMetadata[$this->opusFieldName] = [];
+                    if (! array_key_exists($this->opusField, $documentMetadata)) {
+                        $documentMetadata[$this->opusField] = [];
                     }
-                    array_push($documentMetadata[$this->opusFieldName], ...$fieldValue);
+                    array_push($documentMetadata[$this->opusField], ...$fieldValue);
                 } else {
-                    $documentMetadata[$this->opusFieldName][] = $fieldValue;
+                    $documentMetadata[$this->opusField][] = $fieldValue;
                 }
             }
         }
