@@ -25,7 +25,7 @@
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
  * @category    BibTeX
- * @package     Opus\Bibtex\Import\Configuration
+ * @package     Opus\Bibtex\Import\Config
  * @author      Sascha Szott <opus-repository@saschaszott.de>
  * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
@@ -33,6 +33,7 @@
 
 namespace Opus\Bibtex\Import\Config;
 
+use Opus\Bibtex\Import\Rules\ConstantValues;
 use Opus\Bibtex\Import\Rules\SimpleRule;
 
 class BibtexMapping
@@ -190,9 +191,13 @@ class BibtexMapping
             $ruleInstance = $this->getRuleInstance($rule);
             $this->addRule($name, $ruleInstance);
             if (array_key_exists('options', $rule)) {
-                foreach ($rule['options'] as $propName => $propValue) {
-                    $setter = 'set' . ucfirst($propName);
-                    $ruleInstance->$setter($propValue);
+                if ($ruleInstance instanceof ConstantValues) {
+                    $ruleInstance->setOptions($rule['options']);
+                } else {
+                    foreach ($rule['options'] as $propName => $propValue) {
+                        $setter = 'set' . ucfirst($propName);
+                        $ruleInstance->$setter($propValue);
+                    }
                 }
             }
         }
