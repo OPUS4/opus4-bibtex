@@ -46,6 +46,14 @@ class ConstantValue implements IRule
     protected $value;
 
     /**
+     * @return string
+     */
+    public function getOpusField()
+    {
+        return $this->opusField;
+    }
+
+    /**
      * Setzt den Namen des zu befüllenden OPUS4-Metadatenfelds.
      *
      * @param string $opusField
@@ -54,6 +62,14 @@ class ConstantValue implements IRule
     {
         $this->opusField = ucfirst($opusField);
         return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getValue()
+    {
+        return $this->value;
     }
 
     /**

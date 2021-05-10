@@ -25,7 +25,7 @@
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
  * @category    BibTeX
- * @package     Opus\Bibtex\Import\Configuration
+ * @package     Opus\Bibtex\Import\Config
  * @author      Sascha Szott <opus-repository@saschaszott.de>
  * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
@@ -113,12 +113,17 @@ class DocumentTypeMapping
      *
      * @param $bibtexType Name des BibTeX-Typs
      */
-    public function getOpusType($bibtexType)
+    public function getOpusType($bibtexType, $useDefaultAsFallback = true)
     {
         if (array_key_exists($bibtexType, $this->typeMap)) {
             return $this->typeMap[$bibtexType];
         }
-        return $this->defaultType;
+
+        if ($useDefaultAsFallback) {
+            return $this->defaultType;
+        }
+
+        return null;
     }
 
     /**

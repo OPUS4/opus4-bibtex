@@ -45,10 +45,10 @@ class DocumentType extends SimpleRule
 {
     protected $documentTypeMapping;
 
+    private $fieldsEvaluated = [];
+
     public function __construct()
     {
-        $configService = BibtexService::getInstance();
-        $this->documentTypeMapping = $configService->getTypeMapping();
         $this->setBibtexField('type');
         $this->setOpusField('Type');
         return $this;
@@ -62,27 +62,38 @@ class DocumentType extends SimpleRule
 
     protected function getValue($value)
     {
-        if ($this->getBibtexField() !== 'type') {
-            $defaultType = $this->documentTypeMapping->getDefaultType();
-            $this->documentTypeMapping->setDefaultType(null);
+        if (is_null($this->documentTypeMapping)) {
+            $this->documentTypeMapping = BibtexService::getInstance()->getTypeMapping();
         }
-        $result = $this->documentTypeMapping->getOpusType($value);
-        if (isset($defaultType)) {
-            // Änderung am Default Type wieder rückgängig machen
-            $this->documentTypeMapping->setDefaultType($defaultType);
-        }
+
+        $useDefaultAsFallback = $this->getBibtexField() === 'type';
+        $result = $this->documentTypeMapping->getOpusType($value, $useDefaultAsFallback);
         return $result;
     }
 
     public function apply($bibtexRecord, &$documentMetadata)
     {
+        $this->fieldsEvaluated = [];
         $result = parent::apply($bibtexRecord, $documentMetadata);
-        if (! $result) {
-            if ($this->getBibtexField() !== 'type') {
-                $this->setBibtexField('type');
-                $result = parent::apply($bibtexRecord, $documentMetadata);
-            }
+        $typeField = $this->getBibtexField();
+        if ($result) {
+            $this->fieldsEvaluated[] = $typeField;
+            return true;
         }
+
+        if ($typeField !== 'type') {
+            // Auswertung des Standard-BibTeX-Felds für den Dokumenttyp
+            $this->setBibtexField('type');
+            $result = parent::apply($bibtexRecord, $documentMetadata);
+            $this->fieldsEvaluated[] = 'type';
+            $this->setBibtexField($typeField);
+        }
+
         return $result;
+    }
+
+    public function getEvaluatedBibTexField()
+    {
+        return $this->fieldsEvaluated;
     }
 }

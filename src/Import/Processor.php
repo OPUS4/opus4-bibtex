@@ -46,7 +46,7 @@ class Processor
             $this->fieldMapping = $fieldMapping;
         } else {
             $configService = BibtexService::getInstance();
-            $this->fieldMapping = $configService->getFieldMapping($fieldMapping);
+            $this->fieldMapping = $configService->getFieldMapping();
         }
     }
 

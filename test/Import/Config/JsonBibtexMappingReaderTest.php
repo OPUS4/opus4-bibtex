@@ -25,7 +25,7 @@
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
  * @category    Tests
- * @package     OpusTest\Bibtex\Import\Configuration
+ * @package     OpusTest\Bibtex\Import\Config
  * @author      Sascha Szott <opus-repository@saschaszott.de>
  * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
@@ -35,9 +35,11 @@ namespace OpusTest\Bibtex\Import\Config;
 
 use Opus\Bibtex\Import\Config\BibtexMapping;
 use Opus\Bibtex\Import\Config\BibtexService;
+use Opus\Bibtex\Import\Config\JsonBibtexMappingReader;
 use Opus\Bibtex\Import\Rules\Arxiv;
 use Opus\Bibtex\Import\Rules\BelongsToBibliography;
 use Opus\Bibtex\Import\Rules\ConstantValue;
+use Opus\Bibtex\Import\Rules\ConstantValues;
 use Opus\Bibtex\Import\Rules\Doi;
 use Opus\Bibtex\Import\Rules\Isbn;
 use Opus\Bibtex\Import\Rules\Issn;
@@ -46,6 +48,7 @@ use Opus\Bibtex\Import\Rules\Note;
 use Opus\Bibtex\Import\Rules\PageFirst;
 use Opus\Bibtex\Import\Rules\PageLast;
 use Opus\Bibtex\Import\Rules\PageNumber;
+use Opus\Bibtex\Import\Rules\Pages;
 use Opus\Bibtex\Import\Rules\Person;
 use Opus\Bibtex\Import\Rules\DocumentType;
 use Opus\Bibtex\Import\Rules\PublishedYear;
@@ -58,7 +61,7 @@ use Opus\Bibtex\Import\Rules\TitleParent;
 use Opus\Bibtex\Import\Rules\Type;
 use Opus\Bibtex\Import\Rules\Umlauts;
 
-class JsonFieldMappingReaderTest extends \PHPUnit_Framework_TestCase
+class JsonBibtexMappingReaderTest extends \PHPUnit_Framework_TestCase
 {
     public function testGetFieldMappingConfiguration()
     {
@@ -188,5 +191,71 @@ class JsonFieldMappingReaderTest extends \PHPUnit_Framework_TestCase
             ->addRule(
                 'umlauts'
             );
+    }
+
+    public function testGetMappingConfigurationFromNull()
+    {
+        $jsonBibtexMappingReader = new JsonBibtexMappingReader();
+        $this->setExpectedException('Exception');
+        $jsonBibtexMappingReader->getMappingConfigurationFromFile(null);
+    }
+
+    public function testGetMappingConfigurationFromUnknownFile()
+    {
+        $jsonBibtexMappingReader = new JsonBibtexMappingReader();
+        $this->setExpectedException('Exception');
+        $jsonBibtexMappingReader->getMappingConfigurationFromFile('unknown.json');
+    }
+
+    public function testGetMappingConfigurationFromInvalidJsonFile()
+    {
+        $jsonBibtexMappingReader = new JsonBibtexMappingReader();
+        $this->setExpectedException('Exception');
+        $jsonBibtexMappingReader->getMappingConfigurationFromFile(__DIR__ . '/../_files/mapping-invalid.json');
+    }
+
+    public function testGetMappingConfigurationFromIncompleteJsonFile()
+    {
+        $jsonBibtexMappingReader = new JsonBibtexMappingReader();
+        $this->setExpectedException('Exception');
+        $jsonBibtexMappingReader->getMappingConfigurationFromFile(__DIR__ . '/../_files/mapping-incomplete.json');
+    }
+
+    public function testGetMappingConfigurationFromJsonFile()
+    {
+        $jsonBibtexMappingReader = new JsonBibtexMappingReader();
+        $bibtexMapping = $jsonBibtexMappingReader->getMappingConfigurationFromFile(__DIR__ . '/../_files/mapping.json');
+
+        $this->assertEquals('test', $bibtexMapping->getName());
+        $this->assertEquals('Test BibTeX Mapping Configuration.', $bibtexMapping->getDescription());
+        $this->assertCount(6, $bibtexMapping->getRules());
+
+        $ruleInstance = $bibtexMapping->getRules()['testrule'];
+        $this->assertInstanceOf(SimpleRule::class, $ruleInstance);
+        $this->assertEquals('number', $ruleInstance->getBibtexField());
+        $this->assertEquals('Issue', $ruleInstance->getOpusField());
+
+        $ruleInstance = $bibtexMapping->getRules()['pages'];
+        $this->assertInstanceOf(Pages::class, $ruleInstance);
+
+        $ruleInstance = $bibtexMapping->getRules()['note'];
+        $this->assertInstanceOf(Note::class, $ruleInstance);
+        $this->assertEquals('prefix', $ruleInstance->getMessagePrefix());
+        $this->assertEquals('private', $ruleInstance->getVisibility());
+        $this->assertEquals('summary', $ruleInstance->getBibtexField());
+        $this->assertEquals('Note', $ruleInstance->getOpusField());
+
+        $ruleInstance = $bibtexMapping->getRules()['simpleTestRule'];
+        $this->assertInstanceOf(SimpleRule::class, $ruleInstance);
+        $this->assertEquals('year', $ruleInstance->getBibtexField());
+        $this->assertEquals('CompletedYear', $ruleInstance->getOpusField());
+
+        $ruleInstance = $bibtexMapping->getRules()['constantTestRule'];
+        $this->assertInstanceOf(ConstantValue::class, $ruleInstance);
+        $this->assertEquals('foo', $ruleInstance->getValue());
+        $this->assertEquals('ConstantField', $ruleInstance->getOpusField());
+
+        $ruleInstance = $bibtexMapping->getRules()['constantsTestRule'];
+        $this->assertInstanceOf(ConstantValues::class, $ruleInstance);
     }
 }

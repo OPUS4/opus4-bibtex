@@ -33,7 +33,9 @@
 
 namespace OpusTest\Bibtex\Import\Rules;
 
+use Opus\Bibtex\Import\Config\DocumentTypeMapping;
 use Opus\Bibtex\Import\Processor;
+use Opus\Bibtex\Import\Rules\DocumentType;
 
 class DocumentTypeTest extends \PHPUnit_Framework_TestCase
 {
@@ -75,5 +77,94 @@ class DocumentTypeTest extends \PHPUnit_Framework_TestCase
         $metadata = [];
         $proc->handleRecord($bibtexBlock, $metadata);
         $this->assertEquals('conferenceobject', $metadata['Type']);
+    }
+
+    public function testDefaultValueInTypeField()
+    {
+        $docType = new DocumentType();
+        $docType->setBibtexField('customType');
+        $docType->setOpusField('type');
+        $typeMapping = new DocumentTypeMapping();
+        $typeMapping->setDefaultType('defaultOpusType');
+        $typeMapping->setMapping('bibtexType', 'opusType');
+        $docType->setDocumentTypeMapping($typeMapping);
+
+        $bibtexBlock = [
+            'type' => 'article'
+        ];
+        $this->assertTypeField($docType, $bibtexBlock, $typeMapping->getDefaultType());
+    }
+
+    public function testDefaultValueInCustomTypeField()
+    {
+        $docType = new DocumentType();
+        $docType->setBibtexField('customType');
+        $docType->setOpusField('type');
+        $typeMapping = new DocumentTypeMapping();
+        $typeMapping->setDefaultType('defaultOpusType');
+        $typeMapping->setMapping('bibtexType', 'opusType');
+        $docType->setDocumentTypeMapping($typeMapping);
+
+        $bibtexBlock = [
+            'customType' => 'conference',
+            'type' => 'article'
+        ];
+        $this->assertTypeField($docType, $bibtexBlock, $typeMapping->getDefaultType());
+    }
+
+    public function testMappedValueInCustomTypeField()
+    {
+        $docType = new DocumentType();
+        $docType->setBibtexField('customType');
+        $docType->setOpusField('type');
+        $typeMapping = new DocumentTypeMapping();
+        $typeMapping->setDefaultType('defaultOpusType');
+        $typeMapping->setMapping('bibtexType', 'opusType');
+        $docType->setDocumentTypeMapping($typeMapping);
+
+        $bibtexBlock = [
+            'customType' => 'bibtexType',
+            'type' => 'article'
+        ];
+        $this->assertTypeField($docType, $bibtexBlock, $typeMapping->getOpusType('bibtexType'));
+    }
+
+    public function testMappedValueInTypeField()
+    {
+        $docType = new DocumentType();
+        $docType->setBibtexField('customType');
+        $docType->setOpusField('type');
+        $typeMapping = new DocumentTypeMapping();
+        $typeMapping->setDefaultType('defaultOpusType');
+        $typeMapping->setMapping('bibtexType', 'opusType');
+        $docType->setDocumentTypeMapping($typeMapping);
+
+        $bibtexBlock = [
+            'type' => 'bibtexType'
+        ];
+        $this->assertTypeField($docType, $bibtexBlock, $typeMapping->getOpusType('bibtexType'));
+    }
+
+    public function testMissingTypeField()
+    {
+        $docType = new DocumentType();
+        $docType->setBibtexField('customType');
+        $docType->setOpusField('type');
+        $typeMapping = new DocumentTypeMapping();
+        $typeMapping->setDefaultType('defaultOpusType');
+        $typeMapping->setMapping('bibtexType', 'opusType');
+        $docType->setDocumentTypeMapping($typeMapping);
+
+        $docType->apply([], $metadata);
+        $this->assertEmpty($metadata);
+    }
+
+    private function assertTypeField($docType, $bibtexBlock, $expectedType)
+    {
+        $metadata = [];
+        $docType->apply($bibtexBlock, $metadata);
+        $this->assertEquals(1, count($metadata));
+        $this->assertArrayHasKey('Type', $metadata);
+        $this->assertEquals($expectedType, $metadata['Type']);
     }
 }

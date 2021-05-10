@@ -88,6 +88,11 @@ class SimpleRule implements IRule
         return $this;
     }
 
+    public function getOpusField()
+    {
+        return $this->opusField;
+    }
+
     public function setOpusField($opusField)
     {
         $this->opusField = ucfirst($opusField);

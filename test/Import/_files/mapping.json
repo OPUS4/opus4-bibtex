@@ -1,0 +1,48 @@
+{
+  "name": "test",
+  "description": "Test BibTeX Mapping Configuration.",
+  "mapping": [
+    {
+      "name": "testrule",
+      "options": {
+        "bibtexField": "number",
+        "opusField": "Issue"
+      }
+    },
+    {
+      "name": "pages"
+    },
+    {
+      "name": "note",
+      "options": {
+        "bibtexField": "summary",
+        "messagePrefix": "prefix",
+        "visibility": "private"
+      }
+    },
+    {
+      "name": "simpleTestRule",
+      "class": "SimpleRule",
+      "options": {
+        "bibtexField": "year",
+        "opusField": "completedYear"
+      }
+    },
+    {
+      "name": "constantTestRule",
+      "class": "ConstantValue",
+      "options": {
+        "opusField": "constantField",
+        "value": "foo"
+      }
+    },
+    {
+      "name": "constantsTestRule",
+      "class": "ConstantValues",
+      "options": {
+        "language": "eng",
+        "belongsToBibliography": "off"
+      }
+    }
+  ]
+}

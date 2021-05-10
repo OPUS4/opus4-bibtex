@@ -1,0 +1,9 @@
+{
+  "name": "other-mapping",
+  "description": "Another Test BibTeX Mapping Configuration.",
+  "mapping": [
+    {
+      "name": "pages"
+    }
+  ]
+}

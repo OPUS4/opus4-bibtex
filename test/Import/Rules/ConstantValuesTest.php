@@ -53,5 +53,20 @@ class ConstantValuesTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('deu', $metadata['Language']);
         $this->assertTrue($metadata['BelongsToBibliography']);
+        $this->assertEmpty($constantValuesRule->getEvaluatedBibTexField());
+    }
+
+    public function testWithUnknownClass()
+    {
+        $constantValuesRule = new ConstantValues();
+        $constantValuesRule->setOptions([
+            'key' => 'value'
+        ]);
+
+        $metadata = [];
+        $constantValuesRule->apply([], $metadata);
+
+        $this->assertEquals('value', $metadata['Key']);
+        $this->assertEmpty($constantValuesRule->getEvaluatedBibTexField());
     }
 }

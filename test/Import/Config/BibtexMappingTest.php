@@ -25,7 +25,7 @@
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
  * @category    Tests
- * @package     OpusTest\Bibtex\Import\Configuration
+ * @package     OpusTest\Bibtex\Import\Config
  * @author      Sascha Szott <opus-repository@saschaszott.de>
  * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
@@ -38,7 +38,7 @@ use Opus\Bibtex\Import\Processor;
 use Opus\Bibtex\Import\Rules\ConstantValue;
 use Opus\Bibtex\Import\Rules\SimpleRule;
 
-class MappingConfigurationTest extends \PHPUnit_Framework_TestCase
+class BibtexMappingTest extends \PHPUnit_Framework_TestCase
 {
     public function testUpdateRule()
     {

@@ -84,7 +84,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
         $this->assertTitle('main', 'Ää Öö Üü ß - Ää Öö Üü', $metadata['TitleMain'][0]);
     }
 
-    public function testProcesInvalidFile()
+    public function testProcessInvalidFile()
     {
         $testfile = $this->getPath('invalid.bib');
 
@@ -93,7 +93,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
         $parser->parse();
     }
 
-    public function testProcesInvalidUrlFile()
+    public function testProcessInvalidUrlFile()
     {
         $testfile = $this->getPath('invalid-url.bib');
 
@@ -102,7 +102,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
         $parser->parse();
     }
 
-    public function testProcesUnknownFile()
+    public function testProcessUnknownFile()
     {
         $testfile = $this->getPath('missing.bib');
 
