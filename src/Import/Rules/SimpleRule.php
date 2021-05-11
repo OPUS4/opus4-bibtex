@@ -56,9 +56,15 @@ class SimpleRule implements IRule
     {
         $this->setBibtexField($bibtexField);
         $this->setOpusField($opusField);
-        return $this;
     }
 
+    /**
+     * Anwendung der Regel auf den übergebenen BibTeX-Record.
+     *
+     * @param array $bibtexRecord
+     * @param array $documentMetadata
+     * @return bool
+     */
     public function apply($bibtexRecord, &$documentMetadata)
     {
         $result = false;
@@ -72,27 +78,52 @@ class SimpleRule implements IRule
         return $result;
     }
 
+    /**
+     * Liefert die Namen der bei der Regelanwendung ausgewerteten BibTeX-Felder zurück.
+     *
+     * @return array
+     */
     public function getEvaluatedBibTexField()
     {
         return [$this->bibtexField];
     }
 
+    /**
+     * Liefert den Namen des zu verwendenen BibTeX-Felds zurück.
+     *
+     * @return string
+     */
     public function getBibtexField()
     {
         return $this->bibtexField;
     }
 
+    /**
+     * Setzt das BibTeX-Feld (Quellfeld des Mappings).
+     *
+     * @param string $bibtexField Name des BibTeX-Felds
+     */
     public function setBibtexField($bibtexField)
     {
         $this->bibtexField = $bibtexField;
         return $this;
     }
 
+    /**
+     * Liefert den Namen des zu verwendenden OPUS-Metadatenfelds zurück.
+     *
+     * @return string
+     */
     public function getOpusField()
     {
         return $this->opusField;
     }
 
+    /**
+     * Setzt das OPUS-Metadatenfeld (Zielfeld des Mappings).
+     *
+     * @param string $opusField Name des OPUS-Metadatenfelds
+     */
     public function setOpusField($opusField)
     {
         $this->opusField = ucfirst($opusField);
@@ -110,6 +141,12 @@ class SimpleRule implements IRule
         return $value;
     }
 
+    /**
+     * Entfernt geschweifte Klammern am Anfang bzw. Ende des übergebenen Werts.
+     *
+     * @param string $value der von geschweiften Klammern zu reinigende Wert
+     * @return string
+     */
     protected function deleteBrace($value)
     {
         if (strlen($value) >= 2 && substr($value, 0, 1) == '{' && substr($value, -1, 1) == '}') {

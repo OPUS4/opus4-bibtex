@@ -33,15 +33,26 @@
 
 namespace Opus\Bibtex\Import\Rules;
 
+/**
+ * Erlaubt das Setzen eines Feldwerts für den übergeordneten Titel.
+ */
 class TitleParent extends ArrayRule
 {
+    /**
+     * Konstruktor
+     */
     public function __construct()
     {
         $this->setBibtexField('journal');
         $this->setOpusField('TitleParent');
-        return $this;
     }
 
+    /**
+     * Setzt den übergeordneten Titel.
+     *
+     * @param string $value Wert des übergeordneten Titels.
+     * @return array
+     */
     protected function getValue($value)
     {
         return [

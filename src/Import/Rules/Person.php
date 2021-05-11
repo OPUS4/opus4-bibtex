@@ -33,13 +33,26 @@
 
 namespace Opus\Bibtex\Import\Rules;
 
+/**
+ * Erlaubt das Erzeugen von OPUS-Metadatenfeldern für die Speicherung von Personenangaben.
+ */
 class Person extends ArrayRule
 {
+    /**
+     * Konstruktor
+     */
     public function __construct()
     {
         $this->setOpusField('Person');
     }
 
+    /**
+     * Erzeugt ein OPUS-Metadatenfelder für die Speicherung von Personendaten.
+     * Die Rolle der Person wird aus dem Namen des ausgewerteten BibTeX-Felds abgeleitet.
+     *
+     * @param string $value Wert des BibTeX-Felds
+     * @return array
+     */
     protected function getValue($value)
     {
         $persons = explode(' and ', $value);
@@ -50,7 +63,7 @@ class Person extends ArrayRule
         return $result;
     }
 
-    protected function extractNameParts($name)
+    private function extractNameParts($name)
     {
         $name = trim($name);
         $posFirstComma = strpos($name, ',');

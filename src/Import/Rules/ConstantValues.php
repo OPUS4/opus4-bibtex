@@ -34,36 +34,47 @@
 namespace Opus\Bibtex\Import\Rules;
 
 /**
- * Eine Regel, um mehrere OPUS-Metadatenfelder mit Konstanten zu befüllen. Hierbei wird der Inhalt des BibTeX-Records
- * nicht ausgewertet.
+ * Eine Regel, um mehrere OPUS-Metadatenfelder mit Konstanten zu befüllen. Hierbei wird der Inhalt des zu verarbeitenden
+ * BibTeX-Record nicht ausgewertet.
  */
 class ConstantValues implements IRule
 {
-
+    /**
+     * beschreibt die zu setzenden OPUS-Felder und die dabei zu nutzenden Konstanten
+     *
+     * @var array
+     */
     private $options;
 
     /**
-     * @param mixed $options
+     * Erlaubt das Setzen der zu setzenden OPUS-Felder sowie der dabei zu verwendenden Werte (Konstanten).
+     *
+     * @param array $options
      */
-    public function setOptions($options): void
+    public function setOptions($options)
     {
         $this->options = $options;
+        return $this;
     }
 
     /**
-     * @param array $bibtexRecord
-     * @param array $documentMetadata
-     * @return bool
+     * Ausführung der konfigurierten Regel zur Befüllung von OPUS-Metadatenfeldern mit konstanten Werten.
+     *
+     * @param array $bibtexRecord BibTeX-Record (Array von BibTeX-Feldern)
+     * @param array $documentMetadata OPUS-Metadatensatz (Array von Metadatenfeldern)
+     * @return bool liefert true, wenn die Regel erfolgreich angewendet werden konnte
      */
     public function apply($bibtexRecord, &$documentMetadata)
     {
         $result = false;
+
         // der BibTeX-Record wird zur Bestimmung des Metadatenfelds nicht verwendet
         if (! is_null($this->options)) {
             foreach ($this->options as $propName => $propValue) {
                 $propName = ucfirst($propName);
                 $className = 'Opus\Bibtex\Import\Rules\\' . $propName;
                 if (class_exists($className) and method_exists($className, 'setValue')) {
+                    // zu setzender Wert wird durch Ausführung der Regelklasse bestimmt
                     $class = new $className;
                     $class->setValue($propValue);
                     $class->apply($bibtexRecord, $documentMetadata);
@@ -76,6 +87,11 @@ class ConstantValues implements IRule
         return $result;
     }
 
+    /**
+     * Liefert die Liste der ausgewerteten BibTeX-Felder.
+     *
+     * @return array
+     */
     public function getEvaluatedBibTexField()
     {
         return [];

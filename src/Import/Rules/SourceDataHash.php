@@ -33,8 +33,10 @@
 
 namespace Opus\Bibtex\Import\Rules;
 
-use Opus\Bibtex\Import\Config\BibtexMapping;
-
+/**
+ * Setzt den Hashwert des importierten BibTeX-Record als Wert des Enrichments opus.import.dataHash.
+ * Hierbei wird standardmäßig die MD5-Hashfunktion verwendet.
+ */
 class SourceDataHash extends ArrayRule
 {
     /**
@@ -45,16 +47,26 @@ class SourceDataHash extends ArrayRule
 
     /**
      * Name der Hashfunktion, die zur Bestimmung des Hashwerts verwendet werden soll.
+     *
+     * TODO konfigurierbar machen?
      */
     const HASH_FUNCTION = 'md5';
 
+    /**
+     * Konstruktor
+     */
     public function __construct()
     {
         $this->setBibtexField('_original');
         $this->setOpusField('Enrichment');
-        return $this;
     }
 
+    /**
+     * Ermittelt den Feldwert für den OPUS-Metadatensatz.
+     *
+     * @param string $value BibTeX-Record
+     * @return array
+     */
     protected function getValue($value)
     {
         return [

@@ -34,64 +34,107 @@
 namespace Opus\Bibtex\Import\Rules;
 
 use Opus\Bibtex\Import\Config\BibtexService;
+use Opus\Bibtex\Import\Config\DocumentTypeMapping;
 
 /**
- * ptype ist kein Standard-BibTeX-Feld: das Feld ptype kann genutzt werden, um das Typ-Mapping auf Basis des
- * BibTeX-Types (die Zeichenkette nach @) zu umgehen
+ * Regel zum Setzen des OPUS-Dokumenttyps.
  *
- * Ist im BibTeX-Record kein Feld ptype vorhanden, so wird der Typ aus der Zeichenkette nach @ abgeleitet
+ * Standardmäßig wird der BibTeX-Typ aus der Zeichenkette nach @ im BibTeX-Record abgeleitet. Die Klasse bietet
+ * zusätzlich die Möglichkeit ein benutzerspezifisches (nicht im Standard enthaltenes) BibTeX-Feld zu definieren, das
+ * stattdessen zur Bestimmung des OPUS-Dokumenttyps verwendet wird. Diese Option wird in der ausgelieferten
+ * Mapping-Konfiguration verwendet, um das Nicht-Standard-Feld pytpe beim Dokumenttyp-Mapping auszuwerten.
+ *
  */
 class DocumentType extends SimpleRule
 {
-    protected $documentTypeMapping;
+    /**
+     * Name des BibTeX-Felds, das standardmäßig für die Bestimmung des Dokumenttyps verwendet wird
+     */
+    const DEFAULT_BIBTEX_FIELD_NAME = 'type';
 
+    /**
+     * @var array auf Namen basierendes Mapping von BibTeX-Typen auf OPUS-Dokumenttypen
+     */
+    private $documentTypeMapping;
+
+    /**
+     * @var array Liste der bei der Regelanwendung ausgewerteten BibTeX-Felder
+     */
     private $fieldsEvaluated = [];
 
+    /**
+     * Konstruktor, der Standardeinstellungen setzt
+     */
     public function __construct()
     {
         $this->setBibtexField('type');
         $this->setOpusField('Type');
-        return $this;
     }
 
+    /**
+     * Erlaubt das Registrieren eines Mappings von BibTeX-Typen auf OPUS-Dokumenttypen.
+     *
+     * @param DocumentTypeMapping $documentTypeMapping
+     */
     public function setDocumentTypeMapping($documentTypeMapping)
     {
         $this->documentTypeMapping = $documentTypeMapping;
         return $this;
     }
 
+    /**
+     * Ermittelt den Namen des OPUS-Dokumenttyp für den übergebenen BibTeX-Typen.
+     *
+     * @param string $value Name des BibTeX-Typs
+     * @return string Name des OPUS-Dokumenttyps
+     */
     protected function getValue($value)
     {
         if (is_null($this->documentTypeMapping)) {
             $this->documentTypeMapping = BibtexService::getInstance()->getTypeMapping();
         }
 
-        $useDefaultAsFallback = $this->getBibtexField() === 'type';
-        $result = $this->documentTypeMapping->getOpusType($value, $useDefaultAsFallback);
-        return $result;
+        $useDefaultAsFallback = $this->getBibtexField() === self::DEFAULT_BIBTEX_FIELD_NAME;
+        return $this->documentTypeMapping->getOpusType($value, $useDefaultAsFallback);
     }
 
+    /**
+     * Anwendung der Regel zur Abbildung des BibTeX-Typs auf den OPUS-Dokumenttyp für den übergebenen BibTeX-Record.
+     *
+     * @param array $bibtexRecord BibTeX-Record (Array von BibTeX-Feldern)
+     * @param array $documentMetadata OPUS-Metadatensatz (Array von Metadatenfeldern)
+     * @return bool liefert true, gdw. die Regelanwendung erfolgreich war
+     */
     public function apply($bibtexRecord, &$documentMetadata)
     {
         $this->fieldsEvaluated = [];
+
         $result = parent::apply($bibtexRecord, $documentMetadata);
         $typeField = $this->getBibtexField();
         if ($result) {
+            // Regelanwendung war erfolgreich
             $this->fieldsEvaluated[] = $typeField;
             return true;
         }
 
-        if ($typeField !== 'type') {
+        // bei nicht erfolgreicher Regelanwendung: prüfe, ob möglicherweise ein benutzerspezifisches BibTeX-Feld
+        // ausgewertet wurde und falle auf das Standard-BibTeX-Feld zurück
+        if ($typeField !== self::DEFAULT_BIBTEX_FIELD_NAME) {
             // Auswertung des Standard-BibTeX-Felds für den Dokumenttyp
-            $this->setBibtexField('type');
+            $this->setBibtexField(self::DEFAULT_BIBTEX_FIELD_NAME);
             $result = parent::apply($bibtexRecord, $documentMetadata);
-            $this->fieldsEvaluated[] = 'type';
+            $this->fieldsEvaluated[] = self::DEFAULT_BIBTEX_FIELD_NAME;
             $this->setBibtexField($typeField);
         }
 
         return $result;
     }
 
+    /**
+     * Liefert die Namen der bei der Regelausführung augewerteten BibTeX-Felder.
+     *
+     * @return array
+     */
     public function getEvaluatedBibTexField()
     {
         return $this->fieldsEvaluated;

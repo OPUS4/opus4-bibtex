@@ -33,15 +33,27 @@
 
 namespace Opus\Bibtex\Import\Rules;
 
+/**
+ * Verarbeitung von Identifiern vom Typ DOI. Hierbei wird eine ggf. vorhandene Resolver-URL vor der DOI-Nummer
+ * entfernt.
+ */
 class Doi extends ArrayRule
 {
+    /**
+     * Konstruktor
+     */
     public function __construct()
     {
         $this->setBibtexField('doi');
         $this->setOpusField('Identifier');
-        return $this;
     }
 
+    /**
+     * Bestimmt den aus dem BibTeX-Record abgeleiteten Wert des Identifiers.
+     *
+     * @param string $value Feldwert aus BibTeX-Record
+     * @return array
+     */
     protected function getValue($value)
     {
         if (strtolower(substr($value, 0, 4)) === 'doi:') {

@@ -33,15 +33,27 @@
 
 namespace Opus\Bibtex\Import\Rules;
 
+/**
+ * Erlaubt das Setzen des OPUS-Metadatenfelds BelongsToBibliography vom Typ Boolean auf Basis eines
+ * in der Konfiguration vorgegebenen konstanten Wertes.
+ */
 class BelongsToBibliography extends ConstantValue
 {
-
+    /**
+     * Konstruktor
+     */
     public function __construct()
     {
         $this->setOpusField('BelongsToBibliography');
-        return $this;
     }
 
+    /**
+     * Liefert auf Basis der in der Konfiguration angegebenen Konstante einen Boolean zurück, der als Wert für das
+     * OPUS-Metadatenfeld BelongsToBibliography verwendet wird.
+     *
+     * @param string $value der zu setzende Wert
+     * @return
+     */
     public function setValue($value)
     {
         $this->value = filter_var($value, FILTER_VALIDATE_BOOLEAN);

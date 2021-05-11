@@ -33,23 +33,86 @@
 
 namespace Opus\Bibtex\Import\Rules;
 
+/**
+ * Erlaubt das Setzen von Schlagworten vom Typ 'uncontrolled' und der Sprachen 'eng'. Typ und Sprache können optional
+ * überschrieben werden.
+ */
 class Subject extends ArrayRule
 {
+    /**
+     * @var string Typ des Schlagworts
+     */
+    private $type = 'uncontrolled';
+
+    /**
+     * @var string Sprache des Schlagworts
+     */
+    private $language = 'eng';
+
+    /**
+     * Konstruktor
+     */
     public function __construct()
     {
         $this->setBibtexField('keywords');
         $this->setOpusField('Subject');
-        return $this;
     }
 
+    /**
+     * Gibt den Typ des Schlagworts zurück.
+     *
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
+     * Erlaubt das Setzen des Typs des Schlagworts.
+     *
+     * @param string $type Schlagworttyp
+     */
+    public function setType($type)
+    {
+        $this->type = $type;
+    }
+
+    /**
+     * Gibt die Sprache des Schlagworts zurück.
+     *
+     * @return string
+     */
+    public function getLanguage()
+    {
+        return $this->language;
+    }
+
+    /**
+     * Erlaubt das Setzen der Sprache des Schlagworts.
+     *
+     * @param string $language Sprachkürzel
+     */
+    public function setLanguage($language)
+    {
+        $this->language = $language;
+    }
+
+    /**
+     * Erlaubt das Setzen von Schlagworten des Typs 'uncontrolled' auf Basis des übergebenen Wertes. Die einzelnen
+     * Schlagworte sind hierbei durch Komma voneinander getrennt.
+     *
+     * @param string $value kommaseparierte Liste von Schlagworten
+     * @return array
+     */
     protected function getValue($value)
     {
         $keywords = explode(', ', $value);
         $result = [];
         foreach ($keywords as $keyword) {
             $result[] = [
-                'Language' => 'eng',
-                'Type' => 'uncontrolled',
+                'Language' => $this->language,
+                'Type' => $this->type,
                 'Value' => $this->deleteBrace($keyword)
             ];
         }

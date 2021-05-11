@@ -35,10 +35,16 @@ namespace Opus\Bibtex\Import\Rules;
 
 /**
  * Behandlung von Umlauten, die im BibTeX-File nicht korrekt angegeben wurden (siehe OPUSVIER-4216).
- * Ein Beispiel findet sich in specialchars-invalid.bib
+ * Ein Beispiel für solche Umlaute findet sich in der Testdatei specialchars-invalid.bib
  */
 class Umlauts extends ComplexRule
 {
+    /**
+     * Wandelt speziell angegebene Umlaute im übergebenen Wert in ihr zugehöriges Unicode-Zeichen um.
+     *
+     * @param string $value Wert, der ggf. umzuwandelnde Umlaute enthält
+     * @return string|boolean liefert den umgewandelten Wert oder false, falls keine Umwandlung von Zeichen erfolgt ist
+     */
     private function convertUmlauts($value)
     {
         if (! preg_match('#"[a, o, u]#i', $value)) {
@@ -51,6 +57,13 @@ class Umlauts extends ComplexRule
         );
     }
 
+    /**
+     * Iteriert über die im OPUS-Metadatensatz enthaltenen Felder und ersetzt speziell angegebene Umlaute durch ihr
+     * zugehöriges Unicode-Zeichen.
+     *
+     * @param array $fieldValues Wert aus BibTex-Feldern: wird an dieser Stelle nicht ausgewertet
+     * @param array $documentMetadata OPUS-Metadatensatz (Array von Feldwerten)
+     */
     protected function setFields($fieldValues, &$documentMetadata)
     {
         foreach ($documentMetadata as $fieldName => $fieldValue) {

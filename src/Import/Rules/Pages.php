@@ -33,14 +33,26 @@
 
 namespace Opus\Bibtex\Import\Rules;
 
+/**
+ * Erlaubt das Erzeugen von OPUS-Metadatenfeldern für die Speicherung von Seitenangaben: PageFirst, PageLast und PageNumber.
+ */
 class Pages extends ComplexRule
 {
+    /**
+     * Konstruktor
+     */
     public function __construct()
     {
         parent::__construct(['pages']);
-        return $this;
     }
 
+    /**
+     * Setzt die OPUS-Metadatenfelder für Seitenangaben.
+     *
+     * @param array $fieldValues Werte der BibTeX-Felder
+     * @param array $documentMetadata OPUS-Metadatensatz (Array von Metadatenfeldern)
+     * @return bool liefert true, gdw. die Anwendung der Regeln zur Bestimmung der Seitenangaben erfolgreich war
+     */
     protected function setFields($fieldValues, &$documentMetadata)
     {
         if (array_key_exists('pages', $fieldValues)) {

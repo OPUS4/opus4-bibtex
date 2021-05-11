@@ -243,7 +243,7 @@ class BibtexService
      */
     private function getPath($fileName)
     {
-        if (strpos(self::$instance->iniFileName, '/') === false) {
+        if (strpos($fileName, '/') === false) {
             return __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . $fileName;
         }
         return $fileName;

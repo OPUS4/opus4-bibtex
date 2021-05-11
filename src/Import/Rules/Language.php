@@ -33,11 +33,16 @@
 
 namespace Opus\Bibtex\Import\Rules;
 
+/**
+ * Erlaubt das Setzen des OPUS-Metadatenfelds Language, in dem die Dokumentsprache verwaltet wird.
+ */
 class Language extends ConstantValue
 {
+    /**
+     * Konstruktor
+     */
     public function __construct()
     {
         $this->setOpusField('Language');
-        return $this;
     }
 }

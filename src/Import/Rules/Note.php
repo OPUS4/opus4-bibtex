@@ -33,40 +33,78 @@
 
 namespace Opus\Bibtex\Import\Rules;
 
+/**
+ * Erlaubt das Erzeugen von Notes, wobei neben dem Wert auch die Sichtbarkeit (Standard: public) sowie ein optional
+ * Präfix gesetzt werden kann, das dem Feldwert vorangestellt wird.
+ */
 class Note extends ArrayRule
 {
+    /**
+     * @var string Präfix, der dem Wert der Note vorangestellt wird (Default: leer)
+     */
     private $messagePrefix = '';
 
+    /**
+     * @var string Sichtbarkeitseinstellung der Note (Default: public)
+     */
     private $visibility = 'public';
 
+    /**
+     * Konstruktor
+     */
     public function __construct()
     {
         $this->setOpusField('Note');
-        return $this;
     }
 
+    /**
+     * Gibt das gesetzte Präfix zurück.
+     *
+     * @return string
+     */
     public function getMessagePrefix()
     {
         return $this->messagePrefix;
     }
 
+    /**
+     * Erlaubt das Setzen des Präfix für den Wert der Note.
+     *
+     * @param string $messagePrefix Präfix
+     */
     public function setMessagePrefix($messagePrefix)
     {
         $this->messagePrefix = $messagePrefix;
         return $this;
     }
 
+    /**
+     * Liefert die Sichtbarkeitseinstellung zurück.
+     *
+     * @return string
+     */
     public function getVisibility()
     {
         return $this->visibility;
     }
 
+    /**
+     * Erlaubt das Setzen der Sichtbarkeitseinstellung auf den übergebenen Wert.
+     *
+     * @param $visibility Sichtbarkeitseinstellung
+     */
     public function setVisibility($visibility)
     {
         $this->visibility = $visibility;
         return $this;
     }
 
+    /**
+     * Ermittelt die Werte für das OPUS-Metadatenfeld.
+     *
+     * @param string $value auszuwertender Wert aus BibTeX-Feld
+     * @return array
+     */
     protected function getValue($value)
     {
         return [

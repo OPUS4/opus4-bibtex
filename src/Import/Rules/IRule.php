@@ -36,14 +36,17 @@ namespace Opus\Bibtex\Import\Rules;
 interface IRule
 {
     /**
-     * @param $bibtexRecord BibTeX-Record, der importiert werden soll
-     * @param $documentMetadata Array von Metadatenfeldern, das schließlich in ein OPUS4-Dokument umgewandelt werden soll
+     * @param array $bibtexRecord BibTeX-Record (als Array von BibTeX-Feldern), der importiert werden soll
+     * @param array $documentMetadata OPUS-Metadatensatz (als Array von Metadatenfeldern), der unter Nutzung der
+     *                                Funktion fromArray in ein OPUS4-Dokument umgewandelt werden soll
      * @return boolean Aussage über den Erfolg der Anwendung der Regel (true gdw. erfolgreiche Anwendung)
      */
     public function apply($bibtexRecord, &$documentMetadata);
 
     /**
-     * @return gibt ein Array mit den Namen des BibTeX-Felder zurück, di bei der Regelanwendung auswertet wurden
+     * Gibt ein Array mit den Namen des BibTeX-Felder zurück, die bei der Regelanwendung ausgewertet wurden.
+     *
+     * @return array
      */
     public function getEvaluatedBibTexField();
 }

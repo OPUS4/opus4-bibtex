@@ -33,15 +33,26 @@
 
 namespace Opus\Bibtex\Import\Rules;
 
+/**
+ * Verarbeitung von Identifiern vom Typ ISSN.
+ */
 class Issn extends ArrayRule
 {
+    /**
+     * Konstruktor
+     */
     public function __construct()
     {
         $this->setBibtexField('issn');
         $this->setOpusField('Identifier');
-        return $this;
     }
 
+    /**
+     * Bestimmt den aus dem BibTeX-Record abgeleiteten Wert des Identifiers.
+     *
+     * @param string $value Feldwert aus BibTeX-Record
+     * @return array
+     */
     protected function getValue($value)
     {
         return [

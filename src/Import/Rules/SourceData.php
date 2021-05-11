@@ -33,8 +33,9 @@
 
 namespace Opus\Bibtex\Import\Rules;
 
-use Opus\Bibtex\Import\Config\BibtexMapping;
-
+/**
+ * Setzt den ursprünglichen BibTeX-Record als Wert des Enrichments opus.import.data
+ */
 class SourceData extends ArrayRule
 {
     /**
@@ -42,13 +43,21 @@ class SourceData extends ArrayRule
      */
     const SOURCE_DATA_KEY = 'opus.import.data';
 
+    /**
+     * Konstruktor
+     */
     public function __construct()
     {
         $this->setBibtexField('_original');
         $this->setOpusField('Enrichment');
-        return $this;
     }
 
+    /**
+     * Ermittelt den Feldwert für den OPUS-Metadatensatz.
+     *
+     * @param Feldwert $value BibTeX-Record
+     * @return array
+     */
     protected function getValue($value)
     {
         return [

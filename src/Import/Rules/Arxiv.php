@@ -33,15 +33,27 @@
 
 namespace Opus\Bibtex\Import\Rules;
 
+/**
+ * Verarbeitung von Arxiv-Identifiern. Hierbei wird eine ggf. vorhandene Resolver-URL vor dem Arxiv-Identifier
+ * entfernt.
+ */
 class Arxiv extends ArrayRule
 {
+    /**
+     * Konstruktor
+     */
     public function __construct()
     {
         $this->setBibtexField('arxiv');
         $this->setOpusField('Identifier');
-        return $this;
     }
 
+    /**
+     * Bestimmt den aus dem BibTeX-Record abgeleiteten Wert des Identifiers.
+     *
+     * @param string $value Feldwert aus BibTeX-Record
+     * @return array
+     */
     protected function getValue($value)
     {
         $type = 'url';

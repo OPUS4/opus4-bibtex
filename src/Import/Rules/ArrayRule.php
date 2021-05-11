@@ -38,6 +38,13 @@ namespace Opus\Bibtex\Import\Rules;
  */
 abstract class ArrayRule extends SimpleRule
 {
+    /**
+     * Anwendung der Regel auf den übergebenen BibTeX-Record.
+     *
+     * @param array $bibtexRecord BibTeX-Record (Array von BibTeX-Feldern)
+     * @param array $documentMetadata OPUS-Metadatensatz (Array von Metadatenfeldern)
+     * @return bool liefert true, wenn die Regel erfolgreich angewendet werden konnte
+     */
     public function apply($bibtexRecord, &$documentMetadata)
     {
         $result = false;

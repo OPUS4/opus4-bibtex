@@ -34,7 +34,8 @@
 namespace Opus\Bibtex\Import\Rules;
 
 /**
- * Eine Regel, um ein Metadatenfeld mit einer Konstante zu befüllen. Hierbei wird der BibTeX-Record nicht ausgewertet.
+ * Eine Regel, um ein OPUS-Metadatenfeld mit einer Konstante zu befüllen. Hierbei wird der Inhalt des zu verarbeitenden
+ * BibTeX-Record nicht ausgewertet.
  */
 class ConstantValue implements IRule
 {
@@ -43,10 +44,15 @@ class ConstantValue implements IRule
      */
     protected $opusField;
 
+    /**
+     * @var string der zu setzenden Feldwert (Konstante)
+     */
     protected $value;
 
     /**
-     * @return string
+     * Liefert den Namen des zu befüllenden OPUS-Metadatenfelds zurück.
+     *
+     * @return string Name des OPUS-Metadatenfelds
      */
     public function getOpusField()
     {
@@ -54,7 +60,7 @@ class ConstantValue implements IRule
     }
 
     /**
-     * Setzt den Namen des zu befüllenden OPUS4-Metadatenfelds.
+     * Setzt den Namen des zu befüllenden OPUS-Metadatenfelds.
      *
      * @param string $opusField
      */
@@ -65,7 +71,9 @@ class ConstantValue implements IRule
     }
 
     /**
-     * @return mixed
+     * Liefert den zu setzenden Wert (Konstante) zurück.
+     *
+     * @return string
      */
     public function getValue()
     {
@@ -73,9 +81,9 @@ class ConstantValue implements IRule
     }
 
     /**
-     * Setzt den Feldwert für das OPUS4-Metadatenfeld (Konstante).
+     * Setzt den Feldwert (Konstante) für das OPUS-Metadatenfeld.
      *
-     * @param $value
+     * @param string $value
      */
     public function setValue($value)
     {
@@ -84,9 +92,11 @@ class ConstantValue implements IRule
     }
 
     /**
-     * @param array $bibtexRecord
-     * @param array $documentMetadata
-     * @return bool
+     * Ausführung der konfigurierten Regel zur Befüllung des OPUS-Metadatenfelds mit einem konstanten Wert.
+     *
+     * @param array $bibtexRecord BibTeX-Record (Array von BibTeX-Feldern)
+     * @param array $documentMetadata OPUS-Metadatensatz (Array von Metadatenfeldern)
+     * @return bool liefert true, wenn die Regel erfolgreich angewendet werden konnte
      */
     public function apply($bibtexRecord, &$documentMetadata)
     {
@@ -101,6 +111,11 @@ class ConstantValue implements IRule
         return $result;
     }
 
+    /**
+     * Liefert die Liste der ausgewerteten BibTeX-Felder.
+     *
+     * @return array
+     */
     public function getEvaluatedBibTexField()
     {
         return [];

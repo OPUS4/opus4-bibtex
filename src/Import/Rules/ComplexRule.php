@@ -44,13 +44,27 @@ namespace Opus\Bibtex\Import\Rules;
  */
 abstract class ComplexRule implements IRule
 {
+    /**
+     * @var array|null optionale Liste der bei der Regelausführung auszuwertenden BibTeX-Felder
+     */
     protected $fieldsEvaluated;
 
+    /**
+     * Konstruktor
+     * @param array|null $fieldsEvaluated Liste der BibTeX-Felder, die bei der Regelauswertung verwendet werden können
+     */
     public function __construct($fieldsEvaluated = null)
     {
         $this->fieldsEvaluated = $fieldsEvaluated;
     }
 
+    /**
+     * Anwendung der Regel auf den übergebenen BibTeX-Record.
+     *
+     * @param array $bibtexRecord BibTeX-Record (Array von BibTeX-Feldern)
+     * @param array $documentMetadata OPUS-Metadatensatz (Array von Metadatenfeldern)
+     * @return bool liefert true, wenn die Regel erfolgreich angewendet werden konnte
+     */
     public function apply($bibtexRecord, &$documentMetadata)
     {
         $fieldValues = [];
@@ -69,10 +83,23 @@ abstract class ComplexRule implements IRule
         return $this->setFields($fieldValues, $documentMetadata);
     }
 
+    /**
+     * Liefert die Liste der bei der Regelausführung ausgewerteten BibTeX-Felder zurück.
+     *
+     * @return array
+     */
     public function getEvaluatedBibTexField()
     {
         return is_null($this->fieldsEvaluated) ? [] : $this->fieldsEvaluated;
     }
 
+    /**
+     * Diese Methode muss von Klassen, die ComplexRule ableiten, überschrieben / definiert werden.
+     * Die Methode bestimmt erlaubt das Setzen der OPUS-Metadatenfelder auf Basis der übergebenen Werte von
+     * BibTeX-Feldern.
+     *
+     * @param array $fieldValues Werte von BibTeX-Feldern
+     * @param $documentMetadata OPUS-Metadatensatz (Array von Metadatenfeldern)
+     */
     abstract protected function setFields($fieldValues, &$documentMetadata);
 }

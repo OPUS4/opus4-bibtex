@@ -33,15 +33,28 @@
 
 namespace Opus\Bibtex\Import\Rules;
 
+/**
+ * Setzt das Publikationsjahr im OPUS-Metadatenfeld PublishedYear auf Basis des BibTeX-Felds year, sofern es nur
+ * aus einer vierstelligen Ziffernfolge besteht.
+ */
 class PublishedYear extends SimpleRule
 {
+    /**
+     * Konstruktor
+     */
     public function __construct()
     {
         $this->setBibtexField('year');
         $this->setOpusField('PublishedYear');
-        return $this;
     }
 
+    /**
+     * Ermittelt den Feldwert für den OPUS-Metadatensatz.
+     *
+     * @param Feldwert $value Inhalt des BibTex-Felds
+     * @return array|null liefert null, wenn die Jahresangabe im BibTeX-Feld keine vierstellige Ziffernfolge ist;
+     *                    andernfalls wird der Feldwert für den OPUS-Metadatenfeld zurückgeliefert
+     */
     protected function getValue($value)
     {
         $value = preg_replace('/[^0-9]/', '', $value);

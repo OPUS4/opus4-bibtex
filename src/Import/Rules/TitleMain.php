@@ -33,15 +33,26 @@
 
 namespace Opus\Bibtex\Import\Rules;
 
+/**
+ * Erlaubt das Setzen eines Feldwerts für den Haupttitel.
+ */
 class TitleMain extends ArrayRule
 {
+    /**
+     * Konstruktor
+     */
     public function __construct()
     {
         $this->setBibtexField('title');
         $this->setOpusField('TitleMain');
-        return $this;
     }
 
+    /**
+     * Setzt den Haupttitel.
+     *
+     * @param string $value Wert des Haupttitels.
+     * @return array
+     */
     protected function getValue($value)
     {
         return [
