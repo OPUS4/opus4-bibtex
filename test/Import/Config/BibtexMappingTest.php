@@ -36,6 +36,7 @@ namespace OpusTest\Bibtex\Import\Config;
 use Opus\Bibtex\Import\Config\BibtexMapping;
 use Opus\Bibtex\Import\Processor;
 use Opus\Bibtex\Import\Rules\ConstantValue;
+use Opus\Bibtex\Import\Rules\Language;
 use Opus\Bibtex\Import\Rules\SimpleRule;
 
 class BibtexMappingTest extends \PHPUnit_Framework_TestCase
@@ -208,5 +209,82 @@ class BibtexMappingTest extends \PHPUnit_Framework_TestCase
         $proc->handleRecord(['Year' => '2019'], $metadata);
 
         $this->assertEquals('1870', $metadata['PublishedYear']);
+    }
+
+    public function testRemoveRuleWithUnknownName()
+    {
+        $bibtexMapping = new BibtexMapping();
+        $bibtexMapping->removeRule('unknown');
+        $this->assertEmpty($bibtexMapping->getRules());
+    }
+
+    public function testResetRulesWithEmptyList()
+    {
+        $bibtexMapping = new BibtexMapping();
+        $this->assertEmpty($bibtexMapping->getRules());
+        $bibtexMapping->resetRules();
+        $this->assertEmpty($bibtexMapping->getRules());
+    }
+
+    public function testPrependRuleWithExistingName()
+    {
+        $bibtexMapping = new BibtexMapping();
+        $bibtexMapping->addRule('language');
+        $this->assertEquals(1, count($bibtexMapping->getRules()));
+        $this->arrayHasKey('language', $bibtexMapping->getRules());
+
+        $bibtexMapping->addRule('belongsToBibliography');
+        $this->assertEquals(['language', 'belongsToBibliography'], array_keys($bibtexMapping->getRules()));
+
+        $bibtexMapping->prependRule('belongsToBibliography');
+        $this->assertEquals(['belongsToBibliography', 'language'], array_keys($bibtexMapping->getRules()));
+
+        $bibtexMapping->removeRule('belongsToBibliography');
+        $this->assertEquals(1, count($bibtexMapping->getRules()));
+        $this->arrayHasKey('language', $bibtexMapping->getRules());
+
+        $bibtexMapping->resetRules();
+        $this->assertEmpty($bibtexMapping->getRules());
+    }
+
+    public function testAddRuleWithExistingName()
+    {
+        $bibtexMapping = new BibtexMapping();
+        $bibtexMapping->addRule('language');
+        $this->assertEquals(1, count($bibtexMapping->getRules()));
+        $this->arrayHasKey('language', $bibtexMapping->getRules());
+
+        $bibtexMapping->addRule('belongsToBibliography');
+        $this->assertEquals(['language', 'belongsToBibliography'], array_keys($bibtexMapping->getRules()));
+
+        $bibtexMapping->addRule('language');
+        $this->assertEquals(['belongsToBibliography', 'language'], array_keys($bibtexMapping->getRules()));
+
+        $bibtexMapping->removeRule('belongsToBibliography');
+        $this->assertEquals(1, count($bibtexMapping->getRules()));
+        $this->arrayHasKey('language', $bibtexMapping->getRules());
+
+        $bibtexMapping->resetRules();
+        $this->assertEmpty($bibtexMapping->getRules());
+    }
+
+    public function testUpdateRuleWithUnknownName()
+    {
+        $bibtexMapping = new BibtexMapping();
+        $bibtexMapping->addRule('language');
+        $this->assertEquals(1, count($bibtexMapping->getRules()));
+        $this->arrayHasKey('language', $bibtexMapping->getRules());
+        $rule = $bibtexMapping->getRules()['language'];
+        $this->assertInstanceOf(Language::class, $rule);
+        $this->assertNotInstanceOf(SimpleRule::class, $rule);
+
+        $bibtexMapping->updateRule('belongsToBibliography');
+        $this->assertEquals(['language', 'belongsToBibliography'], array_keys($bibtexMapping->getRules()));
+
+        $bibtexMapping->updateRule('language', new SimpleRule());
+        $this->assertEquals(['language', 'belongsToBibliography'], array_keys($bibtexMapping->getRules()));
+        $rule = $bibtexMapping->getRules()['language'];
+        $this->assertNotInstanceOf(Language::class, $rule);
+        $this->assertInstanceOf(SimpleRule::class, $rule);
     }
 }

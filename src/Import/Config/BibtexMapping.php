@@ -34,12 +34,18 @@
 namespace Opus\Bibtex\Import\Config;
 
 use Opus\Bibtex\Import\Rules\ConstantValues;
+use Opus\Bibtex\Import\Rules\IRule;
 use Opus\Bibtex\Import\Rules\SimpleRule;
 
+/**
+ * Ein BibTeX-Mapping definiert, wie die einzelnen BibTeX-Felder verarbeitet und auf das OPUS4-Datenmodell
+ * abgebildet werden. Jedes BibTeX-Mapping hat einen Namen, eine Beschreibung und eine Menge von Regeln, die
+ * nacheinander ausgeführt werden.
+ */
 class BibtexMapping
 {
     /**
-     * Eindeutiger Name der Regelkonfiguration für die Auswahl.
+     * Eindeutiger Name der Regelkonfiguration für die Auswahl, z.B. in Administrations-Frontend oder im CLI-Kommando.
      *
      * @var string
      */
@@ -64,7 +70,7 @@ class BibtexMapping
      * Liefert den Namen der Mapping-Konfiguration. Diese wird z.B. für die Auswahl der
      * Mapping-Konfiguration in der Administration benötigt.
      *
-     * @return mixed
+     * @return string
      */
     public function getName()
     {
@@ -74,7 +80,7 @@ class BibtexMapping
     /**
      * Setzt den Namen der Mapping-Konfiguration.
      *
-     * @param $name Name der Mapping-Konfiguration
+     * @param string $name Name der Mapping-Konfiguration
      */
     public function setName($name)
     {
@@ -84,10 +90,10 @@ class BibtexMapping
 
     /**
      * Liefert eine Beschreibung der Mapping-Konfiguration zurück. In dieser können
-     * Hinweise oder Bemerkung zum vorliegenden Mapping hinterlegt werden, so dass
-     * die spätere Auswahl der Mapping-Konfiguration erleichtert wird.
+     * Hinweise oder Bemerkungen zum vorliegenden Mapping hinterlegt werden, so dass
+     * die spätere Auswahl der Mapping-Konfiguration im Frontend erleichtert wird.
      *
-     * @return mixed
+     * @return string
      */
     public function getDescription()
     {
@@ -97,7 +103,7 @@ class BibtexMapping
     /**
      * Setzt die Beschreibung der Mapping-Konfiguration.
      *
-     * @param $description Beschreibung der Mapping-Konfiguration
+     * @param string $description textuelle Beschreibung der Mapping-Konfiguration
      */
     public function setDescription($description)
     {
@@ -106,7 +112,7 @@ class BibtexMapping
     }
 
     /**
-     * Gibt die momentan konfigurierte Liste der Regeln zurück.
+     * Gibt die momentan konfigurierte Liste der Mapping-Regeln zurück.
      *
      * @return array
      */
@@ -117,29 +123,38 @@ class BibtexMapping
 
     /**
      * Fügt die übergebene Regel am Anfang der Regelliste hinzu, d.h. die übergebene Regel
-     * wird vor der Ausführung aller anderen Regeln ausgeführt.
+     * wird vor der Ausführung aller anderen Regeln ausgeführt. Existiert bereits eine Regel mit dem
+     * übergebenen Namen, so wird diese Regel vor dem Hinzufügen der übergebenen Regel entfernt.
      *
-     * @param $name Name der Regel
-     * @param $rule die hinzuzufügende Regel
+     * @param string $name Name der Regel
+     * @param IRule|null $rule die hinzuzufügende Regel (wenn null, dann wird die Regel aus dem Namen abgeleitet)
      */
-    public function prependRule($name, $rule)
+    public function prependRule($name, $rule = null)
     {
+        if (is_null($rule)) {
+            $rule = $this->getRuleInstance(['name' => $name]);
+        }
+
+        $this->removeRule($name);
         $this->rules = array_merge([ $name => $rule ], $this->rules);
         return $this;
     }
 
     /**
      * Fügt die übergebene Regel am Ende der Regelliste hinzu, d.h. die übergebene Regel
-     * wird erst nach der Ausführung aller anderen Regeln ausgeführt.
+     * wird erst nach der Ausführung aller anderen Regeln ausgeführt. Existiert bereits eine Regel mit dem
+     * übergebenen Namen, so wird diese Regel vor dem Hinzufügen der übergebenen Regel entfernt.
      *
-     * @param $name Name der Regel
-     * @param $rule die hinzuzufügende Regel
+     * @param string $name Name der Regel
+     * @param IRule|null $rule die hinzuzufügende Regel (wenn null, dann wird die Regel aus dem Namen abgeleitet)
      */
     public function addRule($name, $rule = null)
     {
         if (is_null($rule)) {
             $rule = $this->getRuleInstance(['name' => $name]);
         }
+
+        $this->removeRule($name);
         $this->rules[$name] = $rule;
         return $this;
     }
@@ -148,19 +163,28 @@ class BibtexMapping
      * Überschreibt die unter dem Namen registrierte Regel oder fügt die Regel am Ende der Regelliste hinzu, falls
      * unter dem übergebenen Namen noch keine Regel existiert.
      *
-     * @param $name Name der Regel
-     * @param $rule die zu ersetzende (oder hinzuzufügende Regel)
+     * @param string $name Name der Regel
+     * @param IRule $rule die zu ersetzende (oder hinzuzufügende) Regel
      */
-    public function updateRule($name, $rule)
+    public function updateRule($name, $rule = null)
     {
-        $this->rules[$name] = $rule;
+        if (is_null($rule)) {
+            $rule = $this->getRuleInstance(['name' => $name]);
+        }
+
+        if (array_key_exists($name, $this->rules)) {
+            // Regel mit bekanntem Namen wird ersetzt
+            $this->rules[$name] = $rule;
+        } else {
+            $this->addRule($name, $rule);
+        }
         return $this;
     }
 
     /**
      * Entfernt die unter dem übergebenen Namen abgelegte Regel, sofern eine solche Regel existiert.
      *
-     * @param $name Name der Regel
+     * @param string $name Name der Regel
      */
     public function removeRule($name)
     {
@@ -180,21 +204,25 @@ class BibtexMapping
     }
 
     /**
-     * Erlaubt das Setzen von Mappingregeln auf Basis des übergebenen Konfigurationsarrays.
+     * Erlaubt das Setzen von Mapping-Regeln auf Basis des übergebenen Konfigurationsarrays.
      * @param array $rules
      */
     public function setRules($rules)
     {
         $this->resetRules();
+
         foreach ($rules as $rule) {
             $name = $rule['name'];
             $ruleInstance = $this->getRuleInstance($rule);
             $this->addRule($name, $ruleInstance);
             if (array_key_exists('options', $rule)) {
+                $options = $rule['options'];
                 if ($ruleInstance instanceof ConstantValues) {
-                    $ruleInstance->setOptions($rule['options']);
+                    // Spezialbehandlung: hier führen die Options-Einträge nicht zu Setter-Aufrufen auf der Instanz der
+                    // Regelklasse (ConstantValues hat keine passenden Setter)
+                    $ruleInstance->setOptions($options);
                 } else {
-                    foreach ($rule['options'] as $propName => $propValue) {
+                    foreach ($options as $propName => $propValue) {
                         $setter = 'set' . ucfirst($propName);
                         $ruleInstance->$setter($propValue);
                     }
@@ -204,17 +232,31 @@ class BibtexMapping
         return $this;
     }
 
+    /**
+     * Erzeugt eine Instanz der Mapping-Regel, die durch die übergebene Konfiguration beschrieben ist.
+     *
+     * @param $rule Konfiguration der Mapping-Regel
+     * @return IRule Instanz der Mapping-Regel
+     */
     private function getRuleInstance($rule)
     {
         if (array_key_exists('class', $rule)) {
             $className = ucfirst($rule['class']);
         } else {
+            // ist in der Konfiguration kein expliziter Klassenname gesetzt, so wird der Klassenname aus dem Namen
+            // der Mapping-Regel abgeleitet
             $className = ucfirst($rule['name']);
         }
+
         if (strpos($className, '\\') === false) {
+            // enthält der Klassenname keinen Namespace, so wird der Standard-Namespace, in den die vordefinierten
+            // Mapping-Regel-Implementierungen liegen, verwendet
             $className = "Opus\Bibtex\Import\Rules\\$className";
         }
+
         if (is_null($className) || ! class_exists($className)) {
+            // kann keine Klasse abgeleitet werden, so wird auf SimpleRule als Fallback zurückgegriffen, so dass eine
+            // 1:1-Abbildung zwischen einem BibTeX-Feld und einem OPUS-Metadatenfeld erfolgt
             return new SimpleRule();
         }
         return new $className;
