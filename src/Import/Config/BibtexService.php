@@ -33,6 +33,14 @@
 
 namespace Opus\Bibtex\Import\Config;
 
+/**
+ * Service-Klasse für die Verarbeitung der Konfigurationsdateien, in denen das Mapping der BibTeX-Feldmapping sowie
+ * das Mapping der BibTeX-Typen auf das OPUS-Datenmodell definiert ist.
+ *
+ * Die Klasse ist als Singleton definiert.
+ *
+ * FIXME use dependency injection capabilities of Laminas ServiceManager
+ */
 class BibtexService
 {
     /**
@@ -41,35 +49,46 @@ class BibtexService
      */
     const INI_FILE = 'import.ini';
 
+    /**
+     * @var BibtexService|null interne Instanz der Klasse (für Durchsetzung des Singleton-Patterns)
+     */
     private static $instance = null;
 
     /**
-     * Name der Konfigurationsdatei, falls die Standard-Konfigurationsdatei überschrieben wird.
-     * @var string
+     * @var string Name der auszuwertenden INI-Konfigurationsdatei.
      */
     private $iniFileName;
 
     /**
      * @var array enthält die registrierten Mappings für BibTeX-Felder, wobei jedes Mapping unter seinem Namen
-     * abgelegt wird
+     * abgelegt wird (ist in der Mapping-Datei als name definiert); aktuell werden ausschließlich Mapping-Dateien im
+     * JSON-Format unterstützt.
      */
     private $mappings = [];
 
     /**
-     * @var DocumentTypeMapping Mapping von BibTeX-Typen auf OPUS-Dokumenttypen
+     * @var DocumentTypeMapping Mapping von BibTeX-Typen auf OPUS-Dokumenttypen gemäß Angaben in Konfigurationsdatei
      */
     private $typeMapping;
 
+    /**
+     * Liefert eine Instanz der Klasse zurück; erzeugt eine Instanz, wenn bislang noch keine Instanz erzeugt wurde.
+     *
+     * @param null $iniFileName Name der INI-Datei, die zur Konfiguration genutzt werden soll (wenn nicht gesetzt, so
+     *                          wird die Standardkonfigurationsdate verwendet)
+     * @return BibtexService
+     * @throws \Exception
+     */
     public static function getInstance($iniFileName = null)
     {
-        if (self::$instance == null) {
+        if (is_null(self::$instance)) {
             self::$instance = new BibtexService();
         }
 
-        self::$instance->iniFileName = is_null($iniFileName) ? self::INI_FILE : $iniFileName;
-        if (strpos(self::$instance->iniFileName, '/') === false) {
-            self::$instance->iniFileName = self::$instance->getPath(self::$instance->iniFileName);
-        }
+        self::$instance->iniFileName = self::$instance->getPath(
+            is_null($iniFileName) ? self::INI_FILE : $iniFileName
+        );
+
         self::$instance->initMappings();
         self::$instance->initTypeMapping();
 
@@ -77,12 +96,12 @@ class BibtexService
     }
 
     /**
-     * Liefert das Feld-Mapping auf Basis der Feld-Mapping-Konfiguration mit dem übergebenen Namen zurück.
+     * Liefert das Feld-Mapping auf Basis der Feld-Mapping-Konfiguration (JSON) mit dem übergebenen Namen zurück.
      *
      * @param string|null $mappingConfigName Name der Feld-Mapping-Konfiguration; ist dieser nicht gesetzt, so wird auf
-     *                                  das Default-Mapping zurückgegriffen
+     *                                       das Default-Mapping zurückgegriffen
      * @return BibtexMapping Feld-Mapping von BibTeX-Feldern auf OPUS-Metadatenfelder
-     * @throws \Exception wird geworfen, wenn das Feld-Mapping nicht registriert ist
+     * @throws \Exception wird geworfen, wenn das übergebene Feld-Mapping nicht registriert / unbekannt ist
      */
     public function getFieldMapping($mappingConfigName = null)
     {
@@ -98,7 +117,7 @@ class BibtexService
     }
 
     /**
-     * Liefert das Dokumenttyp-Mapping zurück, das in der Ini-Datei konfiguriert wurde.
+     * Liefert das Dokumenttyp-Mapping zurück, das in der INI-Datei konfiguriert wurde.
      *
      * @return DocumentTypeMapping Dokumenttyp-Mapping
      * @throws \Exception
@@ -119,35 +138,39 @@ class BibtexService
     }
 
     /**
-     * Registriert ein BibTeX-Feld-Mapping aus der Konfigurationsdatei mit dem übergebenen Namen und liefert
-     * die aus der Konfigurationsdatei erzeugte Mappingkonfigurationsdatei zurück.
+     * Registriert ein BibTeX-Feld-Mapping aus der Mapping-Konfigurationsdatei (JSON) mit dem übergebenen Namen
+     * und liefert die aus der Konfigurationsdatei erzeugte Mappingkonfiguration zurück.
      *
-     * @param $fileName Name der Konfigurationsdatei
-     * @return BibTeX-Feld-Mapping, das aus der Konfigurationsdatei erzeugt wurde
+     * @param $fileName Name der Mapping-Konfigurationsdatei
+     * @return BibtexMapping|null Feld-Mapping-Instanz, die aus der Mapping-Konfigurationsdatei erzeugt wurde (liefert
+     *                            null, wenn Instanz nicht erfolgreich erzeugt werden konnte)
      * @throws \Exception
      */
     public function registerMapping($fileName)
     {
-        $result = null;
+        $mapping = null;
         $mappingFile = dirname($this->iniFileName) . DIRECTORY_SEPARATOR . $fileName;
+
         if (is_readable($mappingFile)) {
             // TODO zukünftig weitere Konfigurationsformate unterstützen?
             if (substr($fileName, -5) === '.json') {
-                $result = (new JsonBibtexMappingReader())->getMappingConfigurationFromFile($mappingFile);
-                $this->mappings[$result->getName()] = $result;
+                $mapping = (new JsonBibtexMappingReader())->getMappingConfigurationFromFile($mappingFile);
+                $this->mappings[$mapping->getName()] = $mapping;
             }
         }
-        return $result;
+        return $mapping;
     }
 
     /**
-     * Initialisiert die in der INI-Datei angegebenen BibTeX-Feld-Mappings und registriert sie.
+     * Initialisiert die in der INI-Datei angegebenen BibTeX-Feld-Mappings und registriert sie unter ihren Namen für
+     * die spätere Verwendung.
      *
      * @throws \Exception wird geworfen, wenn die Initialisierung nicht erfolgreich durchgeführt werden konnte
      */
     private function initMappings()
     {
         $this->mappings = [];
+
         try {
             $fieldMappings = $this->getConfiguration('fieldMappings');
             foreach ($fieldMappings as $mappingFileName) {
@@ -212,13 +235,17 @@ class BibtexService
     }
 
     /**
-     * Fügt die Pfadangabe zum übergebenen Namen einer Konfigurationsdatei hinzu.
+     * Fügt die Pfadangabe zum übergebenen Namen einer Konfigurationsdatei hinzu, sofern der übergebene Dateiname
+     * keine Pfadangabe enthält.
      *
-     * @param $fileName Name der Konfigurationsdatei
-     * @return string Pfdangabe
+     * @param string $fileName Name der Konfigurationsdatei
+     * @return string mit Pfadangabe erweiterter Dateiname
      */
     private function getPath($fileName)
     {
-        return __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . $fileName;
+        if (strpos(self::$instance->iniFileName, '/') === false) {
+            return __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . $fileName;
+        }
+        return $fileName;
     }
 }

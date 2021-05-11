@@ -37,7 +37,6 @@ use Opus\Bibtex\Import\Config\BibtexService;
 
 class BibtexServiceTest extends \PHPUnit_Framework_TestCase
 {
-
     public function testListAvailableMappingsDefault()
     {
         $bibtexService = BibtexService::getInstance();

@@ -33,12 +33,16 @@
 
 namespace Opus\Bibtex\Import\Config;
 
+/**
+ * Erlaubt das Auslesen einer JSON-Konfigurationsdatei, in der das Mapping der BibTeX-Felder auf die
+ * OPUS-Metadatenfelder definiert ist.
+ */
 class JsonBibtexMappingReader
 {
     /**
-     * @param $fileName
-     * @return BibtexMapping
-     * @throws \Exception
+     * @param $fileName Name der Mapping-Konfigurationsdatei (JSON)
+     * @return BibtexMapping Instanz des BibTeX-Mappings auf Basis der Angaben in der übergebenen Konfigurationsdatei
+     * @throws \Exception wird geworfen, wenn das konfigurierte Mapping nicht erfolgreich ausgewertet werden konnte
      */
     public function getMappingConfigurationFromFile($fileName)
     {
