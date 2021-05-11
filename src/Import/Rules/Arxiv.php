@@ -34,7 +34,7 @@
 namespace Opus\Bibtex\Import\Rules;
 
 /**
- * Verarbeitung von Arxiv-Identifiern. Hierbei wird eine ggf. vorhandene Resolver-URL vor dem Arxiv-Identifier
+ * Verarbeitung von ArXiv-Identifiern. Hierbei wird eine ggf. vorhandene Resolver-URL vor dem ArXiv-Identifier
  * entfernt.
  */
 class Arxiv extends ArrayRule

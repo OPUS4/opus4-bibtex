@@ -33,6 +33,9 @@
 
 namespace Opus\Bibtex\Import;
 
+/**
+ * Exception, die im Rahmen des Parsing von BibTeX-Records auftritt, z.B. aufgrund von Formatfehlern.
+ */
 class ParserException extends \Exception
 {
 
