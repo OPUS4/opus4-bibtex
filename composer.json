@@ -14,7 +14,7 @@
   },
   "require-dev": {
     "phpunit/phpunit": "^4.8",
-    "laminas/laminas-coding-standard": "*",
+    "laminas/laminas-coding-standard": "1.0.0",
     "phpmetrics/phpmetrics": "2.7.4"
   },
   "autoload": {
