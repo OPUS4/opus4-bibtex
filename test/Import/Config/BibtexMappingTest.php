@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of OPUS. The software OPUS has been originally developed
  * at the University of Stuttgart with funding from the German Research Net,
@@ -38,8 +39,12 @@ use Opus\Bibtex\Import\Processor;
 use Opus\Bibtex\Import\Rules\ConstantValue;
 use Opus\Bibtex\Import\Rules\Language;
 use Opus\Bibtex\Import\Rules\SimpleRule;
+use PHPUnit_Framework_TestCase;
 
-class BibtexMappingTest extends \PHPUnit_Framework_TestCase
+use function array_keys;
+use function count;
+
+class BibtexMappingTest extends PHPUnit_Framework_TestCase
 {
     public function testUpdateRule()
     {
@@ -54,7 +59,7 @@ class BibtexMappingTest extends \PHPUnit_Framework_TestCase
                 new SimpleRule('year', 'completedYear')
             );
 
-        $proc = new Processor($fieldMapping);
+        $proc     = new Processor($fieldMapping);
         $metadata = [];
         $proc->handleRecord(['Year' => '2019'], $metadata);
 
@@ -75,7 +80,7 @@ class BibtexMappingTest extends \PHPUnit_Framework_TestCase
                 new SimpleRule('year', 'completedYear')
             );
 
-        $proc = new Processor($fieldMapping);
+        $proc     = new Processor($fieldMapping);
         $metadata = [];
         $proc->handleRecord(['Year' => '2019'], $metadata);
 
@@ -96,7 +101,7 @@ class BibtexMappingTest extends \PHPUnit_Framework_TestCase
                 new SimpleRule('year', 'completedYear')
             );
 
-        $proc = new Processor($fieldMapping);
+        $proc     = new Processor($fieldMapping);
         $metadata = [];
         $proc->handleRecord(['Year' => '2019'], $metadata);
 
@@ -118,7 +123,7 @@ class BibtexMappingTest extends \PHPUnit_Framework_TestCase
                 new SimpleRule('year', 'completedYear')
             );
 
-        $proc = new Processor($fieldMapping);
+        $proc     = new Processor($fieldMapping);
         $metadata = [];
         $proc->handleRecord(['Year' => '2019'], $metadata);
 
@@ -140,7 +145,7 @@ class BibtexMappingTest extends \PHPUnit_Framework_TestCase
                 new SimpleRule('year', 'completedYear')
             );
 
-        $proc = new Processor($fieldMapping);
+        $proc     = new Processor($fieldMapping);
         $metadata = [];
         $proc->handleRecord(['Year' => '2019'], $metadata);
 
@@ -154,7 +159,7 @@ class BibtexMappingTest extends \PHPUnit_Framework_TestCase
                 new SimpleRule('year', 'publishedYear')
             );
 
-        $proc = new Processor($fieldMapping);
+        $proc     = new Processor($fieldMapping);
         $metadata = [];
         $proc->handleRecord(['Year' => '2019'], $metadata);
 
@@ -165,8 +170,8 @@ class BibtexMappingTest extends \PHPUnit_Framework_TestCase
     public function testPrependRule()
     {
         $fieldMapping = new BibtexMapping();
-        $proc = new Processor($fieldMapping);
-        $metadata = [];
+        $proc         = new Processor($fieldMapping);
+        $metadata     = [];
         $proc->handleRecord(['Year' => '2019'], $metadata);
 
         $this->assertArrayNotHasKey('PublishedYear', $metadata);
@@ -175,14 +180,14 @@ class BibtexMappingTest extends \PHPUnit_Framework_TestCase
             'secondRule',
             (new ConstantValue())->setOpusField('PublishedYear')->setValue('1970')
         );
-        $proc = new Processor($fieldMapping);
+        $proc     = new Processor($fieldMapping);
         $metadata = [];
         $proc->handleRecord(['Year' => '2019'], $metadata);
 
         $this->assertEquals('1970', $metadata['PublishedYear']);
 
         $fieldMapping->removeRule('secondRule');
-        $proc = new Processor($fieldMapping);
+        $proc     = new Processor($fieldMapping);
         $metadata = [];
         $proc->handleRecord(['Year' => '2019'], $metadata);
 
@@ -197,14 +202,14 @@ class BibtexMappingTest extends \PHPUnit_Framework_TestCase
                 'firstRule',
                 (new ConstantValue())->setOpusField('PublishedYear')->setValue('1870')
             );
-        $proc = new Processor($fieldMapping);
+        $proc     = new Processor($fieldMapping);
         $metadata = [];
         $proc->handleRecord(['Year' => '2019'], $metadata);
 
         $this->assertEquals('1970', $metadata['PublishedYear']);
 
         $fieldMapping->removeRule('secondRule');
-        $proc = new Processor($fieldMapping);
+        $proc     = new Processor($fieldMapping);
         $metadata = [];
         $proc->handleRecord(['Year' => '2019'], $metadata);
 

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of OPUS. The software OPUS has been originally developed
  * at the University of Stuttgart with funding from the German Research Net,
@@ -24,14 +25,17 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
+ * @copyright   Copyright (c) 2021, OPUS 4 development team
+ * @license     http://www.gnu.org/licenses/gpl.html General Public License
+ *
  * @category    BibTeX
  * @package     Opus\Bibtex\Import\Rules
  * @author      Sascha Szott <opus-repository@saschaszott.de>
- * @copyright   Copyright (c) 2021, OPUS 4 development team
- * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
 namespace Opus\Bibtex\Import\Rules;
+
+use function ucfirst;
 
 /**
  * Eine Regel, um ein OPUS-Metadatenfeld mit einer Konstante zu befüllen. Hierbei wird der Inhalt des zu verarbeitenden
@@ -39,14 +43,10 @@ namespace Opus\Bibtex\Import\Rules;
  */
 class ConstantValue implements IRule
 {
-    /**
-     * @var string Name des OPUS-Metadatenfelds
-     */
+    /** @var string Name des OPUS-Metadatenfelds */
     protected $opusField;
 
-    /**
-     * @var string der zu setzenden Feldwert (Konstante)
-     */
+    /** @var string der zu setzenden Feldwert (Konstante) */
     protected $value;
 
     /**
@@ -63,6 +63,7 @@ class ConstantValue implements IRule
      * Setzt den Namen des zu befüllenden OPUS-Metadatenfelds.
      *
      * @param string $opusField
+     * @return $this
      */
     public function setOpusField($opusField)
     {
@@ -84,6 +85,7 @@ class ConstantValue implements IRule
      * Setzt den Feldwert (Konstante) für das OPUS-Metadatenfeld.
      *
      * @param string $value
+     * @return $this
      */
     public function setValue($value)
     {
@@ -104,9 +106,9 @@ class ConstantValue implements IRule
         // der BibTeX-Record wird zur Bestimmung des Metadatenfelds nicht verwendet
         // d.h. Metadatenfeldwert wird hier auf eine Konstante gesetzt oder Bestimmung des Feldinhalts auf Basis
         // von anderen Metadatenfeldern
-        if (! is_null($this->value)) {
+        if ($this->value !== null) {
             $documentMetadata[ucfirst($this->opusField)] = $this->value;
-            $result = true;
+            $result                                      = true;
         }
         return $result;
     }

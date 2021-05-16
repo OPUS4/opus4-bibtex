@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of OPUS. The software OPUS has been originally developed
  * at the University of Stuttgart with funding from the German Research Net,
@@ -24,14 +25,23 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
+ * @copyright   Copyright (c) 2021, OPUS 4 development team
+ * @license     http://www.gnu.org/licenses/gpl.html General Public License
+ *
  * @category    BibTeX
  * @package     Opus\Bibtex\Import\Rules
  * @author      Sascha Szott <opus-repository@saschaszott.de>
- * @copyright   Copyright (c) 2021, OPUS 4 development team
- * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
 namespace Opus\Bibtex\Import\Rules;
+
+use function array_merge;
+use function explode;
+use function strlen;
+use function strpos;
+use function strrpos;
+use function substr;
+use function trim;
 
 /**
  * Erlaubt das Erzeugen von OPUS-Metadatenfeldern für die Speicherung von Personenangaben.
@@ -56,22 +66,28 @@ class Person extends ArrayRule
     protected function getValue($value)
     {
         $persons = explode(' and ', $value);
-        $result = [];
+        $result  = [];
         foreach ($persons as $person) {
             $result[] = array_merge(['Role' => $this->bibtexField], $this->extractNameParts($person));
         }
         return $result;
     }
 
+    /**
+     * Zerlegt einen BibTeX Autoren String in seine Teile.
+     *
+     * @param string $name BibTeX-Autor String.
+     * @return array
+     */
     private function extractNameParts($name)
     {
-        $name = trim($name);
+        $name          = trim($name);
         $posFirstComma = strpos($name, ',');
         if ($posFirstComma !== false) {
             // Nachname getrennt durch Komma mit Vorname(n)
             // alles nach dem ersten Komma wird hierbei als Vorname interpretiert
             $result = [
-                'LastName' => trim(substr($name, 0, $posFirstComma))
+                'LastName' => trim(substr($name, 0, $posFirstComma)),
             ];
             if ($posFirstComma < strlen($name) - 1) {
                 $result['FirstName'] = trim(substr($name, $posFirstComma + 1));
@@ -85,7 +101,7 @@ class Person extends ArrayRule
         $posFirstSpace = strpos($name, ' ');
         if ($posFirstSpace === false) {
             return [
-                'LastName' => $name
+                'LastName' => $name,
             ];
         }
 
@@ -94,7 +110,7 @@ class Person extends ArrayRule
             // letztes Zeichen kann kein Leerzeichen sein, daher kein Vergleich der Länge von $name mit $posFirstSpace
             return [
                 'FirstName' => trim(substr($name, 0, $posFirstSpace)),
-                'LastName' => trim(substr($name, $posFirstSpace + 1))
+                'LastName'  => trim(substr($name, $posFirstSpace + 1)),
             ];
         }
 

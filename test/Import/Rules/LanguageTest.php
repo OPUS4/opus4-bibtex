@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of OPUS. The software OPUS has been originally developed
  * at the University of Stuttgart with funding from the German Research Net,
@@ -34,10 +35,10 @@
 namespace OpusTest\Bibtex\Import\Rules;
 
 use Opus\Bibtex\Import\Rules\Language;
+use PHPUnit_Framework_TestCase;
 
-class LanguageTest extends \PHPUnit_Framework_TestCase
+class LanguageTest extends PHPUnit_Framework_TestCase
 {
-
     public function testProcess()
     {
         $languageRule = new Language();

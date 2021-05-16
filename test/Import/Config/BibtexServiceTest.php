@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of OPUS. The software OPUS has been originally developed
  * at the University of Stuttgart with funding from the German Research Net,
@@ -34,12 +35,15 @@
 namespace OpusTest\Bibtex\Import\Config;
 
 use Opus\Bibtex\Import\Config\BibtexService;
+use PHPUnit_Framework_TestCase;
 
-class BibtexServiceTest extends \PHPUnit_Framework_TestCase
+use function count;
+
+class BibtexServiceTest extends PHPUnit_Framework_TestCase
 {
     public function testListAvailableMappingsDefault()
     {
-        $bibtexService = BibtexService::getInstance();
+        $bibtexService     = BibtexService::getInstance();
         $availableMappings = $bibtexService->listAvailableMappings();
         $this->assertEquals(1, count($availableMappings));
         $this->assertEquals('default', $availableMappings[0]);
@@ -59,7 +63,7 @@ class BibtexServiceTest extends \PHPUnit_Framework_TestCase
 
     public function testListAvailableMappingsCustom()
     {
-        $bibtexService = BibtexService::getInstance(__DIR__ . '/../_files/import.ini');
+        $bibtexService     = BibtexService::getInstance(__DIR__ . '/../_files/import.ini');
         $availableMappings = $bibtexService->listAvailableMappings();
         $this->assertEquals(2, count($availableMappings));
         $this->assertEquals('test', $availableMappings[0]);
@@ -79,7 +83,7 @@ class BibtexServiceTest extends \PHPUnit_Framework_TestCase
     public function testGetTypeMapping()
     {
         $bibtexService = BibtexService::getInstance(__DIR__ . '/../_files/import-single.ini');
-        $typeMapping = $bibtexService->getTypeMapping();
+        $typeMapping   = $bibtexService->getTypeMapping();
         $this->assertEquals('article', $typeMapping->getDefaultType());
         $mappings = $typeMapping->getMappings();
         $this->assertEquals(2, count($mappings));
@@ -100,7 +104,7 @@ class BibtexServiceTest extends \PHPUnit_Framework_TestCase
     public function testGetDefaultFieldMapping()
     {
         $bibtexService = BibtexService::getInstance();
-        $fieldMapping = $bibtexService->getFieldMapping();
+        $fieldMapping  = $bibtexService->getFieldMapping();
         $this->assertEquals('default', $fieldMapping->getName());
         $this->assertEquals('Default BibTeX Mapping Configuration.', $fieldMapping->getDescription());
         $this->assertFalse(empty($fieldMapping->getRules()));
@@ -109,7 +113,7 @@ class BibtexServiceTest extends \PHPUnit_Framework_TestCase
     public function testGetFieldMappingSingle()
     {
         $bibtexService = BibtexService::getInstance(__DIR__ . '/../_files/import-single.ini');
-        $fieldMapping = $bibtexService->getFieldMapping('other-mapping');
+        $fieldMapping  = $bibtexService->getFieldMapping('other-mapping');
         $this->assertEquals('other-mapping', $fieldMapping->getName());
         $this->assertEquals('Another Test BibTeX Mapping Configuration.', $fieldMapping->getDescription());
         $this->assertFalse(empty($fieldMapping->getRules()));
@@ -118,7 +122,7 @@ class BibtexServiceTest extends \PHPUnit_Framework_TestCase
     public function testGetFieldMapping()
     {
         $bibtexService = BibtexService::getInstance(__DIR__ . '/../_files/import.ini');
-        $fieldMapping = $bibtexService->getFieldMapping('other-mapping');
+        $fieldMapping  = $bibtexService->getFieldMapping('other-mapping');
         $this->assertEquals('other-mapping', $fieldMapping->getName());
         $this->assertEquals('Another Test BibTeX Mapping Configuration.', $fieldMapping->getDescription());
         $this->assertFalse(empty($fieldMapping->getRules()));

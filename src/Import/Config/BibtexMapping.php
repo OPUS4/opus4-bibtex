@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of OPUS. The software OPUS has been originally developed
  * at the University of Stuttgart with funding from the German Research Net,
@@ -24,11 +25,12 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
+ * @copyright   Copyright (c) 2021, OPUS 4 development team
+ * @license     http://www.gnu.org/licenses/gpl.html General Public License
+ *
  * @category    BibTeX
  * @package     Opus\Bibtex\Import\Config
  * @author      Sascha Szott <opus-repository@saschaszott.de>
- * @copyright   Copyright (c) 2021, OPUS 4 development team
- * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
 namespace Opus\Bibtex\Import\Config;
@@ -36,6 +38,12 @@ namespace Opus\Bibtex\Import\Config;
 use Opus\Bibtex\Import\Rules\ConstantValues;
 use Opus\Bibtex\Import\Rules\IRule;
 use Opus\Bibtex\Import\Rules\SimpleRule;
+
+use function array_key_exists;
+use function array_merge;
+use function class_exists;
+use function strpos;
+use function ucfirst;
 
 /**
  * Ein BibTeX-Mapping definiert, wie die einzelnen BibTeX-Felder verarbeitet und auf das OPUS4-Datenmodell
@@ -81,6 +89,7 @@ class BibtexMapping
      * Setzt den Namen der Mapping-Konfiguration.
      *
      * @param string $name Name der Mapping-Konfiguration
+     * @return $this
      */
     public function setName($name)
     {
@@ -104,6 +113,7 @@ class BibtexMapping
      * Setzt die Beschreibung der Mapping-Konfiguration.
      *
      * @param string $description textuelle Beschreibung der Mapping-Konfiguration
+     * @return $this
      */
     public function setDescription($description)
     {
@@ -128,15 +138,16 @@ class BibtexMapping
      *
      * @param string $name Name der Regel
      * @param IRule|null $rule die hinzuzufügende Regel (wenn null, dann wird die Regel aus dem Namen abgeleitet)
+     * @return $this
      */
     public function prependRule($name, $rule = null)
     {
-        if (is_null($rule)) {
+        if ($rule === null) {
             $rule = $this->getRuleInstance(['name' => $name]);
         }
 
         $this->removeRule($name);
-        $this->rules = array_merge([ $name => $rule ], $this->rules);
+        $this->rules = array_merge([$name => $rule], $this->rules);
         return $this;
     }
 
@@ -147,10 +158,11 @@ class BibtexMapping
      *
      * @param string $name Name der Regel
      * @param IRule|null $rule die hinzuzufügende Regel (wenn null, dann wird die Regel aus dem Namen abgeleitet)
+     * @return $this
      */
     public function addRule($name, $rule = null)
     {
-        if (is_null($rule)) {
+        if ($rule === null) {
             $rule = $this->getRuleInstance(['name' => $name]);
         }
 
@@ -165,10 +177,11 @@ class BibtexMapping
      *
      * @param string $name Name der Regel
      * @param IRule $rule die zu ersetzende (oder hinzuzufügende) Regel
+     * @return $this
      */
     public function updateRule($name, $rule = null)
     {
-        if (is_null($rule)) {
+        if ($rule === null) {
             $rule = $this->getRuleInstance(['name' => $name]);
         }
 
@@ -185,6 +198,7 @@ class BibtexMapping
      * Entfernt die unter dem übergebenen Namen abgelegte Regel, sofern eine solche Regel existiert.
      *
      * @param string $name Name der Regel
+     * @return $this
      */
     public function removeRule($name)
     {
@@ -196,6 +210,8 @@ class BibtexMapping
 
     /**
      * Setzt die Liste der Regeln zurück, so dass die Anwendung der Mapping-Konfiguration einer No-Op entspricht.
+     *
+     * @return $this
      */
     public function resetRules()
     {
@@ -205,14 +221,16 @@ class BibtexMapping
 
     /**
      * Erlaubt das Setzen von Mapping-Regeln auf Basis des übergebenen Konfigurationsarrays.
+     *
      * @param array $rules
+     * @return $this
      */
     public function setRules($rules)
     {
         $this->resetRules();
 
         foreach ($rules as $rule) {
-            $name = $rule['name'];
+            $name         = $rule['name'];
             $ruleInstance = $this->getRuleInstance($rule);
             $this->addRule($name, $ruleInstance);
             if (array_key_exists('options', $rule)) {
@@ -235,7 +253,7 @@ class BibtexMapping
     /**
      * Erzeugt eine Instanz der Mapping-Regel, die durch die übergebene Konfiguration beschrieben ist.
      *
-     * @param $rule Konfiguration der Mapping-Regel
+     * @param array $rule Konfiguration der Mapping-Regel
      * @return IRule Instanz der Mapping-Regel
      */
     private function getRuleInstance($rule)
@@ -254,11 +272,11 @@ class BibtexMapping
             $className = "Opus\Bibtex\Import\Rules\\$className";
         }
 
-        if (is_null($className) || ! class_exists($className)) {
+        if ($className === null || ! class_exists($className)) {
             // kann keine Klasse abgeleitet werden, so wird auf SimpleRule als Fallback zurückgegriffen, so dass eine
             // 1:1-Abbildung zwischen einem BibTeX-Feld und einem OPUS-Metadatenfeld erfolgt
             return new SimpleRule();
         }
-        return new $className;
+        return new $className();
     }
 }

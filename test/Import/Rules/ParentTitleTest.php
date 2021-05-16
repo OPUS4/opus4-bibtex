@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of OPUS. The software OPUS has been originally developed
  * at the University of Stuttgart with funding from the German Research Net,
@@ -34,15 +35,16 @@
 namespace OpusTest\Bibtex\Import\Rules;
 
 use Opus\Bibtex\Import\Processor;
+use PHPUnit_Framework_TestCase;
 
-class ParentTitleTest extends \PHPUnit_Framework_TestCase
+class ParentTitleTest extends PHPUnit_Framework_TestCase
 {
     public function dataProvider()
     {
         return [
             [['journal' => 'My Journal'], 'My Journal'],
             [['journal' => '{My Journal}'], 'My Journal'],
-            [['booktitle' => 'My Book'], 'My Book']
+            [['booktitle' => 'My Book'], 'My Book'],
         ];
     }
 
@@ -52,21 +54,22 @@ class ParentTitleTest extends \PHPUnit_Framework_TestCase
      * @param mixed $arg Value to check given by the data provider
      * @param $res expected mapping-result
      * @return void
-     *
      * @dataProvider dataProvider
      */
     public function testProcess($arg, $res)
     {
-        $proc = new Processor();
+        $proc     = new Processor();
         $metadata = [];
         $proc->handleRecord($arg, $metadata);
 
         $this->assertEquals(
-            [[
-                'Language' => 'eng',
-                'Value' => $res,
-                'Type' => 'parent'
-            ]],
+            [
+                [
+                    'Language' => 'eng',
+                    'Value'    => $res,
+                    'Type'     => 'parent',
+                ],
+            ],
             $metadata['TitleParent']
         );
     }

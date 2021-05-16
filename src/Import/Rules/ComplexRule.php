@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of OPUS. The software OPUS has been originally developed
  * at the University of Stuttgart with funding from the German Research Net,
@@ -24,14 +25,17 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
+ * @copyright   Copyright (c) 2021, OPUS 4 development team
+ * @license     http://www.gnu.org/licenses/gpl.html General Public License
+ *
  * @category    BibTeX
  * @package     Opus\Bibtex\Import\Rules
  * @author      Sascha Szott <opus-repository@saschaszott.de>
- * @copyright   Copyright (c) 2021, OPUS 4 development team
- * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
 namespace Opus\Bibtex\Import\Rules;
+
+use function array_key_exists;
 
 /**
  * Eine Regel, die gleichzeitig auf mehrere BibTeX-Felder zugreift. Im Konstruktor muss die Liste der Feldnamen im
@@ -44,13 +48,12 @@ namespace Opus\Bibtex\Import\Rules;
  */
 abstract class ComplexRule implements IRule
 {
-    /**
-     * @var array|null optionale Liste der bei der Regelausführung auszuwertenden BibTeX-Felder
-     */
+    /** @var array|null optionale Liste der bei der Regelausführung auszuwertenden BibTeX-Felder */
     protected $fieldsEvaluated;
 
     /**
      * Konstruktor
+     *
      * @param array|null $fieldsEvaluated Liste der BibTeX-Felder, die bei der Regelauswertung verwendet werden können
      */
     public function __construct($fieldsEvaluated = null)
@@ -68,7 +71,7 @@ abstract class ComplexRule implements IRule
     public function apply($bibtexRecord, &$documentMetadata)
     {
         $fieldValues = [];
-        if (! is_null($this->fieldsEvaluated)) {
+        if ($this->fieldsEvaluated !== null) {
             foreach ($this->fieldsEvaluated as $fieldName) {
                 if (array_key_exists($fieldName, $bibtexRecord)) {
                     $fieldValues[$fieldName] = $bibtexRecord[$fieldName];
@@ -90,7 +93,7 @@ abstract class ComplexRule implements IRule
      */
     public function getEvaluatedBibTexField()
     {
-        return is_null($this->fieldsEvaluated) ? [] : $this->fieldsEvaluated;
+        return $this->fieldsEvaluated ?? [];
     }
 
     /**
@@ -99,7 +102,7 @@ abstract class ComplexRule implements IRule
      * BibTeX-Feldern.
      *
      * @param array $fieldValues Werte von BibTeX-Feldern
-     * @param $documentMetadata OPUS-Metadatensatz (Array von Metadatenfeldern)
+     * @param array $documentMetadata OPUS-Metadatensatz (Array von Metadatenfeldern)
      */
     abstract protected function setFields($fieldValues, &$documentMetadata);
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of OPUS. The software OPUS has been originally developed
  * at the University of Stuttgart with funding from the German Research Net,
@@ -24,14 +25,19 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
+ * @copyright   Copyright (c) 2021, OPUS 4 development team
+ * @license     http://www.gnu.org/licenses/gpl.html General Public License
+ *
  * @category    BibTeX
  * @package     Opus\Bibtex\Import\Rules
  * @author      Sascha Szott <opus-repository@saschaszott.de>
- * @copyright   Copyright (c) 2021, OPUS 4 development team
- * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
 namespace Opus\Bibtex\Import\Rules;
+
+use function filter_var;
+
+use const FILTER_VALIDATE_BOOLEAN;
 
 /**
  * Erlaubt das Setzen des OPUS-Metadatenfelds BelongsToBibliography vom Typ Boolean auf Basis eines
@@ -52,7 +58,7 @@ class BelongsToBibliography extends ConstantValue
      * OPUS-Metadatenfeld BelongsToBibliography verwendet wird.
      *
      * @param string $value der zu setzende Wert
-     * @return
+     * @return $this
      */
     public function setValue($value)
     {

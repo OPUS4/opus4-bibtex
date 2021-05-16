@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of OPUS. The software OPUS has been originally developed
  * at the University of Stuttgart with funding from the German Research Net,
@@ -34,12 +35,13 @@
 namespace OpusTest\Bibtex\Import\Rules;
 
 use Opus\Bibtex\Import\Processor;
+use PHPUnit_Framework_TestCase;
 
-class PageLastTest extends \PHPUnit_Framework_TestCase
+class PageLastTest extends PHPUnit_Framework_TestCase
 {
     public function testProcess()
     {
-        $proc = new Processor();
+        $proc     = new Processor();
         $metadata = [];
         $proc->handleRecord(['Pages' => '1--10'], $metadata);
         $this->assertEquals('10', $metadata['PageLast']);
