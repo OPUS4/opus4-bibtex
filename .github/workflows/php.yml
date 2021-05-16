@@ -17,4 +17,4 @@ jobs:
         run: curl -s http://getcomposer.org/installer | php && php composer.phar self-update && php composer.phar install
 
       - name: Full Analysis with Coverage
-        run: php composer.phar check-full
+        run: php composer.phar check
