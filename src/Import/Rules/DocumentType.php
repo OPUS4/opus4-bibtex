@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of OPUS. The software OPUS has been originally developed
  * at the University of Stuttgart with funding from the German Research Net,
@@ -24,11 +25,12 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
+ * @copyright   Copyright (c) 2021, OPUS 4 development team
+ * @license     http://www.gnu.org/licenses/gpl.html General Public License
+ *
  * @category    BibTeX
  * @package     Opus\Bibtex\Import\Rules
  * @author      Sascha Szott <opus-repository@saschaszott.de>
- * @copyright   Copyright (c) 2021, OPUS 4 development team
- * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
 namespace Opus\Bibtex\Import\Rules;
@@ -43,7 +45,6 @@ use Opus\Bibtex\Import\Config\DocumentTypeMapping;
  * zusätzlich die Möglichkeit ein benutzerspezifisches (nicht im Standard enthaltenes) BibTeX-Feld zu definieren, das
  * stattdessen zur Bestimmung des OPUS-Dokumenttyps verwendet wird. Diese Option wird in der ausgelieferten
  * Mapping-Konfiguration verwendet, um das Nicht-Standard-Feld pytpe beim Dokumenttyp-Mapping auszuwerten.
- *
  */
 class DocumentType extends SimpleRule
 {
@@ -52,14 +53,10 @@ class DocumentType extends SimpleRule
      */
     const DEFAULT_BIBTEX_FIELD_NAME = 'type';
 
-    /**
-     * @var array auf Namen basierendes Mapping von BibTeX-Typen auf OPUS-Dokumenttypen
-     */
+    /** @var array auf Namen basierendes Mapping von BibTeX-Typen auf OPUS-Dokumenttypen */
     private $documentTypeMapping;
 
-    /**
-     * @var array Liste der bei der Regelanwendung ausgewerteten BibTeX-Felder
-     */
+    /** @var array Liste der bei der Regelanwendung ausgewerteten BibTeX-Felder */
     private $fieldsEvaluated = [];
 
     /**
@@ -75,6 +72,7 @@ class DocumentType extends SimpleRule
      * Erlaubt das Registrieren eines Mappings von BibTeX-Typen auf OPUS-Dokumenttypen.
      *
      * @param DocumentTypeMapping $documentTypeMapping
+     * @return $this
      */
     public function setDocumentTypeMapping($documentTypeMapping)
     {
@@ -90,7 +88,7 @@ class DocumentType extends SimpleRule
      */
     protected function getValue($value)
     {
-        if (is_null($this->documentTypeMapping)) {
+        if ($this->documentTypeMapping === null) {
             $this->documentTypeMapping = BibtexService::getInstance()->getTypeMapping();
         }
 
@@ -109,7 +107,7 @@ class DocumentType extends SimpleRule
     {
         $this->fieldsEvaluated = [];
 
-        $result = parent::apply($bibtexRecord, $documentMetadata);
+        $result    = parent::apply($bibtexRecord, $documentMetadata);
         $typeField = $this->getBibtexField();
         if ($result) {
             // Regelanwendung war erfolgreich
@@ -122,7 +120,7 @@ class DocumentType extends SimpleRule
         if ($typeField !== self::DEFAULT_BIBTEX_FIELD_NAME) {
             // Auswertung des Standard-BibTeX-Felds für den Dokumenttyp
             $this->setBibtexField(self::DEFAULT_BIBTEX_FIELD_NAME);
-            $result = parent::apply($bibtexRecord, $documentMetadata);
+            $result                  = parent::apply($bibtexRecord, $documentMetadata);
             $this->fieldsEvaluated[] = self::DEFAULT_BIBTEX_FIELD_NAME;
             $this->setBibtexField($typeField);
         }

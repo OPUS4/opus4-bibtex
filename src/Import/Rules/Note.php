@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of OPUS. The software OPUS has been originally developed
  * at the University of Stuttgart with funding from the German Research Net,
@@ -24,11 +25,12 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
+ * @copyright   Copyright (c) 2021, OPUS 4 development team
+ * @license     http://www.gnu.org/licenses/gpl.html General Public License
+ *
  * @category    BibTeX
  * @package     Opus\Bibtex\Import\Rules
  * @author      Sascha Szott <opus-repository@saschaszott.de>
- * @copyright   Copyright (c) 2021, OPUS 4 development team
- * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
 namespace Opus\Bibtex\Import\Rules;
@@ -39,14 +41,10 @@ namespace Opus\Bibtex\Import\Rules;
  */
 class Note extends ArrayRule
 {
-    /**
-     * @var string Präfix, der dem Wert der Note vorangestellt wird (Default: leer)
-     */
+    /** @var string Präfix, der dem Wert der Note vorangestellt wird (Default: leer) */
     private $messagePrefix = '';
 
-    /**
-     * @var string Sichtbarkeitseinstellung der Note (Default: public)
-     */
+    /** @var string Sichtbarkeitseinstellung der Note (Default: public) */
     private $visibility = 'public';
 
     /**
@@ -71,6 +69,7 @@ class Note extends ArrayRule
      * Erlaubt das Setzen des Präfix für den Wert der Note.
      *
      * @param string $messagePrefix Präfix
+     * @return $this
      */
     public function setMessagePrefix($messagePrefix)
     {
@@ -91,7 +90,8 @@ class Note extends ArrayRule
     /**
      * Erlaubt das Setzen der Sichtbarkeitseinstellung auf den übergebenen Wert.
      *
-     * @param $visibility Sichtbarkeitseinstellung
+     * @param string $visibility Sichtbarkeitseinstellung
+     * @return $this
      */
     public function setVisibility($visibility)
     {
@@ -109,7 +109,7 @@ class Note extends ArrayRule
     {
         return [
             'Visibility' => $this->visibility,
-            'Message' => $this->messagePrefix . $value
+            'Message'    => $this->messagePrefix . $value,
         ];
     }
 }

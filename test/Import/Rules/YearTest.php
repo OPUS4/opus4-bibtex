@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of OPUS. The software OPUS has been originally developed
  * at the University of Stuttgart with funding from the German Research Net,
@@ -34,12 +35,13 @@
 namespace OpusTest\Bibtex\Import\Rules;
 
 use Opus\Bibtex\Import\Processor;
+use PHPUnit_Framework_TestCase;
 
-class YearTest extends \PHPUnit_Framework_TestCase
+class YearTest extends PHPUnit_Framework_TestCase
 {
     public function testProcess()
     {
-        $proc = new Processor();
+        $proc     = new Processor();
         $metadata = [];
         $proc->handleRecord(['Year' => '2019'], $metadata);
 
@@ -48,7 +50,7 @@ class YearTest extends \PHPUnit_Framework_TestCase
 
     public function testYearPlus()
     {
-        $proc = new Processor();
+        $proc     = new Processor();
         $metadata = [];
         $proc->handleRecord(['Year' => '2017+'], $metadata);
 

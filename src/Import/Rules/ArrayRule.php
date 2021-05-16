@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of OPUS. The software OPUS has been originally developed
  * at the University of Stuttgart with funding from the German Research Net,
@@ -24,14 +25,20 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
+ * @copyright   Copyright (c) 2021, OPUS 4 development team
+ * @license     http://www.gnu.org/licenses/gpl.html General Public License
+ *
  * @category    BibTeX
  * @package     Opus\Bibtex\Import\Rules
  * @author      Sascha Szott <opus-repository@saschaszott.de>
- * @copyright   Copyright (c) 2021, OPUS 4 development team
- * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
 namespace Opus\Bibtex\Import\Rules;
+
+use function array_key_exists;
+use function array_push;
+use function count;
+use function is_array;
 
 /**
  * Eine Regel, die verwendet werden kann, um ein mehrwertiges Metadatenfeld (Feldwert ist hierbei ein Array) zu füllen.

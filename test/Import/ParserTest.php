@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of OPUS. The software OPUS has been originally developed
  * at the University of Stuttgart with funding from the German Research Net,
@@ -35,18 +36,29 @@ namespace OpusTest\Bibtex\Import;
 
 use Opus\Bibtex\Import\Config\BibtexService;
 use Opus\Bibtex\Import\Parser;
-use Opus\Bibtex\Import\Processor;
 use Opus\Bibtex\Import\ParserException;
+use Opus\Bibtex\Import\Processor;
 use Opus\Bibtex\Import\Rules\SourceData;
 use Opus\Bibtex\Import\Rules\SourceDataHash;
+use PHPUnit_Framework_TestCase;
 
-/**
- * Class ParserTest
- * @package OpusTest\Bibtex\Import
- *
- * TODO Tests sortieren - wo gehören sie wirklich hin?
- */
-class ParserTest extends \PHPUnit_Framework_TestCase
+use function array_diff;
+use function array_keys;
+use function array_map;
+use function file_get_contents;
+use function in_array;
+use function is_null;
+use function ksort;
+use function preg_split;
+use function strpos;
+use function strtolower;
+use function trim;
+
+use const DIRECTORY_SEPARATOR;
+use const PREG_SPLIT_DELIM_CAPTURE;
+use const PREG_SPLIT_NO_EMPTY;
+
+class ParserTest extends PHPUnit_Framework_TestCase
 {
     public function testProcessFileSpecialchars()
     {
@@ -77,7 +89,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('misc', $bibTexRecord['type']);
 
         $metadata = [];
-        $proc = new Processor();
+        $proc     = new Processor();
         $proc->handleRecord($bibTexRecord, $metadata);
         $this->assertPerson('author', 'J.', 'Müllerß', $metadata['Person'][0]);
         $this->assertPerson('editor', 'J.', 'Möllerß', $metadata['Person'][1]);
@@ -139,7 +151,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
         $result = $parser->parse();
         $this->assertCount(1, $result);
 
-        $proc = new Processor();
+        $proc     = new Processor();
         $metadata = [];
         $proc->handleRecord($result[0], $metadata);
 
@@ -281,133 +293,167 @@ class ParserTest extends \PHPUnit_Framework_TestCase
 
     public function testFile()
     {
-        $testfile = $this->getPath('testbib.bib');
-        $parser = new Parser($testfile);
+        $testfile      = $this->getPath('testbib.bib');
+        $parser        = new Parser($testfile);
         $bibTexRecords = $parser->parse();
         $this->assertCount(2, $bibTexRecords);
 
         $entries = $this->splitBibtex(file_get_contents($testfile));
-        $hashFn = SourceDataHash::HASH_FUNCTION;
+        $hashFn  = SourceDataHash::HASH_FUNCTION;
 
         $expectedDoc = [
             'BelongsToBibliography' => '0',
-            'PublishedYear' => '2006',
-            'Language' => 'eng',
-            'Type' => 'misc',
-            'TitleMain' => [[
-                'Language' => 'eng',
-                'Value' => 'My Article',
-                'Type' => 'main'
-            ]],
-            'Person' => [[
-                'FirstName' => 'Jr',
-                'LastName' => 'Nobody',
-                'Role' => 'author'
-            ], [
-                'FirstName' => 'J.',
-                'LastName' => 'Müller',
-                'Role' => 'author'
-            ]],
-            'Enrichment' => [[
-                'KeyName' => SourceData::SOURCE_DATA_KEY,
-                'Value' => $entries[0]
-            ], [
-                'KeyName' => SourceDataHash::SOURCE_DATA_HASH_KEY,
-                'Value' => $hashFn . ':' . $hashFn($entries[0])
-            ]]
+            'PublishedYear'         => '2006',
+            'Language'              => 'eng',
+            'Type'                  => 'misc',
+            'TitleMain'             => [
+                [
+                    'Language' => 'eng',
+                    'Value'    => 'My Article',
+                    'Type'     => 'main',
+                ],
+            ],
+            'Person'                => [
+                [
+                    'FirstName' => 'Jr',
+                    'LastName'  => 'Nobody',
+                    'Role'      => 'author',
+                ],
+                [
+                    'FirstName' => 'J.',
+                    'LastName'  => 'Müller',
+                    'Role'      => 'author',
+                ],
+            ],
+            'Enrichment'            => [
+                [
+                    'KeyName' => SourceData::SOURCE_DATA_KEY,
+                    'Value'   => $entries[0],
+                ],
+                [
+                    'KeyName' => SourceDataHash::SOURCE_DATA_HASH_KEY,
+                    'Value'   => $hashFn . ':' . $hashFn($entries[0]),
+                ],
+            ],
         ];
         $this->checkBibTexRecord($bibTexRecords[0], $expectedDoc);
 
         $expectedDoc = [
             'BelongsToBibliography' => '0',
-            'Language' => 'eng',
-            'TitleMain' => [[
-                'Language' => 'eng',
-                'Value' => 'Cool Stuff: With Apples',
-                'Type' => 'main'
-            ]],
-            'Type' => 'article',
-            'Enrichment' => [[
-                'KeyName' => SourceData::SOURCE_DATA_KEY,
-                'Value' => $entries[1]
-            ], [
-                'KeyName' => SourceDataHash::SOURCE_DATA_HASH_KEY,
-                'Value' => $hashFn . ':' . $hashFn($entries[1])
-            ]],
-            'Issue' => '1',
-            'PageFirst' => '1',
-            'PageLast' => '12',
-            'PageNumber' => '12',
-            'PublishedYear' => '2020',
-            'Volume' => '32',
-            'TitleParent' => [[
-                'Language' => 'eng',
-                'Value' => 'Journal of Cool Stuff',
-                'Type' => 'parent'
-            ]],
-            'Identifier' => [[
-                'Value' => 'http://papers.ssrn.com/sol3/papers.cfm?abstract_id=9999999',
-                'Type' => 'url'
-            ], [
-                'Value' => '10.2222/j.jbankfin.2222.32.001',
-                'Type' => 'doi'
-            ], [
-                'Value' => '1100-0011',
-                'Type' => 'issn'
-            ]],
-            'Note' => [[
-                'Visibility' => 'public',
-                'Message' => 'URL of the PDF: http://dx.doi.org/10.2222/j.jbankfin.2222.32.001'
-            ], [
-                'Visibility' => 'public',
-                'Message' => 'URL of the Slides: https://app.box.com/s/1231451532132slide'
-            ], [
-                'Visibility' => 'public',
-                'Message' => "Additional Note: http://www.sciencedirect.com/science/article/pii/123456789\n\tdoi:10.1234/TIT.2020.1234567\n\tarXiv:1234.1233v4"
-            ], [
-                'Visibility' => 'public',
-                'Message' => 'URL of the Abstract: http://www.Forschung.com/blog/research/2020/01/04/Ein-abstract.html'
-            ], [
-                'Visibility' => 'public',
-                'Message' => 'URL of the Code: https://colab.research.google.com/drive/123456a456'
-            ], [
-                'Visibility' => 'public',
-                'Message' => 'URL of the Poster: https://app.box.com/s/1231451532132post'
-            ]],
-            'Person' => [[
-                'FirstName' => 'S.',
-                'LastName' => 'Disterer',
-                'Role' => 'author'
-            ], [
-                'FirstName' => 'C.',
-                'LastName' => 'Nobody',
-                'Role' => 'author'
-            ], [
-                'FirstName' => 'Cool',
-                'LastName' => 'Women',
-                'Role' => 'editor'
-            ], [
-                'FirstName' => 'Cool',
-                'LastName' => 'Men',
-                'Role' => 'editor'
-            ]],
-            'Subject' => [[
-                'Language' => 'eng',
-                'Type' => 'uncontrolled',
-                'Value' => 'Cool'
-            ], [
-                'Language' => 'eng',
-                'Type' => 'uncontrolled',
-                'Value' => 'Stuff'
-            ]]
+            'Language'              => 'eng',
+            'TitleMain'             => [
+                [
+                    'Language' => 'eng',
+                    'Value'    => 'Cool Stuff: With Apples',
+                    'Type'     => 'main',
+                ],
+            ],
+            'Type'                  => 'article',
+            'Enrichment'            => [
+                [
+                    'KeyName' => SourceData::SOURCE_DATA_KEY,
+                    'Value'   => $entries[1],
+                ],
+                [
+                    'KeyName' => SourceDataHash::SOURCE_DATA_HASH_KEY,
+                    'Value'   => $hashFn . ':' . $hashFn($entries[1]),
+                ],
+            ],
+            'Issue'                 => '1',
+            'PageFirst'             => '1',
+            'PageLast'              => '12',
+            'PageNumber'            => '12',
+            'PublishedYear'         => '2020',
+            'Volume'                => '32',
+            'TitleParent'           => [
+                [
+                    'Language' => 'eng',
+                    'Value'    => 'Journal of Cool Stuff',
+                    'Type'     => 'parent',
+                ],
+            ],
+            'Identifier'            => [
+                [
+                    'Value' => 'http://papers.ssrn.com/sol3/papers.cfm?abstract_id=9999999',
+                    'Type'  => 'url',
+                ],
+                [
+                    'Value' => '10.2222/j.jbankfin.2222.32.001',
+                    'Type'  => 'doi',
+                ],
+                [
+                    'Value' => '1100-0011',
+                    'Type'  => 'issn',
+                ],
+            ],
+            'Note'                  => [
+                [
+                    'Visibility' => 'public',
+                    'Message'    => 'URL of the PDF: http://dx.doi.org/10.2222/j.jbankfin.2222.32.001',
+                ],
+                [
+                    'Visibility' => 'public',
+                    'Message'    => 'URL of the Slides: https://app.box.com/s/1231451532132slide',
+                ],
+                [
+                    'Visibility' => 'public',
+                    'Message'    => "Additional Note: http://www.sciencedirect.com/science/article/pii/123456789\n\tdoi:10.1234/TIT.2020.1234567\n\tarXiv:1234.1233v4",
+                ],
+                [
+                    'Visibility' => 'public',
+                    'Message'    => 'URL of the Abstract: http://www.Forschung.com/blog/research/2020/01/04/Ein-abstract.html',
+                ],
+                [
+                    'Visibility' => 'public',
+                    'Message'    => 'URL of the Code: https://colab.research.google.com/drive/123456a456',
+                ],
+                [
+                    'Visibility' => 'public',
+                    'Message'    => 'URL of the Poster: https://app.box.com/s/1231451532132post',
+                ],
+            ],
+            'Person'                => [
+                [
+                    'FirstName' => 'S.',
+                    'LastName'  => 'Disterer',
+                    'Role'      => 'author',
+                ],
+                [
+                    'FirstName' => 'C.',
+                    'LastName'  => 'Nobody',
+                    'Role'      => 'author',
+                ],
+                [
+                    'FirstName' => 'Cool',
+                    'LastName'  => 'Women',
+                    'Role'      => 'editor',
+                ],
+                [
+                    'FirstName' => 'Cool',
+                    'LastName'  => 'Men',
+                    'Role'      => 'editor',
+                ],
+            ],
+            'Subject'               => [
+                [
+                    'Language' => 'eng',
+                    'Type'     => 'uncontrolled',
+                    'Value'    => 'Cool',
+                ],
+                [
+                    'Language' => 'eng',
+                    'Type'     => 'uncontrolled',
+                    'Value'    => 'Stuff',
+                ],
+            ],
         ];
         $this->checkBibTexRecord($bibTexRecords[1], $expectedDoc);
     }
 
     private function checkBibTexRecord($bibTexRecord, $expectedDoc)
     {
-        $proc = new Processor();
-        $metadata = [];
+        $proc            = new Processor();
+        $metadata        = [];
         $fieldsEvaluated = $proc->handleRecord($bibTexRecord, $metadata);
         foreach (array_keys($bibTexRecord) as $fieldName) {
             $fieldName = strtolower($fieldName); // BibTex-Parser liefert Feldnamen z.T. mit beginnendem Großbuchstaben
@@ -443,10 +489,10 @@ class ParserTest extends \PHPUnit_Framework_TestCase
                 ptype = "foo"
             }';
 
-        $parser = new Parser($bibtex);
+        $parser        = new Parser($bibtex);
         $bibTexRecords = $parser->parse();
 
-        $proc = new Processor();
+        $proc     = new Processor();
         $metadata = [];
         $proc->handleRecord($bibTexRecords[0], $metadata);
 
@@ -461,10 +507,10 @@ class ParserTest extends \PHPUnit_Framework_TestCase
                 ptype = "foo"
             }';
 
-        $parser = new Parser($bibtex);
+        $parser        = new Parser($bibtex);
         $bibTexRecords = $parser->parse();
 
-        $proc = new Processor();
+        $proc     = new Processor();
         $metadata = [];
         $proc->handleRecord($bibTexRecords[0], $metadata);
 
@@ -479,10 +525,10 @@ class ParserTest extends \PHPUnit_Framework_TestCase
                 ptype = "mastersthesis"
             }';
 
-        $parser = new Parser($bibtex);
+        $parser        = new Parser($bibtex);
         $bibTexRecords = $parser->parse();
 
-        $proc = new Processor();
+        $proc     = new Processor();
         $metadata = [];
         $proc->handleRecord($bibTexRecords[0], $metadata);
 
@@ -497,10 +543,10 @@ class ParserTest extends \PHPUnit_Framework_TestCase
                 ptype = "journal"
             }';
 
-        $parser = new Parser($bibtex);
+        $parser        = new Parser($bibtex);
         $bibTexRecords = $parser->parse();
 
-        $proc = new Processor();
+        $proc     = new Processor();
         $metadata = [];
         $proc->handleRecord($bibTexRecords[0], $metadata);
 
@@ -515,10 +561,10 @@ class ParserTest extends \PHPUnit_Framework_TestCase
                 pages = "42"
             }';
 
-        $parser = new Parser($bibtex);
+        $parser        = new Parser($bibtex);
         $bibTexRecords = $parser->parse();
 
-        $proc = new Processor();
+        $proc     = new Processor();
         $metadata = [];
         $proc->handleRecord($bibTexRecords[0], $metadata);
         $this->assertEquals(42, $metadata['PageFirst']);
@@ -533,10 +579,10 @@ class ParserTest extends \PHPUnit_Framework_TestCase
                 pages = "42--43"
             }';
 
-        $parser = new Parser($bibtex);
+        $parser        = new Parser($bibtex);
         $bibTexRecords = $parser->parse();
 
-        $proc = new Processor();
+        $proc     = new Processor();
         $metadata = [];
         $proc->handleRecord($bibTexRecords[0], $metadata);
         $this->assertEquals(42, $metadata['PageFirst']);
@@ -551,16 +597,17 @@ class ParserTest extends \PHPUnit_Framework_TestCase
                 pages = "42 - 43"
             }';
 
-        $parser = new Parser($bibtex);
+        $parser        = new Parser($bibtex);
         $bibTexRecords = $parser->parse();
 
-        $proc = new Processor();
+        $proc     = new Processor();
         $metadata = [];
         $proc->handleRecord($bibTexRecords[0], $metadata);
         $this->assertEquals(42, $metadata['PageFirst']);
         $this->assertEquals(43, $metadata['PageLast']);
         $this->assertEquals(2, $metadata['PageNumber']);
     }
+
     public function testPagesHandling3()
     {
         $bibtex =
@@ -568,10 +615,10 @@ class ParserTest extends \PHPUnit_Framework_TestCase
                 pages = "42--41"
             }';
 
-        $parser = new Parser($bibtex);
+        $parser        = new Parser($bibtex);
         $bibTexRecords = $parser->parse();
 
-        $proc = new Processor();
+        $proc     = new Processor();
         $metadata = [];
         $proc->handleRecord($bibTexRecords[0], $metadata);
         $this->assertEquals(42, $metadata['PageFirst']);
@@ -586,10 +633,10 @@ class ParserTest extends \PHPUnit_Framework_TestCase
                 year = 2021
             }';
 
-        $parser = new Parser($bibtex);
+        $parser        = new Parser($bibtex);
         $bibTexRecords = $parser->parse();
 
-        $proc = new Processor();
+        $proc     = new Processor();
         $metadata = [];
         $proc->handleRecord($bibTexRecords[0], $metadata);
         $this->assertEquals(2021, $metadata['PublishedYear']);
@@ -602,10 +649,10 @@ class ParserTest extends \PHPUnit_Framework_TestCase
                 year = MMXXI
             }';
 
-        $parser = new Parser($bibtex);
+        $parser        = new Parser($bibtex);
         $bibTexRecords = $parser->parse();
 
-        $proc = new Processor();
+        $proc     = new Processor();
         $metadata = [];
         $proc->handleRecord($bibTexRecords[0], $metadata);
         $this->assertArrayNotHasKey('PublishedYear', $metadata);
@@ -618,10 +665,10 @@ class ParserTest extends \PHPUnit_Framework_TestCase
                 year = "2020/1"
             }';
 
-        $parser = new Parser($bibtex);
+        $parser        = new Parser($bibtex);
         $bibTexRecords = $parser->parse();
 
-        $proc = new Processor();
+        $proc     = new Processor();
         $metadata = [];
         $proc->handleRecord($bibTexRecords[0], $metadata);
         $this->assertArrayNotHasKey('PublishedYear', $metadata);
@@ -634,10 +681,10 @@ class ParserTest extends \PHPUnit_Framework_TestCase
                 doi = "10.1002/0470841559.ch1"
             }';
 
-        $parser = new Parser($bibtex);
+        $parser        = new Parser($bibtex);
         $bibTexRecords = $parser->parse();
 
-        $proc = new Processor();
+        $proc     = new Processor();
         $metadata = [];
         $proc->handleRecord($bibTexRecords[0], $metadata);
         $identifiers = $metadata['Identifier'];
@@ -653,10 +700,10 @@ class ParserTest extends \PHPUnit_Framework_TestCase
                 arxiv = "https://arxiv.org/abs/2006.00108"
             }';
 
-        $parser = new Parser($bibtex);
+        $parser        = new Parser($bibtex);
         $bibTexRecords = $parser->parse();
 
-        $proc = new Processor();
+        $proc     = new Processor();
         $metadata = [];
         $proc->handleRecord($bibTexRecords[0], $metadata);
         $identifiers = $metadata['Identifier'];
@@ -672,10 +719,10 @@ class ParserTest extends \PHPUnit_Framework_TestCase
                 arxiv = "http://arxiv.org/abs/2006.00108"
             }';
 
-        $parser = new Parser($bibtex);
+        $parser        = new Parser($bibtex);
         $bibTexRecords = $parser->parse();
 
-        $proc = new Processor();
+        $proc     = new Processor();
         $metadata = [];
         $proc->handleRecord($bibTexRecords[0], $metadata);
         $identifiers = $metadata['Identifier'];
@@ -691,10 +738,10 @@ class ParserTest extends \PHPUnit_Framework_TestCase
                 arxiv = "arxiv:2006.00108"
             }';
 
-        $parser = new Parser($bibtex);
+        $parser        = new Parser($bibtex);
         $bibTexRecords = $parser->parse();
 
-        $proc = new Processor();
+        $proc     = new Processor();
         $metadata = [];
         $proc->handleRecord($bibTexRecords[0], $metadata);
         $identifiers = $metadata['Identifier'];
@@ -710,10 +757,10 @@ class ParserTest extends \PHPUnit_Framework_TestCase
                 arxiv = "\url{http://example.org/2006.00108}"
             }';
 
-        $parser = new Parser($bibtex);
+        $parser        = new Parser($bibtex);
         $bibTexRecords = $parser->parse();
 
-        $proc = new Processor();
+        $proc     = new Processor();
         $metadata = [];
         $proc->handleRecord($bibTexRecords[0], $metadata);
         $identifiers = $metadata['Identifier'];
@@ -729,10 +776,10 @@ class ParserTest extends \PHPUnit_Framework_TestCase
                 arxiv = "2006.00108"
             }';
 
-        $parser = new Parser($bibtex);
+        $parser        = new Parser($bibtex);
         $bibTexRecords = $parser->parse();
 
-        $proc = new Processor();
+        $proc     = new Processor();
         $metadata = [];
         $proc->handleRecord($bibTexRecords[0], $metadata);
         $identifiers = $metadata['Identifier'];
@@ -749,10 +796,10 @@ class ParserTest extends \PHPUnit_Framework_TestCase
                 journal = "{Bar \{ Baz \}}"
             }';
 
-        $parser = new Parser($bibtex);
+        $parser        = new Parser($bibtex);
         $bibTexRecords = $parser->parse();
 
-        $proc = new Processor();
+        $proc     = new Processor();
         $metadata = [];
         $proc->handleRecord($bibTexRecords[0], $metadata);
 
@@ -772,10 +819,10 @@ class ParserTest extends \PHPUnit_Framework_TestCase
                 booktitle = {Foo{\"u} Bar}
             }';
 
-        $parser = new Parser($bibtex);
+        $parser        = new Parser($bibtex);
         $bibTexRecords = $parser->parse();
 
-        $proc = new Processor();
+        $proc     = new Processor();
         $metadata = [];
         $proc->handleRecord($bibTexRecords[0], $metadata);
 
@@ -794,10 +841,10 @@ class ParserTest extends \PHPUnit_Framework_TestCase
                 editor = "Doe, John and van Doe, Jane and Doe, Sally M. and van Doe, M. R."
             }';
 
-        $parser = new Parser($bibtex);
+        $parser        = new Parser($bibtex);
         $bibTexRecords = $parser->parse();
 
-        $proc = new Processor();
+        $proc     = new Processor();
         $metadata = [];
         $proc->handleRecord($bibTexRecords[0], $metadata);
 
@@ -824,11 +871,11 @@ class ParserTest extends \PHPUnit_Framework_TestCase
                 unused   = "unused field"
             }';
 
-        $parser = new Parser($bibtex);
+        $parser        = new Parser($bibtex);
         $bibTexRecords = $parser->parse();
 
-        $proc = new Processor();
-        $metadata = [];
+        $proc            = new Processor();
+        $metadata        = [];
         $fieldsEvaluated = $proc->handleRecord($bibTexRecords[0], $metadata);
         $this->assertCount(5, $fieldsEvaluated);
         $this->assertContains('type', $fieldsEvaluated);
@@ -854,11 +901,11 @@ class ParserTest extends \PHPUnit_Framework_TestCase
                 unusedAlt = "another unused field"
             }';
 
-        $parser = new Parser($bibtex);
+        $parser        = new Parser($bibtex);
         $bibTexRecords = $parser->parse();
 
-        $proc = new Processor();
-        $metadata = [];
+        $proc            = new Processor();
+        $metadata        = [];
         $fieldsEvaluated = $proc->handleRecord($bibTexRecords[0], $metadata);
         $this->assertCount(2, $fieldsEvaluated);
         $this->assertTrue(in_array('ptype', $fieldsEvaluated));
@@ -923,44 +970,49 @@ class ParserTest extends \PHPUnit_Framework_TestCase
      */
     public function testProcessor()
     {
-        $bibtex = "@misc{Nobody06,\n       author = \"Nobody, Jr\",\n       title = \"My Article\",\n       year = \"2006\"}";
+        $bibtex       = "@misc{Nobody06,\n       author = \"Nobody, Jr\",\n       title = \"My Article\",\n       year = \"2006\"}";
         $hashFunction = SourceDataHash::HASH_FUNCTION;
-        $bibtexHash = $hashFunction($bibtex);
+        $bibtexHash   = $hashFunction($bibtex);
 
-        $processor = new Processor();
+        $processor   = new Processor();
         $bibtexArray = [
-            'type' => 'misc',
+            'type'         => 'misc',
             'citation-key' => 'Nobody06',
-            'author' => 'Nobody, Jr',
-            'title' => 'My Article',
-            'year' => '2006',
-            '_original' => $bibtex
+            'author'       => 'Nobody, Jr',
+            'title'        => 'My Article',
+            'year'         => '2006',
+            '_original'    => $bibtex,
         ];
 
         $opus = [
             'BelongsToBibliography' => false,
-            'PublishedYear' => '2006',
-            'Language' => 'eng',
-            'Type' => 'misc',
-            'TitleMain' => [[
-                'Language' => 'eng',
-                'Value' => 'My Article',
-                'Type' => 'main'
-            ]],
-            'Person' => [[
-                'FirstName' => 'Jr',
-                'LastName' => 'Nobody',
-                'Role' => 'author'
-            ]],
-            'Enrichment' => [
+            'PublishedYear'         => '2006',
+            'Language'              => 'eng',
+            'Type'                  => 'misc',
+            'TitleMain'             => [
+                [
+                    'Language' => 'eng',
+                    'Value'    => 'My Article',
+                    'Type'     => 'main',
+                ],
+            ],
+            'Person'                => [
+                [
+                    'FirstName' => 'Jr',
+                    'LastName'  => 'Nobody',
+                    'Role'      => 'author',
+                ],
+            ],
+            'Enrichment'            => [
                 [
                     'KeyName' => SourceData::SOURCE_DATA_KEY,
-                    'Value' => $bibtex
-                ], [
+                    'Value'   => $bibtex,
+                ],
+                [
                     'KeyName' => SourceDataHash::SOURCE_DATA_HASH_KEY,
-                    'Value' => $hashFunction . ':' . $bibtexHash
-                ]
-            ]
+                    'Value'   => $hashFunction . ':' . $bibtexHash,
+                ],
+            ],
         ];
 
         $metadata = [];

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of OPUS. The software OPUS has been originally developed
  * at the University of Stuttgart with funding from the German Research Net,
@@ -33,16 +34,15 @@
 
 namespace OpusTest\Bibtex\Import\Rules\DocumentType;
 
+use Opus\Bibtex\Import\Config\BibtexMapping;
 use Opus\Bibtex\Import\Config\BibtexService;
 use Opus\Bibtex\Import\Config\DocumentTypeMapping;
-use Opus\Bibtex\Import\Config\BibtexMapping;
 use Opus\Bibtex\Import\Processor;
 use Opus\Bibtex\Import\Rules\DocumentType;
-use Opus\Bibtex\Import\Rules\Type;
+use PHPUnit_Framework_TestCase;
 
-class DocumentTypeMappingTest extends \PHPUnit_Framework_TestCase
+class DocumentTypeMappingTest extends PHPUnit_Framework_TestCase
 {
-
     public function testDefaultMapping()
     {
         $typeMapping = new DocumentTypeMapping();
@@ -52,7 +52,7 @@ class DocumentTypeMappingTest extends \PHPUnit_Framework_TestCase
         $mappingConf->addRule('type', (new DocumentType())->setDocumentTypeMapping($typeMapping));
 
         $processor = new Processor($mappingConf);
-        $metadata = [];
+        $metadata  = [];
         $processor->handleRecord(['type' => 'unknownType'], $metadata);
 
         $this->assertEquals($typeMapping->getDefaultType(), $metadata['Type']);
@@ -70,7 +70,7 @@ class DocumentTypeMappingTest extends \PHPUnit_Framework_TestCase
             ->addRule('type', (new DocumentType())->setDocumentTypeMapping($typeMapping));
 
         $processor = new Processor($mappingConf);
-        $metadata = [];
+        $metadata  = [];
         $processor->handleRecord(['type' => 'unknownType'], $metadata);
 
         $this->assertArrayNotHasKey('Type', $metadata);
@@ -90,7 +90,7 @@ class DocumentTypeMappingTest extends \PHPUnit_Framework_TestCase
             ->addRule('type', (new DocumentType())->setDocumentTypeMapping($typeMapping));
 
         $processor = new Processor($mappingConf);
-        $metadata = [];
+        $metadata  = [];
         $processor->handleRecord(['type' => 'foo'], $metadata);
 
         $this->assertEquals($typeMapping->getOpusType('foo'), $metadata['Type']);
@@ -111,7 +111,7 @@ class DocumentTypeMappingTest extends \PHPUnit_Framework_TestCase
             ->addRule('type', (new DocumentType())->setDocumentTypeMapping($typeMapping));
 
         $processor = new Processor($mappingConf);
-        $metadata = [];
+        $metadata  = [];
         $processor->handleRecord(['type' => 'foo'], $metadata);
 
         $this->assertEquals($typeMapping->getOpusType('foo'), $metadata['Type']);
@@ -132,7 +132,7 @@ class DocumentTypeMappingTest extends \PHPUnit_Framework_TestCase
             ->addRule('type', (new DocumentType())->setDocumentTypeMapping($typeMapping));
 
         $processor = new Processor($mappingConf);
-        $metadata = [];
+        $metadata  = [];
         $processor->handleRecord(['type' => 'foo'], $metadata);
 
         $this->assertEquals($typeMapping->getOpusType('foo'), $metadata['Type']);
@@ -153,7 +153,7 @@ class DocumentTypeMappingTest extends \PHPUnit_Framework_TestCase
             ->addRule('type', (new DocumentType())->setDocumentTypeMapping($typeMapping));
 
         $processor = new Processor($mappingConf);
-        $metadata = [];
+        $metadata  = [];
         $processor->handleRecord(['type' => 'foo'], $metadata);
 
         $this->assertEquals($typeMapping->getOpusType('foo'), $metadata['Type']);
@@ -175,7 +175,7 @@ class DocumentTypeMappingTest extends \PHPUnit_Framework_TestCase
             ->addRule('type', (new DocumentType())->setDocumentTypeMapping($typeMapping));
 
         $processor = new Processor($mappingConf);
-        $metadata = [];
+        $metadata  = [];
         $processor->handleRecord(['type' => 'foo'], $metadata);
 
         $this->assertEquals($typeMapping->getOpusType('foo'), $metadata['Type']);

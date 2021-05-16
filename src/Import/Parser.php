@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of OPUS. The software OPUS has been originally developed
  * at the University of Stuttgart with funding from the German Research Net,
@@ -24,19 +25,25 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
+ * @copyright   Copyright (c) 2021, OPUS 4 development team
+ * @license     http://www.gnu.org/licenses/gpl.html General Public License
+ *
  * @category    BibTeX
  * @package     Opus\Bibtex\Import
  * @author      Sascha Szott <opus-repository@saschaszott.de>
- * @copyright   Copyright (c) 2021, OPUS 4 development team
- * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
 namespace Opus\Bibtex\Import;
 
+use ErrorException;
 use RenanBr\BibTexParser\Exception\ParserException;
 use RenanBr\BibTexParser\Exception\ProcessorException;
 use RenanBr\BibTexParser\Listener;
 use RenanBr\BibTexParser\Processor\LatexToUnicodeProcessor;
+
+use function array_keys;
+use function is_file;
+use function substr;
 
 /**
  * Liest eine übergebene BibTeX-Datei bzw. eine Zeichenkette, die ein oder mehrere BibTeX-Records enthält ein und
@@ -47,13 +54,12 @@ use RenanBr\BibTexParser\Processor\LatexToUnicodeProcessor;
  */
 class Parser
 {
-    /**
-     * @var string Name einer BibTeX-Datei oder Zeichenkette, die BibTeX-Record(s) enthält
-     */
+    /** @var string Name einer BibTeX-Datei oder Zeichenkette, die BibTeX-Record(s) enthält */
     private $bibtex;
 
     /**
      * Konstruktor
+     *
      * @param string $bibtex Name (optional mit Pfadangabe) einer BibTeX-Datei oder alternativ eine Zeichenkette, die
      *                       aus einem oder mehreren BibTeX-Records besteht
      */
@@ -67,9 +73,9 @@ class Parser
      * von BibTeX-Feldnamen auf die zugehörigen Werte zurück.
      *
      * @return array
-     * @throws \Opus\Bibtex\Import\ParserException wird geworfen, wenn beim Parsing Fehler aufgetreten sind, z.B. weil
+     * @throws \Opus\Bibtex\Import\ParserException Wird geworfen, wenn beim Parsing Fehler aufgetreten sind, z.B. weil
      *                                             die BibTeX-Datei nicht lesbar ist oder im BibTeX-Record Formatfehler
-     *                                             existieren
+     *                                             existieren.
      */
     public function parse()
     {
@@ -89,7 +95,7 @@ class Parser
         } catch (ParserException $e) {
             // Fehler beim Parsen des BibTeX
             throw new \Opus\Bibtex\Import\ParserException();
-        } catch (\ErrorException $e) {
+        } catch (ErrorException $e) {
             // Fehler beim Einlesen der übergebenen Datei
             throw new \Opus\Bibtex\Import\ParserException();
         }

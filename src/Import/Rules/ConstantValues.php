@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of OPUS. The software OPUS has been originally developed
  * at the University of Stuttgart with funding from the German Research Net,
@@ -24,14 +25,19 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
+ * @copyright   Copyright (c) 2021, OPUS 4 development team
+ * @license     http://www.gnu.org/licenses/gpl.html General Public License
+ *
  * @category    BibTeX
  * @package     Opus\Bibtex\Import\Rules
  * @author      Sascha Szott <opus-repository@saschaszott.de>
- * @copyright   Copyright (c) 2021, OPUS 4 development team
- * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
 namespace Opus\Bibtex\Import\Rules;
+
+use function class_exists;
+use function method_exists;
+use function ucfirst;
 
 /**
  * Eine Regel, um mehrere OPUS-Metadatenfelder mit Konstanten zu befüllen. Hierbei wird der Inhalt des zu verarbeitenden
@@ -50,6 +56,7 @@ class ConstantValues implements IRule
      * Erlaubt das Setzen der zu setzenden OPUS-Felder sowie der dabei zu verwendenden Werte (Konstanten).
      *
      * @param array $options
+     * @return $this
      */
     public function setOptions($options)
     {
@@ -69,13 +76,13 @@ class ConstantValues implements IRule
         $result = false;
 
         // der BibTeX-Record wird zur Bestimmung des Metadatenfelds nicht verwendet
-        if (! is_null($this->options)) {
+        if ($this->options !== null) {
             foreach ($this->options as $propName => $propValue) {
-                $propName = ucfirst($propName);
+                $propName  = ucfirst($propName);
                 $className = 'Opus\Bibtex\Import\Rules\\' . $propName;
-                if (class_exists($className) and method_exists($className, 'setValue')) {
+                if (class_exists($className) && method_exists($className, 'setValue')) {
                     // zu setzender Wert wird durch Ausführung der Regelklasse bestimmt
-                    $class = new $className;
+                    $class = new $className();
                     $class->setValue($propValue);
                     $class->apply($bibtexRecord, $documentMetadata);
                 } else {

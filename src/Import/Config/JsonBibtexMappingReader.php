@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of OPUS. The software OPUS has been originally developed
  * at the University of Stuttgart with funding from the German Research Net,
@@ -24,14 +25,22 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
+ * @copyright   Copyright (c) 2021, OPUS 4 development team
+ * @license     http://www.gnu.org/licenses/gpl.html General Public License
+ *
  * @category    BibTeX
  * @package     Opus\Bibtex\Import\Config
  * @author      Sascha Szott <opus-repository@saschaszott.de>
- * @copyright   Copyright (c) 2021, OPUS 4 development team
- * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
 namespace Opus\Bibtex\Import\Config;
+
+use Exception;
+
+use function array_key_exists;
+use function file_get_contents;
+use function is_readable;
+use function json_decode;
 
 /**
  * Erlaubt das Auslesen einer JSON-Konfigurationsdatei, in der das Mapping der BibTeX-Felder auf die
@@ -40,30 +49,32 @@ namespace Opus\Bibtex\Import\Config;
 class JsonBibtexMappingReader
 {
     /**
-     * @param $fileName Name der Mapping-Konfigurationsdatei (JSON)
+     * @param string $fileName Name der Mapping-Konfigurationsdatei (JSON)
      * @return BibtexMapping Instanz des BibTeX-Mappings auf Basis der Angaben in der übergebenen Konfigurationsdatei
-     * @throws \Exception wird geworfen, wenn das konfigurierte Mapping nicht erfolgreich ausgewertet werden konnte
+     * @throws Exception Wird geworfen, wenn das konfigurierte Mapping nicht erfolgreich ausgewertet werden konnte.
      */
     public function getMappingConfigurationFromFile($fileName)
     {
         if (! is_readable($fileName)) {
-            throw new \Exception("could not read file $fileName");
+            throw new Exception("could not read file $fileName");
         }
 
         $json = file_get_contents($fileName);
         if ($json === false) {
-            throw new \Exception("could not get content of file $fileName");
+            throw new Exception("could not get content of file $fileName");
         }
 
         $jsonArr = json_decode($json, true);
-        if (is_null($jsonArr)) {
-            throw new \Exception("could not decode JSON file $fileName");
+        if ($jsonArr === null) {
+            throw new Exception("could not decode JSON file $fileName");
         }
 
-        if (! (array_key_exists('name', $jsonArr) &&
+        if (
+            ! (array_key_exists('name', $jsonArr) &&
             array_key_exists('description', $jsonArr) &&
-            array_key_exists('mapping', $jsonArr))) {
-            throw new \Exception("missing key(s) in JSON file $fileName");
+            array_key_exists('mapping', $jsonArr))
+        ) {
+            throw new Exception("missing key(s) in JSON file $fileName");
         }
 
         return (new BibtexMapping())

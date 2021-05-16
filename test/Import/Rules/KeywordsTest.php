@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of OPUS. The software OPUS has been originally developed
  * at the University of Stuttgart with funding from the German Research Net,
@@ -34,19 +35,20 @@
 namespace OpusTest\Bibtex\Import\Rules;
 
 use Opus\Bibtex\Import\Processor;
+use PHPUnit_Framework_TestCase;
 
-class KeywordsTest extends \PHPUnit_Framework_TestCase
+class KeywordsTest extends PHPUnit_Framework_TestCase
 {
     public function testProcess()
     {
-        $proc = new Processor();
+        $proc     = new Processor();
         $metadata = [];
         $proc->handleRecord(['Keywords' => 'test, check'], $metadata);
 
         $this->assertEquals(
             [
                 ['Language' => 'eng', 'Type' => 'uncontrolled', 'Value' => 'test'],
-                ['Language' => 'eng', 'Type' => 'uncontrolled', 'Value' => 'check']
+                ['Language' => 'eng', 'Type' => 'uncontrolled', 'Value' => 'check'],
             ],
             $metadata['Subject']
         );

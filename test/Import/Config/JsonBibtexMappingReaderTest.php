@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of OPUS. The software OPUS has been originally developed
  * at the University of Stuttgart with funding from the German Research Net,
@@ -36,32 +37,19 @@ namespace OpusTest\Bibtex\Import\Config;
 use Opus\Bibtex\Import\Config\BibtexMapping;
 use Opus\Bibtex\Import\Config\BibtexService;
 use Opus\Bibtex\Import\Config\JsonBibtexMappingReader;
-use Opus\Bibtex\Import\Rules\Arxiv;
 use Opus\Bibtex\Import\Rules\BelongsToBibliography;
 use Opus\Bibtex\Import\Rules\ConstantValue;
 use Opus\Bibtex\Import\Rules\ConstantValues;
-use Opus\Bibtex\Import\Rules\Doi;
-use Opus\Bibtex\Import\Rules\Isbn;
-use Opus\Bibtex\Import\Rules\Issn;
+use Opus\Bibtex\Import\Rules\DocumentType;
 use Opus\Bibtex\Import\Rules\Language;
 use Opus\Bibtex\Import\Rules\Note;
-use Opus\Bibtex\Import\Rules\PageFirst;
-use Opus\Bibtex\Import\Rules\PageLast;
-use Opus\Bibtex\Import\Rules\PageNumber;
 use Opus\Bibtex\Import\Rules\Pages;
 use Opus\Bibtex\Import\Rules\Person;
-use Opus\Bibtex\Import\Rules\DocumentType;
-use Opus\Bibtex\Import\Rules\PublishedYear;
 use Opus\Bibtex\Import\Rules\SimpleRule;
-use Opus\Bibtex\Import\Rules\SourceData;
-use Opus\Bibtex\Import\Rules\SourceDataHash;
-use Opus\Bibtex\Import\Rules\Subject;
-use Opus\Bibtex\Import\Rules\TitleMain;
 use Opus\Bibtex\Import\Rules\TitleParent;
-use Opus\Bibtex\Import\Rules\Type;
-use Opus\Bibtex\Import\Rules\Umlauts;
+use PHPUnit_Framework_TestCase;
 
-class JsonBibtexMappingReaderTest extends \PHPUnit_Framework_TestCase
+class JsonBibtexMappingReaderTest extends PHPUnit_Framework_TestCase
 {
     public function testGetFieldMappingConfiguration()
     {
@@ -224,7 +212,7 @@ class JsonBibtexMappingReaderTest extends \PHPUnit_Framework_TestCase
     public function testGetMappingConfigurationFromJsonFile()
     {
         $jsonBibtexMappingReader = new JsonBibtexMappingReader();
-        $bibtexMapping = $jsonBibtexMappingReader->getMappingConfigurationFromFile(__DIR__ . '/../_files/mapping.json');
+        $bibtexMapping           = $jsonBibtexMappingReader->getMappingConfigurationFromFile(__DIR__ . '/../_files/mapping.json');
 
         $this->assertEquals('test', $bibtexMapping->getName());
         $this->assertEquals('Test BibTeX Mapping Configuration.', $bibtexMapping->getDescription());

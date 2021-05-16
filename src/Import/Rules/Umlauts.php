@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of OPUS. The software OPUS has been originally developed
  * at the University of Stuttgart with funding from the German Research Net,
@@ -24,14 +25,19 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
+ * @copyright   Copyright (c) 2021, OPUS 4 development team
+ * @license     http://www.gnu.org/licenses/gpl.html General Public License
+ *
  * @category    BibTeX
  * @package     Opus\Bibtex\Import\Rules
  * @author      Sascha Szott <opus-repository@saschaszott.de>
- * @copyright   Copyright (c) 2021, OPUS 4 development team
- * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
 namespace Opus\Bibtex\Import\Rules;
+
+use function is_array;
+use function preg_match;
+use function str_replace;
 
 /**
  * Behandlung von Umlauten, die im BibTeX-File nicht korrekt angegeben wurden (siehe OPUSVIER-4216).
@@ -69,9 +75,11 @@ class Umlauts extends ComplexRule
         foreach ($documentMetadata as $fieldName => $fieldValue) {
             if (is_array($fieldValue)) {
                 foreach ($fieldValue as $subFieldIndex => $subFieldValue) {
-                    if ($fieldName === 'Enrichment' &&
+                    if (
+                        $fieldName === 'Enrichment' &&
                         ($subFieldValue['KeyName'] === SourceDataHash::SOURCE_DATA_HASH_KEY ||
-                            $subFieldValue['KeyName'] === SourceData::SOURCE_DATA_KEY)) {
+                            $subFieldValue['KeyName'] === SourceData::SOURCE_DATA_KEY)
+                    ) {
                         continue; // der Original-BibTeX-Record soll nicht verändert werden
                     }
                     foreach ($subFieldValue as $name => $value) {

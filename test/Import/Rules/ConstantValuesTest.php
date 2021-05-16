@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of OPUS. The software OPUS has been originally developed
  * at the University of Stuttgart with funding from the German Research Net,
@@ -34,17 +35,17 @@
 namespace OpusTest\Bibtex\Import\Rules;
 
 use Opus\Bibtex\Import\Rules\ConstantValues;
+use PHPUnit_Framework_TestCase;
 
-class ConstantValuesTest extends \PHPUnit_Framework_TestCase
+class ConstantValuesTest extends PHPUnit_Framework_TestCase
 {
-
     public function testProcess()
     {
         $constantValuesRule = new ConstantValues();
         $constantValuesRule->setOptions(
             [
-                'language' => 'deu',
-                'belongsToBibliography' => 1
+                'language'              => 'deu',
+                'belongsToBibliography' => 1,
             ]
         );
 
@@ -60,7 +61,7 @@ class ConstantValuesTest extends \PHPUnit_Framework_TestCase
     {
         $constantValuesRule = new ConstantValues();
         $constantValuesRule->setOptions([
-            'key' => 'value'
+            'key' => 'value',
         ]);
 
         $metadata = [];

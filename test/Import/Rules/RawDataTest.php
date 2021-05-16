@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of OPUS. The software OPUS has been originally developed
  * at the University of Stuttgart with funding from the German Research Net,
@@ -36,22 +37,22 @@ namespace OpusTest\Bibtex\Import\Rules;
 use Opus\Bibtex\Import\Processor;
 use Opus\Bibtex\Import\Rules\SourceData;
 use Opus\Bibtex\Import\Rules\SourceDataHash;
+use PHPUnit_Framework_TestCase;
 
-class RawDataTest extends \PHPUnit_Framework_TestCase
+class RawDataTest extends PHPUnit_Framework_TestCase
 {
-
     public function testProcess()
     {
-        $proc = new Processor();
+        $proc     = new Processor();
         $metadata = [];
         $proc->handleRecord(['_original' => '@article{...}'], $metadata);
 
         $hashFunction = SourceDataHash::HASH_FUNCTION;
-        $hashValue = $hashFunction('@article{...}');
+        $hashValue    = $hashFunction('@article{...}');
         $this->assertEquals(
             [
                 ['KeyName' => SourceData::SOURCE_DATA_KEY, 'Value' => '@article{...}'],
-                ['KeyName' => SourceDataHash::SOURCE_DATA_HASH_KEY, 'Value' => $hashFunction . ':' . $hashValue]
+                ['KeyName' => SourceDataHash::SOURCE_DATA_HASH_KEY, 'Value' => $hashFunction . ':' . $hashValue],
             ],
             $metadata['Enrichment']
         );

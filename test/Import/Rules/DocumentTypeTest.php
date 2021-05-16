@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of OPUS. The software OPUS has been originally developed
  * at the University of Stuttgart with funding from the German Research Net,
@@ -36,16 +37,18 @@ namespace OpusTest\Bibtex\Import\Rules;
 use Opus\Bibtex\Import\Config\DocumentTypeMapping;
 use Opus\Bibtex\Import\Processor;
 use Opus\Bibtex\Import\Rules\DocumentType;
+use PHPUnit_Framework_TestCase;
 
-class DocumentTypeTest extends \PHPUnit_Framework_TestCase
+use function count;
+
+class DocumentTypeTest extends PHPUnit_Framework_TestCase
 {
-
     public function dataProvider()
     {
         return [
             [['ptype' => 'conference'], 'conferenceobject'],
             [['ptype' => 'journal'], 'article'],
-            [['type' => 'article'], 'article']
+            [['type' => 'article'], 'article'],
         ];
     }
 
@@ -55,12 +58,11 @@ class DocumentTypeTest extends \PHPUnit_Framework_TestCase
      * @param mixed $arg Value to check given by the data provider
      * @param $res expected mapping-result
      * @return void
-     *
      * @dataProvider dataProvider
      */
     public function testProcessMapping($arg, $res)
     {
-        $proc = new Processor();
+        $proc     = new Processor();
         $metadata = [];
         $proc->handleRecord($arg, $metadata);
         $this->assertEquals($res, $metadata['Type']);
@@ -70,10 +72,10 @@ class DocumentTypeTest extends \PHPUnit_Framework_TestCase
     {
         $bibtexBlock = [
             'ptype' => 'conference',
-            'type' => 'article'
+            'type'  => 'article',
         ];
 
-        $proc = new Processor();
+        $proc     = new Processor();
         $metadata = [];
         $proc->handleRecord($bibtexBlock, $metadata);
         $this->assertEquals('conferenceobject', $metadata['Type']);
@@ -90,7 +92,7 @@ class DocumentTypeTest extends \PHPUnit_Framework_TestCase
         $docType->setDocumentTypeMapping($typeMapping);
 
         $bibtexBlock = [
-            'type' => 'article'
+            'type' => 'article',
         ];
         $this->assertTypeField($docType, $bibtexBlock, $typeMapping->getDefaultType());
     }
@@ -107,7 +109,7 @@ class DocumentTypeTest extends \PHPUnit_Framework_TestCase
 
         $bibtexBlock = [
             'customType' => 'conference',
-            'type' => 'article'
+            'type'       => 'article',
         ];
         $this->assertTypeField($docType, $bibtexBlock, $typeMapping->getDefaultType());
     }
@@ -124,7 +126,7 @@ class DocumentTypeTest extends \PHPUnit_Framework_TestCase
 
         $bibtexBlock = [
             'customType' => 'bibtexType',
-            'type' => 'article'
+            'type'       => 'article',
         ];
         $this->assertTypeField($docType, $bibtexBlock, $typeMapping->getOpusType('bibtexType'));
     }
@@ -140,7 +142,7 @@ class DocumentTypeTest extends \PHPUnit_Framework_TestCase
         $docType->setDocumentTypeMapping($typeMapping);
 
         $bibtexBlock = [
-            'type' => 'bibtexType'
+            'type' => 'bibtexType',
         ];
         $this->assertTypeField($docType, $bibtexBlock, $typeMapping->getOpusType('bibtexType'));
     }
