@@ -9,11 +9,12 @@
   ],
   "homepage": "https://www.opus-repository.org",
   "require": {
+    "php" : ">=7.0",
     "renanbr/bibtex-parser": "^2",
     "ryakad/pandoc-php": "~1.0"
   },
   "require-dev": {
-    "phpunit/phpunit": "^4.8",
+    "phpunit/phpunit": "*",
     "laminas/laminas-coding-standard": "*",
     "phpmetrics/phpmetrics": "2.7.4"
   },

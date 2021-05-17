@@ -36,11 +36,11 @@
 namespace OpusTest\Bibtex\Import\Rules;
 
 use Opus\Bibtex\Import\Processor;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
 use function ksort;
 
-class NoteTest extends PHPUnit_Framework_TestCase
+class NoteTest extends TestCase
 {
     public function testProcess()
     {

@@ -36,9 +36,9 @@
 namespace OpusTest\Bibtex\Import\Rules;
 
 use Opus\Bibtex\Import\Rules\Language;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class LanguageTest extends PHPUnit_Framework_TestCase
+class LanguageTest extends TestCase
 {
     public function testProcess()
     {

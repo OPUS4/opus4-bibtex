@@ -40,12 +40,12 @@ use Opus\Bibtex\Import\Processor;
 use Opus\Bibtex\Import\Rules\ConstantValue;
 use Opus\Bibtex\Import\Rules\Language;
 use Opus\Bibtex\Import\Rules\SimpleRule;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
 use function array_keys;
 use function count;
 
-class BibtexMappingTest extends PHPUnit_Framework_TestCase
+class BibtexMappingTest extends TestCase
 {
     public function testUpdateRule()
     {

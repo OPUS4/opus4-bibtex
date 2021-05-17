@@ -36,9 +36,9 @@
 namespace OpusTest\Bibtex\Import\Rules;
 
 use Opus\Bibtex\Import\Rules\ConstantValues;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class ConstantValuesTest extends PHPUnit_Framework_TestCase
+class ConstantValuesTest extends TestCase
 {
     public function testProcess()
     {

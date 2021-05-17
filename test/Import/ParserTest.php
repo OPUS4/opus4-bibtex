@@ -41,7 +41,7 @@ use Opus\Bibtex\Import\ParserException;
 use Opus\Bibtex\Import\Processor;
 use Opus\Bibtex\Import\Rules\SourceData;
 use Opus\Bibtex\Import\Rules\SourceDataHash;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
 use function array_diff;
 use function array_keys;
@@ -58,7 +58,7 @@ use const DIRECTORY_SEPARATOR;
 use const PREG_SPLIT_DELIM_CAPTURE;
 use const PREG_SPLIT_NO_EMPTY;
 
-class ParserTest extends PHPUnit_Framework_TestCase
+class ParserTest extends TestCase
 {
     public function testProcessFileSpecialchars()
     {
@@ -101,7 +101,7 @@ class ParserTest extends PHPUnit_Framework_TestCase
         $testfile = $this->getPath('invalid.bib');
 
         $parser = new Parser($testfile);
-        $this->setExpectedException(ParserException::class);
+        $this->expectException(ParserException::class);
         $parser->parse();
     }
 
@@ -110,7 +110,7 @@ class ParserTest extends PHPUnit_Framework_TestCase
         $testfile = $this->getPath('invalid-url.bib');
 
         $parser = new Parser($testfile);
-        $this->setExpectedException(ParserException::class);
+        $this->expectException(ParserException::class);
         $parser->parse();
     }
 
@@ -292,7 +292,7 @@ class ParserTest extends PHPUnit_Framework_TestCase
                 year     = 1963";
 
         $parser = new Parser($bibtex);
-        $this->setExpectedException(ParserException::class);
+        $this->expectException(ParserException::class);
         $parser->parse();
     }
 

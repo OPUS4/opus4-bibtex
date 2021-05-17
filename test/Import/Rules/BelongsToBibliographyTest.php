@@ -36,9 +36,9 @@
 namespace OpusTest\Bibtex\Import\Rules;
 
 use Opus\Bibtex\Import\Rules\BelongsToBibliography;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class BelongsToBibliographyTest extends PHPUnit_Framework_TestCase
+class BelongsToBibliographyTest extends TestCase
 {
     public function dataProvider(): array
     {

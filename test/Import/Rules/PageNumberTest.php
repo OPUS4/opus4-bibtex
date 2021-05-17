@@ -36,9 +36,9 @@
 namespace OpusTest\Bibtex\Import\Rules;
 
 use Opus\Bibtex\Import\Processor;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class PageNumberTest extends PHPUnit_Framework_TestCase
+class PageNumberTest extends TestCase
 {
     public function testProcess()
     {
