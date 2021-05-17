@@ -44,6 +44,6 @@
     "cs-check": "phpcs -n",
     "cs-report": "phpcs -n --report=checkstyle --report-file=build/checkstyle.xml",
     "cs-fix": "phpcbf",
-    "metrics": "phpmetrics --report-html=build/metrics ."
+    "metrics": "phpmetrics --report-html=build/metrics --junit=build/phpunit.xml ."
   }
 }
