@@ -25,11 +25,12 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
+ * @copyright   Copyright (c) 2021, OPUS 4 development team
+ * @license     http://www.gnu.org/licenses/gpl.html General Public License
+ *
  * @category    Tests
  * @package     OpusTest\Bibtex\Import
  * @author      Sascha Szott <opus-repository@saschaszott.de>
- * @copyright   Copyright (c) 2021, OPUS 4 development team
- * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
 namespace OpusTest\Bibtex\Import;
@@ -47,7 +48,6 @@ use function array_keys;
 use function array_map;
 use function file_get_contents;
 use function in_array;
-use function is_null;
 use function ksort;
 use function preg_split;
 use function strpos;
@@ -222,23 +222,39 @@ class ParserTest extends PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @param string $keyName Expected key
+     * @param string $value Expected value
+     * @param array $enrichment Parsed BibTeX data
+     */
     private function assertEnrichment($keyName, $value, $enrichment)
     {
         $this->assertEquals($keyName, $enrichment['KeyName']);
         $this->assertEquals($value, $enrichment['Value']);
     }
 
+    /**
+     * @param string $role Expected role of person, like "author"
+     * @param string $firstName Expected first name
+     * @param string $lastName Expected last name
+     * @param array $person Parsed BibTeX data
+     */
     private function assertPerson($role, $firstName, $lastName, $person)
     {
         $this->assertEquals($role, $person['Role']);
         $this->assertEquals($lastName, $person['LastName']);
-        if (is_null($firstName)) {
+        if ($firstName === null) {
             $this->assertArrayNotHasKey('FirstName', $person);
         } else {
             $this->assertEquals($firstName, $person['FirstName']);
         }
     }
 
+    /**
+     * @param string $titleType Expected type of title
+     * @param string $titleValue Expected value of title
+     * @param array $title Parsed BibTeX data
+     */
     private function assertTitle($titleType, $titleValue, $title)
     {
         $this->assertEquals($titleType, $title['Type']);
@@ -246,6 +262,10 @@ class ParserTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('eng', $title['Language']);
     }
 
+    /**
+     * @param string $value Expected value
+     * @param array $subject Parsed BibTeX data
+     */
     private function assertSubject($value, $subject)
     {
         $this->assertEquals('uncontrolled', $subject['Type']);
@@ -253,6 +273,10 @@ class ParserTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($value, $subject['Value']);
     }
 
+    /**
+     * @param string $message Expected message
+     * @param array $note Parsed BibTeX data
+     */
     private function assertNote($message, $note)
     {
         $this->assertEquals('public', $note['Visibility']);
@@ -450,6 +474,10 @@ class ParserTest extends PHPUnit_Framework_TestCase
         $this->checkBibTexRecord($bibTexRecords[1], $expectedDoc);
     }
 
+    /**
+     * @param array $bibTexRecord BibTeX fields
+     * @param array $expectedDoc OPUS fields
+     */
     private function checkBibTexRecord($bibTexRecord, $expectedDoc)
     {
         $proc            = new Processor();
@@ -471,6 +499,10 @@ class ParserTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(ksort($expectedDoc), ksort($metadata));
     }
 
+    /**
+     * @param string $bibtex BibTeX record
+     * @return string[]
+     */
     private function splitBibtex($bibtex)
     {
         $entries = preg_split('/^@/m', $bibtex, null, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
@@ -1020,6 +1052,10 @@ class ParserTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($opus, $metadata);
     }
 
+    /**
+     * @param string $fileName Name of file
+     * @return string Path to file
+     */
     private function getPath($fileName)
     {
         return __DIR__ . DIRECTORY_SEPARATOR . '_files' . DIRECTORY_SEPARATOR . $fileName;

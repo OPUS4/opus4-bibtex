@@ -25,11 +25,12 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
+ * @copyright   Copyright (c) 2021, OPUS 4 development team
+ * @license     http://www.gnu.org/licenses/gpl.html General Public License
+ *
  * @category    Tests
  * @package     OpusTest\Bibtex\Import\Rules
  * @author      Sascha Szott <opus-repository@saschaszott.de>
- * @copyright   Copyright (c) 2021, OPUS 4 development team
- * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
 namespace OpusTest\Bibtex\Import\Rules;
@@ -39,7 +40,7 @@ use PHPUnit_Framework_TestCase;
 
 class TitleTest extends PHPUnit_Framework_TestCase
 {
-    public function dataProvider()
+    public function dataProvider(): array
     {
         return [
             [['title' => 'My Article'], 'My Article'],
@@ -51,8 +52,7 @@ class TitleTest extends PHPUnit_Framework_TestCase
      * Test title-rule.
      *
      * @param mixed $arg Value to check given by the data provider
-     * @param $res expected mapping-result
-     * @return void
+     * @param string $res expected mapping-result
      * @dataProvider dataProvider
      */
     public function testProcess($arg, $res)
