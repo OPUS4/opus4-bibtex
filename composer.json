@@ -14,7 +14,7 @@
     "ryakad/pandoc-php": "~1.0"
   },
   "require-dev": {
-    "phpunit/phpunit": "*",
+    "phpunit/phpunit": "9.*",
     "laminas/laminas-coding-standard": "*",
     "phpmetrics/phpmetrics": "2.7.4"
   },

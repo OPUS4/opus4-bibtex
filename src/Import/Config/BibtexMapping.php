@@ -224,6 +224,8 @@ class BibtexMapping
      *
      * @param array $rules
      * @return $this
+     *
+     * TODO remove dependency on ConstantValues - move responsiblity for processing options into class
      */
     public function setRules($rules)
     {
