@@ -40,9 +40,9 @@ use Opus\Bibtex\Import\Config\BibtexService;
 use Opus\Bibtex\Import\Config\DocumentTypeMapping;
 use Opus\Bibtex\Import\Processor;
 use Opus\Bibtex\Import\Rules\DocumentType;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class DocumentTypeMappingTest extends PHPUnit_Framework_TestCase
+class DocumentTypeMappingTest extends TestCase
 {
     public function testDefaultMapping()
     {

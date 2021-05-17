@@ -38,11 +38,11 @@ namespace OpusTest\Bibtex\Import\Rules;
 use Opus\Bibtex\Import\Config\DocumentTypeMapping;
 use Opus\Bibtex\Import\Processor;
 use Opus\Bibtex\Import\Rules\DocumentType;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
 use function count;
 
-class DocumentTypeTest extends PHPUnit_Framework_TestCase
+class DocumentTypeTest extends TestCase
 {
     public function dataProvider(): array
     {

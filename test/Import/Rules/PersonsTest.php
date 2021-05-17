@@ -37,9 +37,9 @@ namespace OpusTest\Bibtex\Import\Rules;
 
 use Opus\Bibtex\Import\Parser;
 use Opus\Bibtex\Import\Processor;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class PersonsTest extends PHPUnit_Framework_TestCase
+class PersonsTest extends TestCase
 {
     public function testProcessAuthors()
     {

@@ -38,9 +38,9 @@ namespace OpusTest\Bibtex\Import\Rules;
 use Opus\Bibtex\Import\Processor;
 use Opus\Bibtex\Import\Rules\SourceData;
 use Opus\Bibtex\Import\Rules\SourceDataHash;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class RawDataTest extends PHPUnit_Framework_TestCase
+class RawDataTest extends TestCase
 {
     public function testProcess()
     {
