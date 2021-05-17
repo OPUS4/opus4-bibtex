@@ -16,5 +16,8 @@ jobs:
       - name: Install Composer and Dependencies
         run: curl -s http://getcomposer.org/installer | php && php composer.phar self-update && php composer.phar install
 
-      - name: Full Analysis with Coverage
-        run: php composer.phar check
+      - name: Tests
+        run: php composer.phar test
+
+      - name: Coding Style
+        run: php composer.phar cs-check
