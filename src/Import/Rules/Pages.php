@@ -80,6 +80,10 @@ class Pages extends ComplexRule
         return false;
     }
 
+    /**
+     * @param string $value BibTeX value
+     * @return string First page value
+     */
     private function getPageFirst($value)
     {
         $value = str_replace(['--', '––', '–'], '-', $value);
@@ -87,6 +91,10 @@ class Pages extends ComplexRule
         return trim($parts[0]);
     }
 
+    /**
+     * @param string $value BibTeX value
+     * @return string Last page value
+     */
     private function getPageLast($value)
     {
         $value = str_replace(['--', '––', '–'], '-', $value);
@@ -97,6 +105,10 @@ class Pages extends ComplexRule
         return trim($parts[0]);
     }
 
+    /**
+     * @param array $documentMetadata OPUS data
+     * @return int|null Number of pages
+     */
     private function getPageNumber($documentMetadata)
     {
         $pageFirst =
