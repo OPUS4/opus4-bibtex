@@ -43,7 +43,7 @@ use function ucfirst;
  * Eine Regel, um mehrere OPUS-Metadatenfelder mit Konstanten zu befüllen. Hierbei wird der Inhalt des zu verarbeitenden
  * BibTeX-Record nicht ausgewertet.
  */
-class ConstantValues implements IRule
+class ConstantValues implements RuleInterface
 {
     /**
      * beschreibt die zu setzenden OPUS-Felder und die dabei zu nutzenden Konstanten

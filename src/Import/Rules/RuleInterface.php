@@ -35,7 +35,7 @@
 
 namespace Opus\Bibtex\Import\Rules;
 
-interface IRule
+interface RuleInterface
 {
     /**
      * @param array $bibtexRecord BibTeX-Record (als Array von BibTeX-Feldern), der importiert werden soll
