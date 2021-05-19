@@ -35,7 +35,7 @@
 
 namespace Opus\Bibtex\Import\Config;
 
-use Opus\Exception;
+use Exception;
 
 class BibtexConfigException extends Exception
 {
