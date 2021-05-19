@@ -43,7 +43,7 @@ use function is_array;
 /**
  * Eine Regel, die verwendet werden kann, um ein mehrwertiges Metadatenfeld (Feldwert ist hierbei ein Array) zu füllen.
  */
-abstract class ArrayRule extends SimpleRule
+abstract class AbstractArrayRule extends SimpleRule
 {
     /**
      * Anwendung der Regel auf den übergebenen BibTeX-Record.

@@ -43,7 +43,7 @@ use function trim;
  * Verarbeitung von Identifiern vom Typ DOI. Hierbei wird eine ggf. vorhandene Resolver-URL vor der DOI-Nummer
  * entfernt.
  */
-class Doi extends ArrayRule
+class Doi extends AbstractArrayRule
 {
     /**
      * Konstruktor

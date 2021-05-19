@@ -46,7 +46,7 @@ use function trim;
 /**
  * Erlaubt das Erzeugen von OPUS-Metadatenfeldern für die Speicherung von Personenangaben.
  */
-class Person extends ArrayRule
+class Person extends AbstractArrayRule
 {
     /**
      * Konstruktor

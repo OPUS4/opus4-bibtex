@@ -39,7 +39,7 @@ namespace Opus\Bibtex\Import\Rules;
  * Erlaubt das Erzeugen von Notes, wobei neben dem Wert auch die Sichtbarkeit (Standard: public) sowie ein optional
  * Präfix gesetzt werden kann, das dem Feldwert vorangestellt wird.
  */
-class Note extends ArrayRule
+class Note extends AbstractArrayRule
 {
     /** @var string Präfix, der dem Wert der Note vorangestellt wird (Default: leer) */
     private $messagePrefix = '';

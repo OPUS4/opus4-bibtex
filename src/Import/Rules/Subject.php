@@ -41,7 +41,7 @@ use function explode;
  * Erlaubt das Setzen von Schlagworten vom Typ 'uncontrolled' und der Sprachen 'eng'. Typ und Sprache können optional
  * überschrieben werden.
  */
-class Subject extends ArrayRule
+class Subject extends AbstractArrayRule
 {
     /** @var string Typ des Schlagworts */
     private $type = 'uncontrolled';

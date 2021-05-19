@@ -39,7 +39,7 @@ namespace Opus\Bibtex\Import\Rules;
  * Setzt den Hashwert des importierten BibTeX-Record als Wert des Enrichments opus.import.dataHash.
  * Hierbei wird standardmäßig die MD5-Hashfunktion verwendet.
  */
-class SourceDataHash extends ArrayRule
+class SourceDataHash extends AbstractArrayRule
 {
     /**
      * Name des Enrichments, in dem der Hashwert (auf Basis der Hashfunktion HASH_FUNCTION) des importierten
