@@ -48,7 +48,7 @@ use function trim;
  *
  * TODO etwas kompliziert, oder? Mit redundantem Code zwischen getPageFirst and getPageLast
  */
-class Pages extends ComplexRule
+class Pages extends AbstractComplexRule
 {
     /**
      * Konstruktor

@@ -46,7 +46,7 @@ use function str_replace;
  * Behandlung von Umlauten, die im BibTeX-File nicht korrekt angegeben wurden (siehe OPUSVIER-4216).
  * Ein Beispiel für solche Umlaute findet sich in der Testdatei specialchars-invalid.bib
  */
-class Umlauts extends ComplexRule
+class Umlauts extends AbstractComplexRule
 {
     /** @var array Namen von Feldern, die bei der Umlautbehandlung ignoriert werden sollen */
     protected $fieldBlacklist;
