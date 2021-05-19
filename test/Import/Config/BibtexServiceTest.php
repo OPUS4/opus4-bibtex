@@ -35,6 +35,7 @@
 
 namespace OpusTest\Bibtex\Import\Config;
 
+use Opus\Bibtex\Import\Config\BibtexConfigException;
 use Opus\Bibtex\Import\Config\BibtexService;
 use PHPUnit\Framework\TestCase;
 
@@ -52,13 +53,13 @@ class BibtexServiceTest extends TestCase
 
     public function testListAvailableMappingsInvalidIniFile()
     {
-        $this->expectException('Exception');
+        $this->expectException(BibtexConfigException::class);
         BibtexService::getInstance(__DIR__ . '/../_files/import-invalid.ini');
     }
 
     public function testListAvailableMappingsInvalidIniFileAlternative()
     {
-        $this->expectException('Exception');
+        $this->expectException(BibtexConfigException::class);
         BibtexService::getInstance(__DIR__ . '/../_files/import-invalid-alt.ini');
     }
 
@@ -98,7 +99,7 @@ class BibtexServiceTest extends TestCase
     public function testGetMissingDefaultFieldMapping()
     {
         $bibtexService = BibtexService::getInstance(__DIR__ . '/../_files/import-single.ini');
-        $this->expectException('Exception');
+        $this->expectException(BibtexConfigException::class);
         $bibtexService->getFieldMapping();
     }
 

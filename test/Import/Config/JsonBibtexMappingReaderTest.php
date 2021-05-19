@@ -35,6 +35,7 @@
 
 namespace OpusTest\Bibtex\Import\Config;
 
+use Opus\Bibtex\Import\Config\BibtexConfigException;
 use Opus\Bibtex\Import\Config\BibtexMapping;
 use Opus\Bibtex\Import\Config\BibtexService;
 use Opus\Bibtex\Import\Config\JsonBibtexMappingReader;
@@ -188,28 +189,28 @@ class JsonBibtexMappingReaderTest extends TestCase
     public function testGetMappingConfigurationFromNull()
     {
         $jsonBibtexMappingReader = new JsonBibtexMappingReader();
-        $this->expectException('Exception');
+        $this->expectException(BibtexConfigException::class);
         $jsonBibtexMappingReader->getMappingConfigurationFromFile(null);
     }
 
     public function testGetMappingConfigurationFromUnknownFile()
     {
         $jsonBibtexMappingReader = new JsonBibtexMappingReader();
-        $this->expectException('Exception');
+        $this->expectException(BibtexConfigException::class);
         $jsonBibtexMappingReader->getMappingConfigurationFromFile('unknown.json');
     }
 
     public function testGetMappingConfigurationFromInvalidJsonFile()
     {
         $jsonBibtexMappingReader = new JsonBibtexMappingReader();
-        $this->expectException('Exception');
+        $this->expectException(BibtexConfigException::class);
         $jsonBibtexMappingReader->getMappingConfigurationFromFile(__DIR__ . '/../_files/mapping-invalid.json');
     }
 
     public function testGetMappingConfigurationFromIncompleteJsonFile()
     {
         $jsonBibtexMappingReader = new JsonBibtexMappingReader();
-        $this->expectException('Exception');
+        $this->expectException(BibtexConfigException::class);
         $jsonBibtexMappingReader->getMappingConfigurationFromFile(__DIR__ . '/../_files/mapping-incomplete.json');
     }
 
