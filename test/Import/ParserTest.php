@@ -39,6 +39,7 @@ use Opus\Bibtex\Import\Config\BibtexService;
 use Opus\Bibtex\Import\Parser;
 use Opus\Bibtex\Import\ParserException;
 use Opus\Bibtex\Import\Processor;
+use Opus\Bibtex\Import\Rules\Pages;
 use Opus\Bibtex\Import\Rules\SourceData;
 use Opus\Bibtex\Import\Rules\SourceDataHash;
 use PHPUnit\Framework\TestCase;
@@ -952,37 +953,27 @@ class ParserTest extends TestCase
         $this->assertContains('citation-key', $unusedFields);
     }
 
-    /*
     public function testComplexRule()
     {
         $bibtex =
             '@article{citekey,
-                author    = "John Doe",
-                firstpage = 1,
-                lastpage  = 2
+                author = "John Doe",
+                pages  = 1-2
             }';
 
-        $parser = new Parser($bibtex);
+        $parser        = new Parser($bibtex);
         $bibTexRecords = $parser->parse();
 
-        $complexRule = new ComplexRule(
-            function ($fieldValues, &$documentMetadata) {
-                $documentMetadata['PageFirst'] = $fieldValues['firstpage'];
-                $documentMetadata['PageLast'] = $fieldValues['lastpage'];
-                $documentMetadata['PageNumber'] = intval($documentMetadata['PageLast']) - intval($documentMetadata['PageFirst']);
-            },
-            ['firstpage', 'lastpage']
-        );
-        $mappingConfiguration = BibtexService::getFieldMapping();
-        $mappingConfiguration->resetRules();
-        $mappingConfiguration->addRule('newRule', $complexRule);
-        $proc = new Processor($mappingConfiguration);
-        $metadata = [];
+        $complexRule = new Pages();
+        $mapping     = (BibtexService::getInstance())->getFieldMapping();
+        $mapping->resetRules();
+        $mapping->addRule('newRule', $complexRule);
+        $proc            = new Processor($mapping);
+        $metadata        = [];
         $fieldsEvaluated = $proc->handleRecord($bibTexRecords[0], $metadata);
 
-        $this->assertCount(2, $fieldsEvaluated);
-        $this->assertContains('firstpage', $fieldsEvaluated);
-        $this->assertContains('lastpage', $fieldsEvaluated);
+        $this->assertCount(1, $fieldsEvaluated);
+        $this->assertContains('pages', $fieldsEvaluated);
 
         $bibTexFields = $parser->getBibTexFieldNames($bibTexRecords[0]);
         $unusedFields = array_diff($bibTexFields, $fieldsEvaluated);
@@ -995,7 +986,7 @@ class ParserTest extends TestCase
         $this->assertArrayHasKey('PageFirst', $metadata);
         $this->assertArrayHasKey('PageLast', $metadata);
         $this->assertArrayHasKey('PageNumber', $metadata);
-    }*/
+    }
 
     /**
      * Dieser Testcase wurde aus der ursprünglichen Implementierung übernommen.
