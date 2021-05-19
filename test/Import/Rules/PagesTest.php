@@ -38,13 +38,50 @@ namespace OpusTest\Bibtex\Import\Rules;
 use Opus\Bibtex\Import\Processor;
 use PHPUnit\Framework\TestCase;
 
-class PageFirstTest extends TestCase
+class PagesTest extends TestCase
 {
-    public function testProcess()
+    public function testPageFirst()
     {
         $proc     = new Processor();
         $metadata = [];
         $proc->handleRecord(['Pages' => '1--10'], $metadata);
         $this->assertEquals('1', $metadata['PageFirst']);
+    }
+
+    public function testPageLast()
+    {
+        $proc     = new Processor();
+        $metadata = [];
+        $proc->handleRecord(['Pages' => '1--10'], $metadata);
+        $this->assertEquals('10', $metadata['PageLast']);
+    }
+
+    public function testPageLastSameAsPageFirst()
+    {
+        $proc     = new Processor();
+        $metadata = [];
+        $proc->handleRecord(['Pages' => '42'], $metadata);
+        $this->assertEquals('42', $metadata['PageFirst']);
+        $this->assertEquals('42', $metadata['PageLast']);
+        $this->assertEquals('1', $metadata['PageNumber']);
+    }
+
+    public function testPageNumber()
+    {
+        $proc     = new Processor();
+        $metadata = [];
+        $proc->handleRecord(['Pages' => '1--10'], $metadata);
+
+        $this->assertEquals('10', $metadata['PageNumber']);
+    }
+
+    public function testPageLastLessThanPageFirst()
+    {
+        $proc     = new Processor();
+        $metadata = [];
+        $proc->handleRecord(['Pages' => '42-41'], $metadata);
+        $this->assertEquals('42', $metadata['PageFirst']);
+        $this->assertEquals('41', $metadata['PageLast']);
+        $this->assertArrayNotHasKey('PageNumber', $metadata);
     }
 }
