@@ -9,7 +9,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      
+
+      - name: Change to PHP 7.3
+        run: sudo update-alternatives --set php /usr/bin/php7.3
+
       - name: Install Pandoc
         run: sudo apt-get install pandoc
 
