@@ -44,7 +44,7 @@ use function ucfirst;
 /**
  * Eine Regel, die ein Metadatenfeld auf Basis des Inhalts eines Felds des BibTeX-Records füllt.
  */
-class SimpleRule implements IRule
+class SimpleRule implements RuleInterface
 {
     /** @var string Name des auszuwertenden BibTeX-Felds */
     protected $bibtexField;

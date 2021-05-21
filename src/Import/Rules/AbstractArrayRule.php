@@ -28,23 +28,48 @@
  * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  *
- * @category    Tests
- * @package     OpusTest\Bibtex\Import\Rules
+ * @category    BibTeX
+ * @package     Opus\Bibtex\Import\Rules
  * @author      Sascha Szott <opus-repository@saschaszott.de>
  */
 
-namespace OpusTest\Bibtex\Import\Rules;
+namespace Opus\Bibtex\Import\Rules;
 
-use Opus\Bibtex\Import\Processor;
-use PHPUnit\Framework\TestCase;
+use function array_key_exists;
+use function array_push;
+use function count;
+use function is_array;
 
-class PageLastTest extends TestCase
+/**
+ * Eine Regel, die verwendet werden kann, um ein mehrwertiges Metadatenfeld (Feldwert ist hierbei ein Array) zu füllen.
+ */
+abstract class AbstractArrayRule extends SimpleRule
 {
-    public function testProcess()
+    /**
+     * Anwendung der Regel auf den übergebenen BibTeX-Record.
+     *
+     * @param array $bibtexRecord BibTeX-Record (Array von BibTeX-Feldern)
+     * @param array $documentMetadata OPUS-Metadatensatz (Array von Metadatenfeldern)
+     * @return bool liefert true, wenn die Regel erfolgreich angewendet werden konnte
+     */
+    public function apply($bibtexRecord, &$documentMetadata)
     {
-        $proc     = new Processor();
-        $metadata = [];
-        $proc->handleRecord(['Pages' => '1--10'], $metadata);
-        $this->assertEquals('10', $metadata['PageLast']);
+        $result = false;
+        if (array_key_exists($this->bibtexField, $bibtexRecord)) {
+            $fieldValue = $this->getValue($bibtexRecord[$this->bibtexField]);
+            if (count($fieldValue) > 0) {
+                $result = true;
+                if (array_key_exists(0, $fieldValue) && is_array($fieldValue[0])) {
+                    // $fieldValue ist ein mehrdimensionales Array
+                    if (! array_key_exists($this->opusField, $documentMetadata)) {
+                        $documentMetadata[$this->opusField] = [];
+                    }
+                    array_push($documentMetadata[$this->opusField], ...$fieldValue);
+                } else {
+                    $documentMetadata[$this->opusField][] = $fieldValue;
+                }
+            }
+        }
+        return $result;
     }
 }

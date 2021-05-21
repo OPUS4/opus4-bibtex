@@ -36,7 +36,7 @@
 namespace Opus\Bibtex\Import\Config;
 
 use Opus\Bibtex\Import\Rules\ConstantValues;
-use Opus\Bibtex\Import\Rules\IRule;
+use Opus\Bibtex\Import\Rules\RuleInterface;
 use Opus\Bibtex\Import\Rules\SimpleRule;
 
 use function array_key_exists;
@@ -137,7 +137,7 @@ class BibtexMapping
      * übergebenen Namen, so wird diese Regel vor dem Hinzufügen der übergebenen Regel entfernt.
      *
      * @param string $name Name der Regel
-     * @param IRule|null $rule die hinzuzufügende Regel (wenn null, dann wird die Regel aus dem Namen abgeleitet)
+     * @param RuleInterface|null $rule die hinzuzufügende Regel (wenn null, dann wird die Regel aus dem Namen abgeleitet)
      * @return $this
      */
     public function prependRule($name, $rule = null)
@@ -157,7 +157,7 @@ class BibtexMapping
      * übergebenen Namen, so wird diese Regel vor dem Hinzufügen der übergebenen Regel entfernt.
      *
      * @param string $name Name der Regel
-     * @param IRule|null $rule die hinzuzufügende Regel (wenn null, dann wird die Regel aus dem Namen abgeleitet)
+     * @param RuleInterface|null $rule die hinzuzufügende Regel (wenn null, dann wird die Regel aus dem Namen abgeleitet)
      * @return $this
      */
     public function addRule($name, $rule = null)
@@ -176,7 +176,7 @@ class BibtexMapping
      * unter dem übergebenen Namen noch keine Regel existiert.
      *
      * @param string $name Name der Regel
-     * @param IRule $rule die zu ersetzende (oder hinzuzufügende) Regel
+     * @param RuleInterface $rule die zu ersetzende (oder hinzuzufügende) Regel
      * @return $this
      */
     public function updateRule($name, $rule = null)
@@ -256,7 +256,7 @@ class BibtexMapping
      * Erzeugt eine Instanz der Mapping-Regel, die durch die übergebene Konfiguration beschrieben ist.
      *
      * @param array $rule Konfiguration der Mapping-Regel
-     * @return IRule Instanz der Mapping-Regel
+     * @return RuleInterface Instanz der Mapping-Regel
      */
     private function getRuleInstance($rule)
     {

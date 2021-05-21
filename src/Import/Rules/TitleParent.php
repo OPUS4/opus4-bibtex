@@ -38,7 +38,7 @@ namespace Opus\Bibtex\Import\Rules;
 /**
  * Erlaubt das Setzen eines Feldwerts für den übergeordneten Titel.
  */
-class TitleParent extends ArrayRule
+class TitleParent extends AbstractArrayRule
 {
     /**
      * Konstruktor

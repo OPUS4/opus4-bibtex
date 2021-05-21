@@ -48,7 +48,7 @@ use function trim;
  *
  * TODO etwas kompliziert, oder? Mit redundantem Code zwischen getPageFirst and getPageLast
  */
-class Pages extends ComplexRule
+class Pages extends AbstractComplexRule
 {
     /**
      * Konstruktor
@@ -68,56 +68,22 @@ class Pages extends ComplexRule
     protected function setFields($fieldValues, &$documentMetadata)
     {
         if (array_key_exists('pages', $fieldValues)) {
-            $pagesFieldValue               = $fieldValues['pages'];
-            $documentMetadata['PageFirst'] = $this->getPageFirst($pagesFieldValue);
-            $documentMetadata['PageLast']  = $this->getPageLast($pagesFieldValue);
-            $pageNumber                    = $this->getPageNumber($documentMetadata);
-            if ($pageNumber !== null) {
-                $documentMetadata['PageNumber'] = $pageNumber;
+            $pagesFieldValue = $fieldValues['pages'];
+
+            $value                         = str_replace(['--', '––', '–'], '-', $pagesFieldValue);
+            $parts                         = explode('-', $value, 2);
+            $documentMetadata['PageFirst'] = trim($parts[0]);
+            $documentMetadata['PageLast']  = trim($parts[count($parts) === 2 ? 1 : 0]);
+
+            $pageFirst =
+                array_key_exists('PageFirst', $documentMetadata) ? intval($documentMetadata['PageFirst']) : 0;
+            $pageLast  =
+                array_key_exists('PageLast', $documentMetadata) ? intval($documentMetadata['PageLast']) : 0;
+            if ($pageFirst > 0 && $pageLast > 0 && $pageLast >= $pageFirst) {
+                $documentMetadata['PageNumber'] = 1 + $pageLast - $pageFirst;
             }
             return true;
         }
         return false;
-    }
-
-    /**
-     * @param string $value BibTeX value
-     * @return string First page value
-     */
-    private function getPageFirst($value)
-    {
-        $value = str_replace(['--', '––', '–'], '-', $value);
-        $parts = explode('-', $value, 2);
-        return trim($parts[0]);
-    }
-
-    /**
-     * @param string $value BibTeX value
-     * @return string Last page value
-     */
-    private function getPageLast($value)
-    {
-        $value = str_replace(['--', '––', '–'], '-', $value);
-        $parts = explode('-', $value, 2);
-        if (count($parts) === 2) {
-            return trim($parts[1]);
-        }
-        return trim($parts[0]);
-    }
-
-    /**
-     * @param array $documentMetadata OPUS data
-     * @return int|null Number of pages
-     */
-    private function getPageNumber($documentMetadata)
-    {
-        $pageFirst =
-            array_key_exists('PageFirst', $documentMetadata) ? intval($documentMetadata['PageFirst']) : 0;
-        $pageLast  =
-            array_key_exists('PageLast', $documentMetadata) ? intval($documentMetadata['PageLast']) : 0;
-        if ($pageFirst > 0 && $pageLast > 0 && $pageLast >= $pageFirst) {
-            return 1 + $pageLast - $pageFirst;
-        }
-        return null;
     }
 }

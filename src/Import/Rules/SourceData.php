@@ -38,7 +38,7 @@ namespace Opus\Bibtex\Import\Rules;
 /**
  * Setzt den ursprünglichen BibTeX-Record als Wert des Enrichments opus.import.data
  */
-class SourceData extends ArrayRule
+class SourceData extends AbstractArrayRule
 {
     /**
      * Name des Enrichments, das zur Speicherung des importierten (unveränderten) BibTeX-Record verwendet wird

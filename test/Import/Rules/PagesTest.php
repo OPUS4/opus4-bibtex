@@ -28,27 +28,60 @@
  * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  *
- * @category    BibTeX
- * @package     Opus\Bibtex\Import\Rules
+ * @category    Tests
+ * @package     OpusTest\Bibtex\Import\Rules
  * @author      Sascha Szott <opus-repository@saschaszott.de>
  */
 
-namespace Opus\Bibtex\Import\Rules;
+namespace OpusTest\Bibtex\Import\Rules;
 
-interface IRule
+use Opus\Bibtex\Import\Processor;
+use PHPUnit\Framework\TestCase;
+
+class PagesTest extends TestCase
 {
-    /**
-     * @param array $bibtexRecord BibTeX-Record (als Array von BibTeX-Feldern), der importiert werden soll
-     * @param array $documentMetadata OPUS-Metadatensatz (als Array von Metadatenfeldern), der unter Nutzung der
-     *                                Funktion fromArray in ein OPUS4-Dokument umgewandelt werden soll
-     * @return boolean Aussage über den Erfolg der Anwendung der Regel (true gdw. erfolgreiche Anwendung)
-     */
-    public function apply($bibtexRecord, &$documentMetadata);
+    public function testPageFirst()
+    {
+        $proc     = new Processor();
+        $metadata = [];
+        $proc->handleRecord(['Pages' => '1--10'], $metadata);
+        $this->assertEquals('1', $metadata['PageFirst']);
+    }
 
-    /**
-     * Gibt ein Array mit den Namen des BibTeX-Felder zurück, die bei der Regelanwendung ausgewertet wurden.
-     *
-     * @return array
-     */
-    public function getEvaluatedBibTexField();
+    public function testPageLast()
+    {
+        $proc     = new Processor();
+        $metadata = [];
+        $proc->handleRecord(['Pages' => '1--10'], $metadata);
+        $this->assertEquals('10', $metadata['PageLast']);
+    }
+
+    public function testPageLastSameAsPageFirst()
+    {
+        $proc     = new Processor();
+        $metadata = [];
+        $proc->handleRecord(['Pages' => '42'], $metadata);
+        $this->assertEquals('42', $metadata['PageFirst']);
+        $this->assertEquals('42', $metadata['PageLast']);
+        $this->assertEquals('1', $metadata['PageNumber']);
+    }
+
+    public function testPageNumber()
+    {
+        $proc     = new Processor();
+        $metadata = [];
+        $proc->handleRecord(['Pages' => '1--10'], $metadata);
+
+        $this->assertEquals('10', $metadata['PageNumber']);
+    }
+
+    public function testPageLastLessThanPageFirst()
+    {
+        $proc     = new Processor();
+        $metadata = [];
+        $proc->handleRecord(['Pages' => '42-41'], $metadata);
+        $this->assertEquals('42', $metadata['PageFirst']);
+        $this->assertEquals('41', $metadata['PageLast']);
+        $this->assertArrayNotHasKey('PageNumber', $metadata);
+    }
 }

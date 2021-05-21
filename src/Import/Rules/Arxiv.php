@@ -44,7 +44,7 @@ use function substr;
  * Verarbeitung von ArXiv-Identifiern. Hierbei wird eine ggf. vorhandene Resolver-URL vor dem ArXiv-Identifier
  * entfernt.
  */
-class Arxiv extends ArrayRule
+class Arxiv extends AbstractArrayRule
 {
     /**
      * Konstruktor

@@ -38,7 +38,7 @@ namespace Opus\Bibtex\Import\Rules;
 /**
  * Verarbeitung von Identifiern vom Typ ISSN.
  */
-class Issn extends ArrayRule
+class Issn extends AbstractArrayRule
 {
     /**
      * Konstruktor

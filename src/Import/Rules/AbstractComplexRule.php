@@ -46,7 +46,7 @@ use function array_key_exists;
  * werden, um auf alle in den Dokumentmetadaten gespeicherten Felder zugreifen und neue Felder in den Dokumentmetadaten
  * hinzufügen.
  */
-abstract class ComplexRule implements IRule
+abstract class AbstractComplexRule implements RuleInterface
 {
     /** @var array|null optionale Liste der bei der Regelausführung auszuwertenden BibTeX-Felder */
     protected $fieldsEvaluated;
@@ -97,7 +97,7 @@ abstract class ComplexRule implements IRule
     }
 
     /**
-     * Diese Methode muss von Klassen, die ComplexRule ableiten, überschrieben / definiert werden.
+     * Diese Methode muss von Klassen, die AbstractComplexRule ableiten, überschrieben / definiert werden.
      * Die Methode bestimmt erlaubt das Setzen der OPUS-Metadatenfelder auf Basis der übergebenen Werte von
      * BibTeX-Feldern.
      *

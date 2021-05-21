@@ -35,8 +35,6 @@
 
 namespace Opus\Bibtex\Import\Config;
 
-use Exception;
-
 use function array_key_exists;
 use function file_get_contents;
 use function is_readable;
@@ -51,22 +49,22 @@ class JsonBibtexMappingReader
     /**
      * @param string $fileName Name der Mapping-Konfigurationsdatei (JSON)
      * @return BibtexMapping Instanz des BibTeX-Mappings auf Basis der Angaben in der übergebenen Konfigurationsdatei
-     * @throws Exception Wird geworfen, wenn das konfigurierte Mapping nicht erfolgreich ausgewertet werden konnte.
+     * @throws BibtexConfigException Wird geworfen, wenn das konfigurierte Mapping nicht erfolgreich ausgewertet werden konnte.
      */
     public function getMappingConfigurationFromFile($fileName)
     {
         if (! is_readable($fileName)) {
-            throw new Exception("could not read file $fileName");
+            throw new BibtexConfigException("could not read file $fileName");
         }
 
         $json = file_get_contents($fileName);
         if ($json === false) {
-            throw new Exception("could not get content of file $fileName");
+            throw new BibtexConfigException("could not get content of file $fileName");
         }
 
         $jsonArr = json_decode($json, true);
         if ($jsonArr === null) {
-            throw new Exception("could not decode JSON file $fileName");
+            throw new BibtexConfigException("could not decode JSON file $fileName");
         }
 
         if (
@@ -74,7 +72,7 @@ class JsonBibtexMappingReader
             array_key_exists('description', $jsonArr) &&
             array_key_exists('mapping', $jsonArr))
         ) {
-            throw new Exception("missing key(s) in JSON file $fileName");
+            throw new BibtexConfigException("missing key(s) in JSON file $fileName");
         }
 
         return (new BibtexMapping())

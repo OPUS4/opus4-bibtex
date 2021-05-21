@@ -28,24 +28,27 @@
  * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  *
- * @category    Tests
- * @package     OpusTest\Bibtex\Import\Rules
+ * @category    BibTeX
+ * @package     Opus\Bibtex\Import\Rules
  * @author      Sascha Szott <opus-repository@saschaszott.de>
  */
 
-namespace OpusTest\Bibtex\Import\Rules;
+namespace Opus\Bibtex\Import\Rules;
 
-use Opus\Bibtex\Import\Processor;
-use PHPUnit\Framework\TestCase;
-
-class PageNumberTest extends TestCase
+interface RuleInterface
 {
-    public function testProcess()
-    {
-        $proc     = new Processor();
-        $metadata = [];
-        $proc->handleRecord(['Pages' => '1--10'], $metadata);
+    /**
+     * @param array $bibtexRecord BibTeX-Record (als Array von BibTeX-Feldern), der importiert werden soll
+     * @param array $documentMetadata OPUS-Metadatensatz (als Array von Metadatenfeldern), der unter Nutzung der
+     *                                Funktion fromArray in ein OPUS4-Dokument umgewandelt werden soll
+     * @return boolean Aussage über den Erfolg der Anwendung der Regel (true gdw. erfolgreiche Anwendung)
+     */
+    public function apply($bibtexRecord, &$documentMetadata);
 
-        $this->assertEquals('10', $metadata['PageNumber']);
-    }
+    /**
+     * Gibt ein Array mit den Namen des BibTeX-Felder zurück, die bei der Regelanwendung ausgewertet wurden.
+     *
+     * @return array
+     */
+    public function getEvaluatedBibTexField();
 }
