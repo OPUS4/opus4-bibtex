@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of OPUS. The software OPUS has been originally developed
  * at the University of Stuttgart with funding from the German Research Net,
@@ -24,43 +25,63 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
+ * @copyright   Copyright (c) 2021, OPUS 4 development team
+ * @license     http://www.gnu.org/licenses/gpl.html General Public License
+ *
  * @category    BibTeX
  * @package     Opus\Bibtex\Import\Rules
  * @author      Sascha Szott <opus-repository@saschaszott.de>
- * @copyright   Copyright (c) 2021, OPUS 4 development team
- * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
 namespace Opus\Bibtex\Import\Rules;
 
-class Arxiv extends ArrayRule
+use function preg_replace;
+use function strlen;
+use function strtolower;
+use function substr;
+
+/**
+ * Verarbeitung von ArXiv-Identifiern. Hierbei wird eine ggf. vorhandene Resolver-URL vor dem ArXiv-Identifier
+ * entfernt.
+ */
+class Arxiv extends AbstractArrayRule
 {
+    /**
+     * Konstruktor
+     */
     public function __construct()
     {
-        $this->setBibtexFieldName('arxiv');
-        $this->setOpusFieldName('Identifier');
-        $this->setFn(
-            function ($value) {
-                $type = 'url';
+        $this->setBibtexField('arxiv');
+        $this->setOpusField('Identifier');
+    }
 
-                $baseUrl1 = 'http://arxiv.org/abs/';
-                $baseUrl2 = 'https://arxiv.org/abs/';
-                if (substr($value, 0, strlen($baseUrl1)) == $baseUrl1 ||
-                    substr($value, 0, strlen($baseUrl2)) == $baseUrl2) {
-                    $type = 'arxiv';
-                    // URL-Präfix abschneiden, so dass nur die ArXiv-ID übrigbleibt
-                    $value = preg_replace('#https?://arxiv.org/abs/#i', '', $value);
-                } elseif (strtolower(substr($value, 0, 6)) === 'arxiv:') {
-                    $type = 'arxiv';
-                    $value = substr($value, 6); // Präfix 'arxiv:' abschneiden
-                }
+    /**
+     * Bestimmt den aus dem BibTeX-Record abgeleiteten Wert des Identifiers.
+     *
+     * @param string $value Feldwert aus BibTeX-Record
+     * @return array
+     */
+    protected function getValue($value)
+    {
+        $type = 'url';
 
-                return [
-                    'Value' => $value,
-                    'Type' => $type
-                ];
-            }
-        );
-        return $this;
+        $baseUrl1 = 'http://arxiv.org/abs/';
+        $baseUrl2 = 'https://arxiv.org/abs/';
+        if (
+            substr($value, 0, strlen($baseUrl1)) === $baseUrl1 ||
+            substr($value, 0, strlen($baseUrl2)) === $baseUrl2
+        ) {
+            $type = 'arxiv';
+            // URL-Präfix abschneiden, so dass nur die ArXiv-ID übrigbleibt
+            $value = preg_replace('#https?://arxiv.org/abs/#i', '', $value);
+        } elseif (strtolower(substr($value, 0, 6)) === 'arxiv:') {
+            $type  = 'arxiv';
+            $value = substr($value, 6); // Präfix 'arxiv:' abschneiden
+        }
+
+        return [
+            'Value' => $value,
+            'Type'  => $type,
+        ];
     }
 }

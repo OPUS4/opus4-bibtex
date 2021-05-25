@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of OPUS. The software OPUS has been originally developed
  * at the University of Stuttgart with funding from the German Research Net,
@@ -24,38 +25,30 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
+ * @copyright   Copyright (c) 2021, OPUS 4 development team
+ * @license     http://www.gnu.org/licenses/gpl.html General Public License
+ *
  * @category    BibTeX
  * @package     Opus\Bibtex\Import\Rules
  * @author      Sascha Szott <opus-repository@saschaszott.de>
- * @copyright   Copyright (c) 2021, OPUS 4 development team
- * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
 namespace Opus\Bibtex\Import\Rules;
 
-/**
- * Eine Regel, die verwendet werden kann, um ein mehrwertiges Metadatenfeld (Feldwert ist hierbei ein Array) zu füllen.
- */
-class ArrayRule extends SimpleRule
+interface RuleInterface
 {
-    public function apply($bibtexRecord, &$documentMetadata)
-    {
-        $result = false;
-        if (array_key_exists($this->bibtexFieldName, $bibtexRecord)) {
-            $fieldValue = ($this->fn)($bibtexRecord[$this->bibtexFieldName]);
-            if (count($fieldValue) > 0) {
-                $result = true;
-                if (array_key_exists(0, $fieldValue) && is_array($fieldValue[0])) {
-                    // $fieldValue ist ein mehrdimensionales Array
-                    if (! array_key_exists($this->opusFieldName, $documentMetadata)) {
-                        $documentMetadata[$this->opusFieldName] = [];
-                    }
-                    array_push($documentMetadata[$this->opusFieldName], ...$fieldValue);
-                } else {
-                    $documentMetadata[$this->opusFieldName][] = $fieldValue;
-                }
-            }
-        }
-        return $result;
-    }
+    /**
+     * @param array $bibtexRecord BibTeX-Record (als Array von BibTeX-Feldern), der importiert werden soll
+     * @param array $documentMetadata OPUS-Metadatensatz (als Array von Metadatenfeldern), der unter Nutzung der
+     *                                Funktion fromArray in ein OPUS4-Dokument umgewandelt werden soll
+     * @return boolean Aussage über den Erfolg der Anwendung der Regel (true gdw. erfolgreiche Anwendung)
+     */
+    public function apply($bibtexRecord, &$documentMetadata);
+
+    /**
+     * Gibt ein Array mit den Namen des BibTeX-Felder zurück, die bei der Regelanwendung ausgewertet wurden.
+     *
+     * @return array
+     */
+    public function getEvaluatedBibTexField();
 }

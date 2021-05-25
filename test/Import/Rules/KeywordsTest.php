@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of OPUS. The software OPUS has been originally developed
  * at the University of Stuttgart with funding from the German Research Net,
@@ -24,29 +25,31 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
+ * @copyright   Copyright (c) 2021, OPUS 4 development team
+ * @license     http://www.gnu.org/licenses/gpl.html General Public License
+ *
  * @category    Tests
  * @package     OpusTest\Bibtex\Import\Rules
  * @author      Sascha Szott <opus-repository@saschaszott.de>
- * @copyright   Copyright (c) 2021, OPUS 4 development team
- * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
 namespace OpusTest\Bibtex\Import\Rules;
 
 use Opus\Bibtex\Import\Processor;
+use PHPUnit\Framework\TestCase;
 
-class KeywordsTest extends \PHPUnit_Framework_TestCase
+class KeywordsTest extends TestCase
 {
     public function testProcess()
     {
-        $proc = new Processor();
+        $proc     = new Processor();
         $metadata = [];
         $proc->handleRecord(['Keywords' => 'test, check'], $metadata);
 
         $this->assertEquals(
             [
                 ['Language' => 'eng', 'Type' => 'uncontrolled', 'Value' => 'test'],
-                ['Language' => 'eng', 'Type' => 'uncontrolled', 'Value' => 'check']
+                ['Language' => 'eng', 'Type' => 'uncontrolled', 'Value' => 'check'],
             ],
             $metadata['Subject']
         );

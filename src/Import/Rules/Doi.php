@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of OPUS. The software OPUS has been originally developed
  * at the University of Stuttgart with funding from the German Research Net,
@@ -24,32 +25,49 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
+ * @copyright   Copyright (c) 2021, OPUS 4 development team
+ * @license     http://www.gnu.org/licenses/gpl.html General Public License
+ *
  * @category    BibTeX
  * @package     Opus\Bibtex\Import\Rules
  * @author      Sascha Szott <opus-repository@saschaszott.de>
- * @copyright   Copyright (c) 2021, OPUS 4 development team
- * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
 namespace Opus\Bibtex\Import\Rules;
 
-class Doi extends ArrayRule
+use function strtolower;
+use function substr;
+use function trim;
+
+/**
+ * Verarbeitung von Identifiern vom Typ DOI. Hierbei wird eine ggf. vorhandene Resolver-URL vor der DOI-Nummer
+ * entfernt.
+ */
+class Doi extends AbstractArrayRule
 {
+    /**
+     * Konstruktor
+     */
     public function __construct()
     {
-        $this->setBibtexFieldName('doi');
-        $this->setOpusFieldName('Identifier');
-        $this->setFn(
-            function ($value) {
-                if (strtolower(substr($value, 0, 4)) === 'doi:') {
-                    $value = trim(substr($value, 4)); // Präfix doi: abschneiden
-                }
-                return [
-                    'Value' => $value,
-                    'Type' => 'doi'
-                ];
-            }
-        );
-        return $this;
+        $this->setBibtexField('doi');
+        $this->setOpusField('Identifier');
+    }
+
+    /**
+     * Bestimmt den aus dem BibTeX-Record abgeleiteten Wert des Identifiers.
+     *
+     * @param string $value Feldwert aus BibTeX-Record
+     * @return array
+     */
+    protected function getValue($value)
+    {
+        if (strtolower(substr($value, 0, 4)) === 'doi:') {
+            $value = trim(substr($value, 4)); // Präfix doi: abschneiden
+        }
+        return [
+            'Value' => $value,
+            'Type'  => 'doi',
+        ];
     }
 }

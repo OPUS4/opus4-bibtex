@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of OPUS. The software OPUS has been originally developed
  * at the University of Stuttgart with funding from the German Research Net,
@@ -24,31 +25,50 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * @category    BibTeX
- * @package     Opus\Bibtex\Import\Rules
- * @author      Sascha Szott <opus-repository@saschaszott.de>
  * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
+ *
+ * @category    Tests
+ * @package     OpusTest\Bibtex\Import\Rules
+ * @author      Sascha Szott <opus-repository@saschaszott.de>
  */
 
-namespace Opus\Bibtex\Import\Rules;
+namespace OpusTest\Bibtex\Import\Rules;
 
-class PageLast extends SimpleRule
+use Opus\Bibtex\Import\Rules\BelongsToBibliography;
+use PHPUnit\Framework\TestCase;
+
+class BelongsToBibliographyTest extends TestCase
 {
-    public function __construct()
+    public function dataProvider(): array
     {
-        $this->setBibtexFieldName('pages');
-        $this->setOpusFieldName('PageLast');
-        $this->setFn(
-            function ($value) {
-                $value = str_replace(['--', '––', '–'], '-', $value);
-                $parts = explode('-', $value, 2);
-                if (count($parts) == 2) {
-                    return trim($parts[1]);
-                }
-                return trim($parts[0]);
-            }
-        );
-        return $this;
+        return [
+            ['on', true],
+            ['off', false],
+            ['true', true],
+            ['false', false],
+            [true, true],
+            [false, false],
+            ['1', true],
+            ['0', false],
+            [1, true],
+            [0, false],
+        ];
+    }
+
+    /**
+     * @param mixed $arg Test config value
+     * @param bool $res Expected result
+     * @dataProvider dataProvider
+     */
+    public function testProcess($arg, $res)
+    {
+        $belongsToBibliographyRule = new BelongsToBibliography();
+        $belongsToBibliographyRule->setValue($arg);
+
+        $metadata = [];
+        $belongsToBibliographyRule->apply([], $metadata);
+
+        $this->assertEquals($res, $metadata['BelongsToBibliography']);
     }
 }

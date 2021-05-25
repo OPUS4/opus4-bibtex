@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of OPUS. The software OPUS has been originally developed
  * at the University of Stuttgart with funding from the German Research Net,
@@ -24,38 +25,44 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
+ * @copyright   Copyright (c) 2021, OPUS 4 development team
+ * @license     http://www.gnu.org/licenses/gpl.html General Public License
+ *
  * @category    BibTeX
  * @package     Opus\Bibtex\Import\Rules
  * @author      Sascha Szott <opus-repository@saschaszott.de>
- * @copyright   Copyright (c) 2021, OPUS 4 development team
- * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
 namespace Opus\Bibtex\Import\Rules;
 
-use Opus\Bibtex\Import\Configuration\ConfigurationManager;
+use function filter_var;
 
-class Type extends SimpleRule
+use const FILTER_VALIDATE_BOOLEAN;
+
+/**
+ * Erlaubt das Setzen des OPUS-Metadatenfelds BelongsToBibliography vom Typ Boolean auf Basis eines
+ * in der Konfiguration vorgegebenen konstanten Wertes.
+ */
+class BelongsToBibliography extends ConstantValue
 {
-    protected $documentTypeMapping;
-
+    /**
+     * Konstruktor
+     */
     public function __construct()
     {
-        $this->documentTypeMapping = ConfigurationManager::getTypeMapping();
-
-        $this->setBibtexFieldName('type');
-        $this->setOpusFieldName('Type');
-        $this->setFn(
-            function ($value) {
-                return $this->documentTypeMapping->getMapping($value);
-            }
-        );
-        return $this;
+        $this->setOpusField('BelongsToBibliography');
     }
 
-    public function setDocumentTypeMapping($documentTypeMapping)
+    /**
+     * Liefert auf Basis der in der Konfiguration angegebenen Konstante einen Boolean zurück, der als Wert für das
+     * OPUS-Metadatenfeld BelongsToBibliography verwendet wird.
+     *
+     * @param string $value der zu setzende Wert
+     * @return $this
+     */
+    public function setValue($value)
     {
-        $this->documentTypeMapping = $documentTypeMapping;
+        $this->value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
         return $this;
     }
 }

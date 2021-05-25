@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of OPUS. The software OPUS has been originally developed
  * at the University of Stuttgart with funding from the German Research Net,
@@ -24,57 +25,51 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
+ * @copyright   Copyright (c) 2021, OPUS 4 development team
+ * @license     http://www.gnu.org/licenses/gpl.html General Public License
+ *
  * @category    BibTeX
  * @package     Opus\Bibtex\Import\Rules
  * @author      Sascha Szott <opus-repository@saschaszott.de>
- * @copyright   Copyright (c) 2021, OPUS 4 development team
- * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
 namespace Opus\Bibtex\Import\Rules;
 
+use function array_key_exists;
+use function array_push;
+use function count;
+use function is_array;
+
 /**
- * Eine Regel, die gleichzeitig auf mehrere BibTeX-Felder zugreift. Im Konstruktor muss die Liste der Feldnamen im
- * BibTeX-Record übergeben werden, auf die in der Regelausführung zugegriffen werden soll. Auf andere Felder kann
- * bei der Regelausführung nicht zugegriffen werden.
- *
- * Wird im Konstruktor keine Feldliste (oder eine leere Feldliste) übergeben, so kann die Regel auch dazu genutzt
- * werden, um auf alle in den Dokumentmetadaten gespeicherten Felder zugreifen und neue Felder in den Dokumentmetadaten
- * hinzufügen.
+ * Eine Regel, die verwendet werden kann, um ein mehrwertiges Metadatenfeld (Feldwert ist hierbei ein Array) zu füllen.
  */
-class ComplexRule implements IRule
+abstract class AbstractArrayRule extends SimpleRule
 {
-    protected $fn;
-
-    protected $fieldsEvaluated;
-
-    public function __construct($fn, $fieldsEvaluated = null)
-    {
-        $this->fn = $fn;
-        $this->fieldsEvaluated = $fieldsEvaluated;
-    }
-
+    /**
+     * Anwendung der Regel auf den übergebenen BibTeX-Record.
+     *
+     * @param array $bibtexRecord BibTeX-Record (Array von BibTeX-Feldern)
+     * @param array $documentMetadata OPUS-Metadatensatz (Array von Metadatenfeldern)
+     * @return bool liefert true, wenn die Regel erfolgreich angewendet werden konnte
+     */
     public function apply($bibtexRecord, &$documentMetadata)
     {
-        $fieldValues = [];
-        if (! is_null($this->fieldsEvaluated)) {
-            foreach ($this->fieldsEvaluated as $fieldName) {
-                if (array_key_exists($fieldName, $bibtexRecord)) {
-                    $fieldValues[$fieldName] = $bibtexRecord[$fieldName];
+        $result = false;
+        if (array_key_exists($this->bibtexField, $bibtexRecord)) {
+            $fieldValue = $this->getValue($bibtexRecord[$this->bibtexField]);
+            if (count($fieldValue) > 0) {
+                $result = true;
+                if (array_key_exists(0, $fieldValue) && is_array($fieldValue[0])) {
+                    // $fieldValue ist ein mehrdimensionales Array
+                    if (! array_key_exists($this->opusField, $documentMetadata)) {
+                        $documentMetadata[$this->opusField] = [];
+                    }
+                    array_push($documentMetadata[$this->opusField], ...$fieldValue);
                 } else {
-                    // Feld existiert nicht im BibTeX-Record und kann daher nicht ausgewertet werden
-                    unset($this->fieldsEvaluated[$fieldName]);
+                    $documentMetadata[$this->opusField][] = $fieldValue;
                 }
             }
         }
-        // FIXME wir können nicht wirklich sicherstellen, dass beim Aufruf von $this->fn tatsächlich auf die in
-        //       $this->fieldValues angegebenen Werte des BibTeX-Records zugegriffen wird
-        ($this->fn)($fieldValues, $documentMetadata);
-        return true;
-    }
-
-    public function getEvaluatedBibTexField()
-    {
-        return is_null($this->fieldsEvaluated) ? [] : $this->fieldsEvaluated;
+        return $result;
     }
 }

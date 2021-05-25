@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of OPUS. The software OPUS has been originally developed
  * at the University of Stuttgart with funding from the German Research Net,
@@ -24,35 +25,97 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
+ * @copyright   Copyright (c) 2021, OPUS 4 development team
+ * @license     http://www.gnu.org/licenses/gpl.html General Public License
+ *
  * @category    BibTeX
  * @package     Opus\Bibtex\Import\Rules
  * @author      Sascha Szott <opus-repository@saschaszott.de>
- * @copyright   Copyright (c) 2021, OPUS 4 development team
- * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
 namespace Opus\Bibtex\Import\Rules;
 
-class Subject extends ArrayRule
+use function explode;
+
+/**
+ * Erlaubt das Setzen von Schlagworten vom Typ 'uncontrolled' und der Sprachen 'eng'. Typ und Sprache können optional
+ * überschrieben werden.
+ */
+class Subject extends AbstractArrayRule
 {
+    /** @var string Typ des Schlagworts */
+    private $type = 'uncontrolled';
+
+    /** @var string Sprache des Schlagworts */
+    private $language = 'eng';
+
+    /**
+     * Konstruktor
+     */
     public function __construct()
     {
-        $this->setBibtexFieldName('keywords');
-        $this->setOpusFieldName('Subject');
-        $this->setFn(
-            function ($value) {
-                $keywords = explode(', ', $value);
-                $result = [];
-                foreach ($keywords as $keyword) {
-                    $result[] = [
-                        'Language' => 'eng',
-                        'Type' => 'uncontrolled',
-                        'Value' => $this->deleteBrace($keyword)
-                    ];
-                }
-                return $result;
-            }
-        );
-        return $this;
+        $this->setBibtexField('keywords');
+        $this->setOpusField('Subject');
+    }
+
+    /**
+     * Gibt den Typ des Schlagworts zurück.
+     *
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
+     * Erlaubt das Setzen des Typs des Schlagworts.
+     *
+     * @param string $type Schlagworttyp
+     */
+    public function setType($type)
+    {
+        $this->type = $type;
+    }
+
+    /**
+     * Gibt die Sprache des Schlagworts zurück.
+     *
+     * @return string
+     */
+    public function getLanguage()
+    {
+        return $this->language;
+    }
+
+    /**
+     * Erlaubt das Setzen der Sprache des Schlagworts.
+     *
+     * @param string $language Sprachkürzel
+     */
+    public function setLanguage($language)
+    {
+        $this->language = $language;
+    }
+
+    /**
+     * Erlaubt das Setzen von Schlagworten des Typs 'uncontrolled' auf Basis des übergebenen Wertes. Die einzelnen
+     * Schlagworte sind hierbei durch Komma voneinander getrennt.
+     *
+     * @param string $value kommaseparierte Liste von Schlagworten
+     * @return array
+     */
+    protected function getValue($value)
+    {
+        $keywords = explode(', ', $value);
+        $result   = [];
+        foreach ($keywords as $keyword) {
+            $result[] = [
+                'Language' => $this->language,
+                'Type'     => $this->type,
+                'Value'    => $this->deleteBrace($keyword),
+            ];
+        }
+        return $result;
     }
 }

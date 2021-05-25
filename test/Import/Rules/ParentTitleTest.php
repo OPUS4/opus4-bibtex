@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of OPUS. The software OPUS has been originally developed
  * at the University of Stuttgart with funding from the German Research Net,
@@ -24,25 +25,27 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
+ * @copyright   Copyright (c) 2021, OPUS 4 development team
+ * @license     http://www.gnu.org/licenses/gpl.html General Public License
+ *
  * @category    Tests
  * @package     OpusTest\Bibtex\Import\Rules
  * @author      Sascha Szott <opus-repository@saschaszott.de>
- * @copyright   Copyright (c) 2021, OPUS 4 development team
- * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
 namespace OpusTest\Bibtex\Import\Rules;
 
 use Opus\Bibtex\Import\Processor;
+use PHPUnit\Framework\TestCase;
 
-class ParentTitleTest extends \PHPUnit_Framework_TestCase
+class ParentTitleTest extends TestCase
 {
-    public function dataProvider()
+    public function dataProvider(): array
     {
         return [
             [['journal' => 'My Journal'], 'My Journal'],
             [['journal' => '{My Journal}'], 'My Journal'],
-            [['booktitle' => 'My Book'], 'My Book']
+            [['booktitle' => 'My Book'], 'My Book'],
         ];
     }
 
@@ -50,23 +53,23 @@ class ParentTitleTest extends \PHPUnit_Framework_TestCase
      * Test Mapping of Publication-types.
      *
      * @param mixed $arg Value to check given by the data provider
-     * @param $res expected mapping-result
-     * @return void
-     *
+     * @param string $res expected mapping-result
      * @dataProvider dataProvider
      */
     public function testProcess($arg, $res)
     {
-        $proc = new Processor();
+        $proc     = new Processor();
         $metadata = [];
         $proc->handleRecord($arg, $metadata);
 
         $this->assertEquals(
-            [[
-                'Language' => 'eng',
-                'Value' => $res,
-                'Type' => 'parent'
-            ]],
+            [
+                [
+                    'Language' => 'eng',
+                    'Value'    => $res,
+                    'Type'     => 'parent',
+                ],
+            ],
             $metadata['TitleParent']
         );
     }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of OPUS. The software OPUS has been originally developed
  * at the University of Stuttgart with funding from the German Research Net,
@@ -24,40 +25,65 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
+ * @copyright   Copyright (c) 2021, OPUS 4 development team
+ * @license     http://www.gnu.org/licenses/gpl.html General Public License
+ *
  * @category    BibTeX
  * @package     Opus\Bibtex\Import
  * @author      Sascha Szott <opus-repository@saschaszott.de>
- * @copyright   Copyright (c) 2021, OPUS 4 development team
- * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
 namespace Opus\Bibtex\Import;
 
-use Opus\Bibtex\Import\Configuration\FieldMapping;
-use Opus\Bibtex\Import\Configuration\ConfigurationManager;
+use Exception;
+use Opus\Bibtex\Import\Config\BibtexMapping;
+use Opus\Bibtex\Import\Config\BibtexService;
 
+use function array_change_key_case;
+use function in_array;
+use function substr;
+
+/**
+ * Bildet die Werte von BibTeX-Feldern auf konfigurierte OPUS-Metadatenfelder ab. Das Feld-Mapping wird hierbei in einer
+ * Konfigurationsdatei vorgebeben. Es existiert mit default-mapping.json eine Standardkonfiguration für die Abbildung
+ * der Felder. In der README.md sind die Konfigurationsmöglichkeiten detailliert beschrieben.
+ */
 class Processor
 {
+    /** @var BibtexMapping Feld-Mapping (aus externer Konfigurationsdatei) */
     private $fieldMapping;
 
+    /**
+     * Konstruktor
+     *
+     * @param BibtexMapping|null $fieldMapping Feld-Mapping als Instanz von BibtexMapping
+     * @throws Exception Wird geworfen, wenn bei der Auswertung der Feld-Mapping-Konfiguration Fehler aufgetreten sind.
+     */
     public function __construct($fieldMapping = null)
     {
-        if (! is_null($fieldMapping) || $fieldMapping instanceof FieldMapping) {
+        if ($fieldMapping !== null || $fieldMapping instanceof BibtexMapping) {
             $this->fieldMapping = $fieldMapping;
         } else {
-            $this->fieldMapping = ConfigurationManager::getFieldMapping($fieldMapping);
+            $configService      = BibtexService::getInstance();
+            $this->fieldMapping = $configService->getFieldMapping();
         }
     }
 
     /**
-     * @param $bibtexRecord BibTeX-Record
-     * @param $opusMetadata Array mit Metadaten, das mit fromArray in ein Opus-Document umgewandelt werden kann
-     * @return array Felder des BibTeX-Records, die bei der Befüllung der Metadaten in $opusMetadata ausgewertet wurden
+     * Erzeugt aus den Feldern (und ihren Werten) des übergebenen BibTeX-Records ein Array von OPUS-Metadatenfeldern.
+     * Dieses Array kann im weiteren Verlauf mit der Funktion fromArray in ein Objekt vom Typ Opus_Document umgewandelt
+     * werden.
+     *
+     * @param array $bibtexRecord BibTeX-Record als Array von BibTeX-Feldern auf die zugehörigen Feldwerte
+     * @param array $opusMetadata OPUS-Metadatensatz als Array von Metadatenfelden auf die zugehörigen Werte
+     * @return array Array mit Namen der Felder des BibTeX-Records, die bei der Befüllung des OPUS-Metadatensatzes
+     *               ausgewertet wurden
      */
     public function handleRecord($bibtexRecord, &$opusMetadata)
     {
-        $bibtexRecord = array_change_key_case($bibtexRecord);
+        $bibtexRecord          = array_change_key_case($bibtexRecord);
         $bibtexFieldsEvaluated = [];
+
         foreach ($this->fieldMapping->getRules() as $name => $rule) {
             $ruleResult = $rule->apply($bibtexRecord, $opusMetadata);
             if ($ruleResult) {

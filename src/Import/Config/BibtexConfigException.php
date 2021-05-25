@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of OPUS. The software OPUS has been originally developed
  * at the University of Stuttgart with funding from the German Research Net,
@@ -24,28 +25,18 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * @category    BibTeX
- * @package     Opus\Bibtex\Import\Rules
- * @author      Sascha Szott <opus-repository@saschaszott.de>
  * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
+ *
+ * @category    BibTeX
+ * @package     Opus\Bibtex\Import\Config
+ * @author      Sascha Szott <opus-repository@saschaszott.de>
  */
 
-namespace Opus\Bibtex\Import\Rules;
+namespace Opus\Bibtex\Import\Config;
 
-class PageFirst extends SimpleRule
+use Exception;
+
+class BibtexConfigException extends Exception
 {
-    public function __construct()
-    {
-        $this->setBibtexFieldName('pages');
-        $this->setOpusFieldName('PageFirst');
-        $this->setFn(
-            function ($value) {
-                $value = str_replace(['--', '––', '–'], '-', $value);
-                $parts = explode('-', $value, 2);
-                return trim($parts[0]);
-            }
-        );
-        return $this;
-    }
 }

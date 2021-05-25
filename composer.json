@@ -9,12 +9,13 @@
   ],
   "homepage": "https://www.opus-repository.org",
   "require": {
+    "php" : ">=7.0",
     "renanbr/bibtex-parser": "^2",
     "ryakad/pandoc-php": "~1.0"
   },
   "require-dev": {
-    "phpunit/phpunit": "^4.8",
-    "zendframework/zend-coding-standard": "~1.0.0",
+    "phpunit/phpunit": "7.*",
+    "laminas/laminas-coding-standard": "*",
     "phpmetrics/phpmetrics": "2.7.4"
   },
   "autoload": {
@@ -43,6 +44,6 @@
     "cs-check": "phpcs -n",
     "cs-report": "phpcs -n --report=checkstyle --report-file=build/checkstyle.xml",
     "cs-fix": "phpcbf",
-    "metrics": "phpmetrics --report-html=build/metrics ."
+    "metrics": "phpmetrics --report-html=build/metrics --junit=build/phpunit.xml ."
   }
 }

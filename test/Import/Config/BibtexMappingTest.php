@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of OPUS. The software OPUS has been originally developed
  * at the University of Stuttgart with funding from the German Research Net,
@@ -24,25 +25,31 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * @category    Tests
- * @package     OpusTest\Bibtex\Import\Configuration
- * @author      Sascha Szott <opus-repository@saschaszott.de>
  * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
+ *
+ * @category    Tests
+ * @package     OpusTest\Bibtex\Import\Config
+ * @author      Sascha Szott <opus-repository@saschaszott.de>
  */
 
-namespace OpusTest\Bibtex\Import\Configuration;
+namespace OpusTest\Bibtex\Import\Config;
 
-use Opus\Bibtex\Import\Configuration\FieldMapping;
+use Opus\Bibtex\Import\Config\BibtexMapping;
 use Opus\Bibtex\Import\Processor;
-use Opus\Bibtex\Import\Rules\ConstantValueRule;
+use Opus\Bibtex\Import\Rules\ConstantValue;
+use Opus\Bibtex\Import\Rules\Language;
 use Opus\Bibtex\Import\Rules\SimpleRule;
+use PHPUnit\Framework\TestCase;
 
-class MappingConfigurationTest extends \PHPUnit_Framework_TestCase
+use function array_keys;
+use function count;
+
+class BibtexMappingTest extends TestCase
 {
     public function testUpdateRule()
     {
-        $fieldMapping = new FieldMapping();
+        $fieldMapping = new BibtexMapping();
         $fieldMapping
             ->addRule(
                 'publishedYear',
@@ -53,7 +60,7 @@ class MappingConfigurationTest extends \PHPUnit_Framework_TestCase
                 new SimpleRule('year', 'completedYear')
             );
 
-        $proc = new Processor($fieldMapping);
+        $proc     = new Processor($fieldMapping);
         $metadata = [];
         $proc->handleRecord(['Year' => '2019'], $metadata);
 
@@ -63,7 +70,7 @@ class MappingConfigurationTest extends \PHPUnit_Framework_TestCase
 
     public function testAddRuleOverwrite()
     {
-        $fieldMapping = new FieldMapping();
+        $fieldMapping = new BibtexMapping();
         $fieldMapping
             ->addRule(
                 'publishedYear',
@@ -74,7 +81,7 @@ class MappingConfigurationTest extends \PHPUnit_Framework_TestCase
                 new SimpleRule('year', 'completedYear')
             );
 
-        $proc = new Processor($fieldMapping);
+        $proc     = new Processor($fieldMapping);
         $metadata = [];
         $proc->handleRecord(['Year' => '2019'], $metadata);
 
@@ -84,7 +91,7 @@ class MappingConfigurationTest extends \PHPUnit_Framework_TestCase
 
     public function testAddRule()
     {
-        $fieldMapping = new FieldMapping();
+        $fieldMapping = new BibtexMapping();
         $fieldMapping
             ->addRule(
                 'publishedYear',
@@ -95,7 +102,7 @@ class MappingConfigurationTest extends \PHPUnit_Framework_TestCase
                 new SimpleRule('year', 'completedYear')
             );
 
-        $proc = new Processor($fieldMapping);
+        $proc     = new Processor($fieldMapping);
         $metadata = [];
         $proc->handleRecord(['Year' => '2019'], $metadata);
 
@@ -105,7 +112,7 @@ class MappingConfigurationTest extends \PHPUnit_Framework_TestCase
 
     public function testResetRule()
     {
-        $fieldMapping = new FieldMapping();
+        $fieldMapping = new BibtexMapping();
         $fieldMapping
             ->addRule(
                 'publishedYear',
@@ -117,7 +124,7 @@ class MappingConfigurationTest extends \PHPUnit_Framework_TestCase
                 new SimpleRule('year', 'completedYear')
             );
 
-        $proc = new Processor($fieldMapping);
+        $proc     = new Processor($fieldMapping);
         $metadata = [];
         $proc->handleRecord(['Year' => '2019'], $metadata);
 
@@ -127,7 +134,7 @@ class MappingConfigurationTest extends \PHPUnit_Framework_TestCase
 
     public function testRemoveRule()
     {
-        $fieldMapping = new FieldMapping();
+        $fieldMapping = new BibtexMapping();
         $fieldMapping
             ->addRule(
                 'publishedYear',
@@ -139,7 +146,7 @@ class MappingConfigurationTest extends \PHPUnit_Framework_TestCase
                 new SimpleRule('year', 'completedYear')
             );
 
-        $proc = new Processor($fieldMapping);
+        $proc     = new Processor($fieldMapping);
         $metadata = [];
         $proc->handleRecord(['Year' => '2019'], $metadata);
 
@@ -153,7 +160,7 @@ class MappingConfigurationTest extends \PHPUnit_Framework_TestCase
                 new SimpleRule('year', 'publishedYear')
             );
 
-        $proc = new Processor($fieldMapping);
+        $proc     = new Processor($fieldMapping);
         $metadata = [];
         $proc->handleRecord(['Year' => '2019'], $metadata);
 
@@ -163,25 +170,25 @@ class MappingConfigurationTest extends \PHPUnit_Framework_TestCase
 
     public function testPrependRule()
     {
-        $fieldMapping = new FieldMapping();
-        $proc = new Processor($fieldMapping);
-        $metadata = [];
+        $fieldMapping = new BibtexMapping();
+        $proc         = new Processor($fieldMapping);
+        $metadata     = [];
         $proc->handleRecord(['Year' => '2019'], $metadata);
 
         $this->assertArrayNotHasKey('PublishedYear', $metadata);
 
         $fieldMapping->prependRule(
             'secondRule',
-            (new ConstantValueRule())->setOpusFieldName('PublishedYear')->setValue('1970')
+            (new ConstantValue())->setOpusField('PublishedYear')->setValue('1970')
         );
-        $proc = new Processor($fieldMapping);
+        $proc     = new Processor($fieldMapping);
         $metadata = [];
         $proc->handleRecord(['Year' => '2019'], $metadata);
 
         $this->assertEquals('1970', $metadata['PublishedYear']);
 
         $fieldMapping->removeRule('secondRule');
-        $proc = new Processor($fieldMapping);
+        $proc     = new Processor($fieldMapping);
         $metadata = [];
         $proc->handleRecord(['Year' => '2019'], $metadata);
 
@@ -190,23 +197,100 @@ class MappingConfigurationTest extends \PHPUnit_Framework_TestCase
         $fieldMapping
             ->addRule(
                 'secondRule',
-                (new ConstantValueRule())->setOpusFieldName('PublishedYear')->setValue('1970')
+                (new ConstantValue())->setOpusField('PublishedYear')->setValue('1970')
             )
             ->prependRule(
                 'firstRule',
-                (new ConstantValueRule())->setOpusFieldName('PublishedYear')->setValue('1870')
+                (new ConstantValue())->setOpusField('PublishedYear')->setValue('1870')
             );
-        $proc = new Processor($fieldMapping);
+        $proc     = new Processor($fieldMapping);
         $metadata = [];
         $proc->handleRecord(['Year' => '2019'], $metadata);
 
         $this->assertEquals('1970', $metadata['PublishedYear']);
 
         $fieldMapping->removeRule('secondRule');
-        $proc = new Processor($fieldMapping);
+        $proc     = new Processor($fieldMapping);
         $metadata = [];
         $proc->handleRecord(['Year' => '2019'], $metadata);
 
         $this->assertEquals('1870', $metadata['PublishedYear']);
+    }
+
+    public function testRemoveRuleWithUnknownName()
+    {
+        $bibtexMapping = new BibtexMapping();
+        $bibtexMapping->removeRule('unknown');
+        $this->assertEmpty($bibtexMapping->getRules());
+    }
+
+    public function testResetRulesWithEmptyList()
+    {
+        $bibtexMapping = new BibtexMapping();
+        $this->assertEmpty($bibtexMapping->getRules());
+        $bibtexMapping->resetRules();
+        $this->assertEmpty($bibtexMapping->getRules());
+    }
+
+    public function testPrependRuleWithExistingName()
+    {
+        $bibtexMapping = new BibtexMapping();
+        $bibtexMapping->addRule('language');
+        $this->assertEquals(1, count($bibtexMapping->getRules()));
+        $this->arrayHasKey('language', $bibtexMapping->getRules());
+
+        $bibtexMapping->addRule('belongsToBibliography');
+        $this->assertEquals(['language', 'belongsToBibliography'], array_keys($bibtexMapping->getRules()));
+
+        $bibtexMapping->prependRule('belongsToBibliography');
+        $this->assertEquals(['belongsToBibliography', 'language'], array_keys($bibtexMapping->getRules()));
+
+        $bibtexMapping->removeRule('belongsToBibliography');
+        $this->assertEquals(1, count($bibtexMapping->getRules()));
+        $this->arrayHasKey('language', $bibtexMapping->getRules());
+
+        $bibtexMapping->resetRules();
+        $this->assertEmpty($bibtexMapping->getRules());
+    }
+
+    public function testAddRuleWithExistingName()
+    {
+        $bibtexMapping = new BibtexMapping();
+        $bibtexMapping->addRule('language');
+        $this->assertEquals(1, count($bibtexMapping->getRules()));
+        $this->arrayHasKey('language', $bibtexMapping->getRules());
+
+        $bibtexMapping->addRule('belongsToBibliography');
+        $this->assertEquals(['language', 'belongsToBibliography'], array_keys($bibtexMapping->getRules()));
+
+        $bibtexMapping->addRule('language');
+        $this->assertEquals(['belongsToBibliography', 'language'], array_keys($bibtexMapping->getRules()));
+
+        $bibtexMapping->removeRule('belongsToBibliography');
+        $this->assertEquals(1, count($bibtexMapping->getRules()));
+        $this->arrayHasKey('language', $bibtexMapping->getRules());
+
+        $bibtexMapping->resetRules();
+        $this->assertEmpty($bibtexMapping->getRules());
+    }
+
+    public function testUpdateRuleWithUnknownName()
+    {
+        $bibtexMapping = new BibtexMapping();
+        $bibtexMapping->addRule('language');
+        $this->assertEquals(1, count($bibtexMapping->getRules()));
+        $this->arrayHasKey('language', $bibtexMapping->getRules());
+        $rule = $bibtexMapping->getRules()['language'];
+        $this->assertInstanceOf(Language::class, $rule);
+        $this->assertNotInstanceOf(SimpleRule::class, $rule);
+
+        $bibtexMapping->updateRule('belongsToBibliography');
+        $this->assertEquals(['language', 'belongsToBibliography'], array_keys($bibtexMapping->getRules()));
+
+        $bibtexMapping->updateRule('language', new SimpleRule());
+        $this->assertEquals(['language', 'belongsToBibliography'], array_keys($bibtexMapping->getRules()));
+        $rule = $bibtexMapping->getRules()['language'];
+        $this->assertNotInstanceOf(Language::class, $rule);
+        $this->assertInstanceOf(SimpleRule::class, $rule);
     }
 }

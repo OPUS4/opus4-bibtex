@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of OPUS. The software OPUS has been originally developed
  * at the University of Stuttgart with funding from the German Research Net,
@@ -24,45 +25,63 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * @category    BibTeX
- * @package     Opus\Bibtex\Import\Rules
- * @author      Sascha Szott <opus-repository@saschaszott.de>
  * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
- */
-
-namespace Opus\Bibtex\Import\Rules;
-
-use Opus\Bibtex\Import\Configuration\ConfigurationManager;
-
-/**
- * ptype ist kein Standard-BibTeX-Feld: das Feld ptype kann genutzt werden, um das Typ-Mapping auf Basis des
- * BibTeX-Types (die Zeichenkette nach @) zu umgehen
  *
- * Ist im BibTeX-Record kein Feld ptype vorhanden, so wird der Typ aus der Zeichenkette nach @ abgeleitet
+ * @category    Tests
+ * @package     OpusTest\Bibtex\Import\Rules
+ * @author      Sascha Szott <opus-repository@saschaszott.de>
  */
-class Ptype extends SimpleRule
+
+namespace OpusTest\Bibtex\Import\Rules;
+
+use Opus\Bibtex\Import\Processor;
+use PHPUnit\Framework\TestCase;
+
+class PagesTest extends TestCase
 {
-    protected $documentTypeMapping;
-
-    public function __construct()
+    public function testPageFirst()
     {
-        $this->documentTypeMapping = ConfigurationManager::getTypeMapping();
-        $this->documentTypeMapping->setDefaultType(null); // Default-Type soll nicht zur Anwendung kommen
-
-        $this->setBibtexFieldName('ptype');
-        $this->setOpusFieldName('Type');
-        $this->setFn(
-            function ($value) {
-                return $this->documentTypeMapping->getMapping($value);
-            }
-        );
-        return $this;
+        $proc     = new Processor();
+        $metadata = [];
+        $proc->handleRecord(['Pages' => '1--10'], $metadata);
+        $this->assertEquals('1', $metadata['PageFirst']);
     }
 
-    public function setDocumentTypeMapping($documentTypeMapping)
+    public function testPageLast()
     {
-        $this->documentTypeMapping = $documentTypeMapping;
-        return $this;
+        $proc     = new Processor();
+        $metadata = [];
+        $proc->handleRecord(['Pages' => '1--10'], $metadata);
+        $this->assertEquals('10', $metadata['PageLast']);
+    }
+
+    public function testPageLastSameAsPageFirst()
+    {
+        $proc     = new Processor();
+        $metadata = [];
+        $proc->handleRecord(['Pages' => '42'], $metadata);
+        $this->assertEquals('42', $metadata['PageFirst']);
+        $this->assertEquals('42', $metadata['PageLast']);
+        $this->assertEquals('1', $metadata['PageNumber']);
+    }
+
+    public function testPageNumber()
+    {
+        $proc     = new Processor();
+        $metadata = [];
+        $proc->handleRecord(['Pages' => '1--10'], $metadata);
+
+        $this->assertEquals('10', $metadata['PageNumber']);
+    }
+
+    public function testPageLastLessThanPageFirst()
+    {
+        $proc     = new Processor();
+        $metadata = [];
+        $proc->handleRecord(['Pages' => '42-41'], $metadata);
+        $this->assertEquals('42', $metadata['PageFirst']);
+        $this->assertEquals('41', $metadata['PageLast']);
+        $this->assertArrayNotHasKey('PageNumber', $metadata);
     }
 }

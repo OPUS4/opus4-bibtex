@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of OPUS. The software OPUS has been originally developed
  * at the University of Stuttgart with funding from the German Research Net,
@@ -24,39 +25,67 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
+ * @copyright   Copyright (c) 2021, OPUS 4 development team
+ * @license     http://www.gnu.org/licenses/gpl.html General Public License
+ *
  * @category    BibTeX
  * @package     Opus\Bibtex\Import\Rules
  * @author      Sascha Szott <opus-repository@saschaszott.de>
- * @copyright   Copyright (c) 2021, OPUS 4 development team
- * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
 namespace Opus\Bibtex\Import\Rules;
 
-/**
- * Eine Regel, um ein Metadatenfeld mit einer Konstante zu befüllen. Hierbei wird der BibTeX-Record nicht ausgewertet.
- */
-class ConstantValueRule implements IRule
-{
-    protected $opusFieldName;
+use function ucfirst;
 
+/**
+ * Eine Regel, um ein OPUS-Metadatenfeld mit einer Konstante zu befüllen. Hierbei wird der Inhalt des zu verarbeitenden
+ * BibTeX-Record nicht ausgewertet.
+ */
+class ConstantValue implements RuleInterface
+{
+    /** @var string Name des OPUS-Metadatenfelds */
+    protected $opusField;
+
+    /** @var string der zu setzenden Feldwert (Konstante) */
     protected $value;
 
     /**
-     * Setzt den Namen des zu befüllenden OPUS4-Metadatenfelds.
+     * Liefert den Namen des zu befüllenden OPUS-Metadatenfelds zurück.
      *
-     * @param string $opusFieldName
+     * @return string Name des OPUS-Metadatenfelds
      */
-    public function setOpusFieldName($opusFieldName)
+    public function getOpusField()
     {
-        $this->opusFieldName = ucfirst($opusFieldName);
+        return $this->opusField;
+    }
+
+    /**
+     * Setzt den Namen des zu befüllenden OPUS-Metadatenfelds.
+     *
+     * @param string $opusField
+     * @return $this
+     */
+    public function setOpusField($opusField)
+    {
+        $this->opusField = ucfirst($opusField);
         return $this;
     }
 
     /**
-     * Setzt den Feldwert für das OPUS4-Metadatenfeld (Konstante).
+     * Liefert den zu setzenden Wert (Konstante) zurück.
      *
-     * @param $value
+     * @return string
+     */
+    public function getValue()
+    {
+        return $this->value;
+    }
+
+    /**
+     * Setzt den Feldwert (Konstante) für das OPUS-Metadatenfeld.
+     *
+     * @param string $value
+     * @return $this
      */
     public function setValue($value)
     {
@@ -64,19 +93,31 @@ class ConstantValueRule implements IRule
         return $this;
     }
 
+    /**
+     * Ausführung der konfigurierten Regel zur Befüllung des OPUS-Metadatenfelds mit einem konstanten Wert.
+     *
+     * @param array $bibtexRecord BibTeX-Record (Array von BibTeX-Feldern)
+     * @param array $documentMetadata OPUS-Metadatensatz (Array von Metadatenfeldern)
+     * @return bool liefert true, wenn die Regel erfolgreich angewendet werden konnte
+     */
     public function apply($bibtexRecord, &$documentMetadata)
     {
         $result = false;
         // der BibTeX-Record wird zur Bestimmung des Metadatenfelds nicht verwendet
         // d.h. Metadatenfeldwert wird hier auf eine Konstante gesetzt oder Bestimmung des Feldinhalts auf Basis
         // von anderen Metadatenfeldern
-        if (! is_null($this->value)) {
-            $documentMetadata[$this->opusFieldName] = $this->value;
-            $result = true;
+        if ($this->value !== null) {
+            $documentMetadata[ucfirst($this->opusField)] = $this->value;
+            $result                                      = true;
         }
         return $result;
     }
 
+    /**
+     * Liefert die Liste der ausgewerteten BibTeX-Felder.
+     *
+     * @return array
+     */
     public function getEvaluatedBibTexField()
     {
         return [];

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of OPUS. The software OPUS has been originally developed
  * at the University of Stuttgart with funding from the German Research Net,
@@ -24,43 +25,47 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
+ * @copyright   Copyright (c) 2021, OPUS 4 development team
+ * @license     http://www.gnu.org/licenses/gpl.html General Public License
+ *
  * @category    Tests
  * @package     OpusTest\Bibtex\Import\Rules
  * @author      Sascha Szott <opus-repository@saschaszott.de>
- * @copyright   Copyright (c) 2021, OPUS 4 development team
- * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
 namespace OpusTest\Bibtex\Import\Rules;
 
 use Opus\Bibtex\Import\Processor;
+use PHPUnit\Framework\TestCase;
 
-class IdentifierTest extends \PHPUnit_Framework_TestCase
+use function ksort;
+
+class IdentifierTest extends TestCase
 {
     public function testProcess()
     {
-        $proc = new Processor();
-        $metadata = [];
+        $proc        = new Processor();
+        $metadata    = [];
         $bibtexBlock = [
             'arxiv' => 'http://papers.ssrn.com/sol3/papers.cfm?abstract_id=9999999',
-            'doi' => '10.2222/j.jbankfin.2222.32.001',
-            'issn' => '1100-0011'
+            'doi'   => '10.2222/j.jbankfin.2222.32.001',
+            'issn'  => '1100-0011',
         ];
         $proc->handleRecord($bibtexBlock, $metadata);
 
         $expected = [
             [
                 'Value' => 'http://papers.ssrn.com/sol3/papers.cfm?abstract_id=9999999',
-                'Type' => 'url'
+                'Type'  => 'url',
             ],
             [
                 'Value' => '10.2222/j.jbankfin.2222.32.001',
-                'Type' => 'doi'
+                'Type'  => 'doi',
             ],
             [
                 'Value' => '1100-0011',
-                'Type' => 'issn'
-            ]
+                'Type'  => 'issn',
+            ],
         ];
 
         $this->assertEquals(ksort($expected), ksort($metadata['Identifier']));

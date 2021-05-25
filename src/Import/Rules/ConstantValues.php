@@ -35,81 +35,72 @@
 
 namespace Opus\Bibtex\Import\Rules;
 
+use function class_exists;
+use function method_exists;
+use function ucfirst;
+
 /**
- * Erlaubt das Erzeugen von Notes, wobei neben dem Wert auch die Sichtbarkeit (Standard: public) sowie ein optional
- * Präfix gesetzt werden kann, das dem Feldwert vorangestellt wird.
+ * Eine Regel, um mehrere OPUS-Metadatenfelder mit Konstanten zu befüllen. Hierbei wird der Inhalt des zu verarbeitenden
+ * BibTeX-Record nicht ausgewertet.
  */
-class Note extends AbstractArrayRule
+class ConstantValues implements RuleInterface
 {
-    /** @var string Präfix, der dem Wert der Note vorangestellt wird (Default: leer) */
-    private $messagePrefix = '';
-
-    /** @var string Sichtbarkeitseinstellung der Note (Default: public) */
-    private $visibility = 'public';
-
     /**
-     * Konstruktor
-     */
-    public function __construct()
-    {
-        $this->setOpusField('Note');
-    }
-
-    /**
-     * Gibt das gesetzte Präfix zurück.
+     * beschreibt die zu setzenden OPUS-Felder und die dabei zu nutzenden Konstanten
      *
-     * @return string
+     * @var array
      */
-    public function getMessagePrefix()
-    {
-        return $this->messagePrefix;
-    }
+    private $options;
 
     /**
-     * Erlaubt das Setzen des Präfix für den Wert der Note.
+     * Erlaubt das Setzen der zu setzenden OPUS-Felder sowie der dabei zu verwendenden Werte (Konstanten).
      *
-     * @param string $messagePrefix Präfix
+     * @param array $options
      * @return $this
      */
-    public function setMessagePrefix($messagePrefix)
+    public function setOptions($options)
     {
-        $this->messagePrefix = $messagePrefix;
+        $this->options = $options;
         return $this;
     }
 
     /**
-     * Liefert die Sichtbarkeitseinstellung zurück.
+     * Ausführung der konfigurierten Regel zur Befüllung von OPUS-Metadatenfeldern mit konstanten Werten.
      *
-     * @return string
+     * @param array $bibtexRecord BibTeX-Record (Array von BibTeX-Feldern)
+     * @param array $documentMetadata OPUS-Metadatensatz (Array von Metadatenfeldern)
+     * @return bool liefert true, wenn die Regel erfolgreich angewendet werden konnte
      */
-    public function getVisibility()
+    public function apply($bibtexRecord, &$documentMetadata)
     {
-        return $this->visibility;
+        $result = false;
+
+        // der BibTeX-Record wird zur Bestimmung des Metadatenfelds nicht verwendet
+        if ($this->options !== null) {
+            foreach ($this->options as $propName => $propValue) {
+                $propName  = ucfirst($propName);
+                $className = 'Opus\Bibtex\Import\Rules\\' . $propName;
+                if (class_exists($className) && method_exists($className, 'setValue')) {
+                    // zu setzender Wert wird durch Ausführung der Regelklasse bestimmt
+                    $class = new $className();
+                    $class->setValue($propValue);
+                    $class->apply($bibtexRecord, $documentMetadata);
+                } else {
+                    $documentMetadata[ucfirst($propName)] = $propValue;
+                }
+                $result = true;
+            }
+        }
+        return $result;
     }
 
     /**
-     * Erlaubt das Setzen der Sichtbarkeitseinstellung auf den übergebenen Wert.
+     * Liefert die Liste der ausgewerteten BibTeX-Felder.
      *
-     * @param string $visibility Sichtbarkeitseinstellung
-     * @return $this
-     */
-    public function setVisibility($visibility)
-    {
-        $this->visibility = $visibility;
-        return $this;
-    }
-
-    /**
-     * Ermittelt die Werte für das OPUS-Metadatenfeld.
-     *
-     * @param string $value auszuwertender Wert aus BibTeX-Feld
      * @return array
      */
-    protected function getValue($value)
+    public function getEvaluatedBibTexField()
     {
-        return [
-            'Visibility' => $this->visibility,
-            'Message'    => $this->messagePrefix . $value,
-        ];
+        return [];
     }
 }

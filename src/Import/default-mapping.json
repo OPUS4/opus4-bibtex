@@ -1,0 +1,153 @@
+{
+  "name": "default",
+  "description": "Default BibTeX Mapping Configuration.",
+  "mapping": [
+    {
+      "name": "documentType",
+      "options": {
+        "bibtexField": "ptype"
+      }
+    },
+    {
+      "name": "issue",
+      "options": {
+        "bibtexField": "number",
+        "opusField": "Issue"
+      }
+    },
+    {
+      "name": "volume",
+      "options": {
+        "bibtexField": "volume",
+        "opusField": "Volume"
+      }
+    },
+    {
+      "name": "pages"
+    },
+    {
+      "name": "publishedYear"
+    },
+    {
+      "name": "issn"
+    },
+    {
+      "name": "isbn"
+    },
+    {
+      "name": "doi"
+    },
+    {
+      "name": "arxiv"
+    },
+    {
+      "name": "titleMain"
+    },
+    {
+      "name": "journalTitle",
+      "class": "TitleParent",
+      "options": {
+        "bibtexField": "journal"
+      }
+    },
+    {
+      "name": "bookTitle",
+      "class": "TitleParent",
+      "options": {
+        "bibtexField": "booktitle"
+      }
+    },
+    {
+      "name": "subject"
+    },
+    {
+      "name": "pdfUrl",
+      "class": "Note",
+      "options": {
+        "bibtexField": "pdfurl",
+        "messagePrefix": "URL of the PDF: ",
+        "visibility": "public"
+      }
+    },
+    {
+      "name": "slides",
+      "class": "Note",
+      "options": {
+        "bibtexField": "slides",
+        "messagePrefix": "URL of the Slides: ",
+        "visibility": "public"
+      }
+    },
+    {
+      "name": "annote",
+      "class": "Note",
+      "options": {
+        "bibtexField": "annote",
+        "messagePrefix": "Additional Note: ",
+        "visibility": "public"
+      }
+    },
+    {
+      "name": "summary",
+      "class": "Note",
+      "options": {
+        "bibtexField": "summary",
+        "messagePrefix": "URL of the Abstract: ",
+        "visibility": "public"
+      }
+    },
+    {
+      "name": "code",
+      "class": "Note",
+      "options": {
+        "bibtexField": "code",
+        "messagePrefix": "URL of the Code: ",
+        "visibility": "public"
+      }
+    },
+    {
+      "name": "poster",
+      "class": "Note",
+      "options": {
+        "bibtexField": "poster",
+        "messagePrefix": "URL of the Poster: ",
+        "visibility": "public"
+      }
+    },
+    {
+      "name": "author",
+      "class": "Person",
+      "options": {
+        "bibtexField": "author"
+      }
+    },
+    {
+      "name": "editor",
+      "class": "Person",
+      "options": {
+        "bibtexField": "editor"
+      }
+    },
+    {
+      "name": "sourceData"
+    },
+    {
+      "name": "sourceDataHash"
+    },
+    {
+      "name": "language",
+      "options": {
+        "value": "eng"
+      }
+    },
+    {
+      "name": "belongsToBibliography",
+      "options": {
+        "value": false
+      }
+    },
+    {
+      "name": "umlauts"
+    }
+  ]
+}

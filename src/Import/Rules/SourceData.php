@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of OPUS. The software OPUS has been originally developed
  * at the University of Stuttgart with funding from the German Research Net,
@@ -24,31 +25,46 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
+ * @copyright   Copyright (c) 2021, OPUS 4 development team
+ * @license     http://www.gnu.org/licenses/gpl.html General Public License
+ *
  * @category    BibTeX
  * @package     Opus\Bibtex\Import\Rules
  * @author      Sascha Szott <opus-repository@saschaszott.de>
- * @copyright   Copyright (c) 2021, OPUS 4 development team
- * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
 namespace Opus\Bibtex\Import\Rules;
 
-use Opus\Bibtex\Import\Configuration\FieldMapping;
-
-class SourceData extends ArrayRule
+/**
+ * Setzt den ursprünglichen BibTeX-Record als Wert des Enrichments opus.import.data
+ */
+class SourceData extends AbstractArrayRule
 {
+    /**
+     * Name des Enrichments, das zur Speicherung des importierten (unveränderten) BibTeX-Record verwendet wird
+     */
+    const SOURCE_DATA_KEY = 'opus.import.data';
+
+    /**
+     * Konstruktor
+     */
     public function __construct()
     {
-        $this->setBibtexFieldName('_original');
-        $this->setOpusFieldName('Enrichment');
-        $this->setFn(
-            function ($value) {
-                return [
-                    'KeyName' => FieldMapping::SOURCE_DATA_KEY,
-                    'Value' => $value
-                ];
-            }
-        );
-        return $this;
+        $this->setBibtexField('_original');
+        $this->setOpusField('Enrichment');
+    }
+
+    /**
+     * Ermittelt den Feldwert für den OPUS-Metadatensatz.
+     *
+     * @param Feldwert $value BibTeX-Record
+     * @return array
+     */
+    protected function getValue($value)
+    {
+        return [
+            'KeyName' => self::SOURCE_DATA_KEY,
+            'Value'   => $value,
+        ];
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of OPUS. The software OPUS has been originally developed
  * at the University of Stuttgart with funding from the German Research Net,
@@ -24,27 +25,29 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
+ * @copyright   Copyright (c) 2021, OPUS 4 development team
+ * @license     http://www.gnu.org/licenses/gpl.html General Public License
+ *
  * @category    Tests
  * @package     OpusTest\Bibtex\Import\Rules
  * @author      Sascha Szott <opus-repository@saschaszott.de>
- * @copyright   Copyright (c) 2021, OPUS 4 development team
- * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
 namespace OpusTest\Bibtex\Import\Rules;
 
 use Opus\Bibtex\Import\Parser;
 use Opus\Bibtex\Import\Processor;
+use PHPUnit\Framework\TestCase;
 
-class PersonsTest extends \PHPUnit_Framework_TestCase
+class PersonsTest extends TestCase
 {
     public function testProcessAuthors()
     {
-        $proc = new Processor();
-        $metadata = [];
+        $proc        = new Processor();
+        $metadata    = [];
         $bibtexBlock = [
             'Author' => 'Wang, Y. and Xie and Steffen, S.',
-            'Editor' => 'Ming, J.'
+            'Editor' => 'Ming, J.',
         ];
         $proc->handleRecord($bibtexBlock, $metadata);
 
@@ -52,23 +55,23 @@ class PersonsTest extends \PHPUnit_Framework_TestCase
             [
                 [
                     'FirstName' => 'Y.',
-                    'LastName' => 'Wang',
-                    'Role' => 'author'
+                    'LastName'  => 'Wang',
+                    'Role'      => 'author',
                 ],
                 [
                     'LastName' => 'Xie',
-                    'Role' => 'author'
+                    'Role'     => 'author',
                 ],
                 [
                     'FirstName' => 'S.',
-                    'LastName' => 'Steffen',
-                    'Role' => 'author'
+                    'LastName'  => 'Steffen',
+                    'Role'      => 'author',
                 ],
                 [
                     'FirstName' => 'J.',
-                    'LastName' => 'Ming',
-                    'Role' => 'editor'
-                ]
+                    'LastName'  => 'Ming',
+                    'Role'      => 'editor',
+                ],
             ],
             $metadata['Person']
         );
@@ -76,10 +79,10 @@ class PersonsTest extends \PHPUnit_Framework_TestCase
 
     public function testProcessSpecialCharacters()
     {
-        $parser = new Parser('@misc{test, author = {M{\"u}ller, Michael}}');
+        $parser       = new Parser('@misc{test, author = {M{\"u}ller, Michael}}');
         $bibtexRecord = $parser->parse();
 
-        $proc = new Processor();
+        $proc     = new Processor();
         $metadata = [];
         $proc->handleRecord(
             $bibtexRecord[0],
@@ -90,9 +93,9 @@ class PersonsTest extends \PHPUnit_Framework_TestCase
             [
                 [
                     'FirstName' => 'Michael',
-                    'LastName' => 'Müller',
-                    'Role' => 'author'
-                ]
+                    'LastName'  => 'Müller',
+                    'Role'      => 'author',
+                ],
             ],
             $metadata['Person']
         );

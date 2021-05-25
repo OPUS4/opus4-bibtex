@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of OPUS. The software OPUS has been originally developed
  * at the University of Stuttgart with funding from the German Research Net,
@@ -24,30 +25,32 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * @category    BibTeX
- * @package     Opus\Bibtex\Import\Configuration
- * @author      Sascha Szott <opus-repository@saschaszott.de>
  * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
+ *
+ * @category    BibTeX
+ * @package     Opus\Bibtex\Import\Config
+ * @author      Sascha Szott <opus-repository@saschaszott.de>
  */
 
-namespace Opus\Bibtex\Import\Configuration;
+namespace Opus\Bibtex\Import\Config;
 
+use function array_key_exists;
+
+/**
+ * Hält die Konfigurationseinstellungen zum Mapping von BibTeX-Typen auf OPUS-Dokumenttypen.
+ */
 class DocumentTypeMapping
 {
     /**
-     * Mapping (assoziatives Array) von BibTeX-Typen auf OPUS-Dokumenttypen, wobei ein BibTeX-Typ nur einem
+     * @var array Mapping (assoziatives Array) von BibTeX-Typen auf OPUS-Dokumenttypen, wobei ein BibTeX-Typ nur einem
      * OPUS-Dokumenttyp zugeordnet sein kann.
-     *
-     * @var array
      */
     private $typeMap = [];
 
     /**
-     * Dieser OPUS-Dokumenttyp wird zurückgegeben, wenn für den BibTeX-Typ kein Mapping auf einen OPUS-Dokumenttyp
-     * existiert.
-     *
-     * @var string
+     * @var string Name des OPUS-Dokumenttyps, der zurückgegeben wird, wenn für den BibTeX-Typ kein Mapping auf einen
+     * OPUS-Dokumenttyp existiert.
      */
     private $defaultType;
 
@@ -55,8 +58,9 @@ class DocumentTypeMapping
      * Erlaubt das Setzen eines Mapping-Eintrags vom übergebenen BibTeX-Typ auf den übergebenen OPUS-Dokumenttyp.
      * Liegt für den übergebenen BibTeX-Typ bereits ein Mapping vor, so wird es überschrieben.
      *
-     * @param $bibtexType Name des BibTeX-Typs
-     * @param $opusType Name des OPUS-Dokumenttyps
+     * @param string $bibtexType Name des BibTeX-Typs
+     * @param string $opusType Name des OPUS-Dokumenttyps
+     * @return $this
      */
     public function setMapping($bibtexType, $opusType)
     {
@@ -68,28 +72,34 @@ class DocumentTypeMapping
      * Erlaubt das Entfernen des Typ-Mappings für den übergebenen BibTeX-Typ. Der Versuch des Entfernens eines nicht
      * vorhandenen Mappings wird ignoriert.
      *
-     * @param $bibtexType Name des BibTeX-Typs
+     * @param string $bibtexType Name des BibTeX-Typs
+     * @return $this
      */
     public function removeMapping($bibtexType)
     {
         if (array_key_exists($bibtexType, $this->typeMap)) {
             unset($this->typeMap[$bibtexType]);
         }
+        return $this;
     }
 
     /**
      * Setzt das Typ-Mapping zurück.
+     *
+     * @return $this
      */
     public function clearMapping()
     {
         $this->typeMap = [];
+        return $this;
     }
 
     /**
      * Erlaubt das Setzen eines OPUS-Dokumenttyp, der immer dann zurückgegeben wird, wenn für einen BibTeX-Typ kein
      * Mapping-Eintrag existiert.
      *
-     * @param $defaultType Name des OPUS-Dokumenttyps
+     * @param string $defaultType Name des OPUS-Dokumenttyps
+     * @return $this
      */
     public function setDefaultType($defaultType)
     {
@@ -109,20 +119,31 @@ class DocumentTypeMapping
 
     /**
      * Gibt den OPUS-Dokumenttyp für den übergebenen BibTeX-Typ zurück, der explizit im Mapping eingetragen wurde.
-     * Existiert kein Mapping-Eintrag für den BibTeX-Typ, so wird der Default-Type zurückgegeben.
+     * Existiert kein Mapping-Eintrag für den übergebenen BibTeX-Typ, so wird der Default-Type als OPUS-Dokumenttyp
+     * zurückgegeben. Ist kein Default-Typ definiert, so wird null zurückgegeben.
      *
-     * @param $bibtexType Name des BibTeX-Typs
+     * @param string $bibtexType Name des BibTeX-Typs
+     * @param bool $useDefaultAsFallback False deaktiviert Fallback auf Defaulttyp.
+     * @return string|null Name des zugehörigen OPUS-Dokumenttyps (oder null, wenn kein Mapping möglich)
+     *
+     * TODO macht $useDefaultAsFallback Sinn? Wie/wo wird es verwendet?
      */
-    public function getMapping($bibtexType)
+    public function getOpusType($bibtexType, $useDefaultAsFallback = true)
     {
         if (array_key_exists($bibtexType, $this->typeMap)) {
             return $this->typeMap[$bibtexType];
         }
-        return $this->defaultType;
+
+        if ($useDefaultAsFallback) {
+            return $this->defaultType;
+        }
+
+        return null;
     }
 
     /**
-     * Gibt die aktuelle Typmapping-Konfiguration zurück
+     * Gibt die aktuelle Typmapping-Konfiguration zurück.
+     *
      * @return array
      */
     public function getMappings()

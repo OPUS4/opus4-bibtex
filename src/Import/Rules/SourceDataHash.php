@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of OPUS. The software OPUS has been originally developed
  * at the University of Stuttgart with funding from the German Research Net,
@@ -24,31 +25,55 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
+ * @copyright   Copyright (c) 2021, OPUS 4 development team
+ * @license     http://www.gnu.org/licenses/gpl.html General Public License
+ *
  * @category    BibTeX
  * @package     Opus\Bibtex\Import\Rules
  * @author      Sascha Szott <opus-repository@saschaszott.de>
- * @copyright   Copyright (c) 2021, OPUS 4 development team
- * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
 namespace Opus\Bibtex\Import\Rules;
 
-use Opus\Bibtex\Import\Configuration\FieldMapping;
-
-class SourceDataHash extends ArrayRule
+/**
+ * Setzt den Hashwert des importierten BibTeX-Record als Wert des Enrichments opus.import.dataHash.
+ * Hierbei wird standardmäßig die MD5-Hashfunktion verwendet.
+ */
+class SourceDataHash extends AbstractArrayRule
 {
+    /**
+     * Name des Enrichments, in dem der Hashwert (auf Basis der Hashfunktion HASH_FUNCTION) des importierten
+     * BibTeX-Records gespeichert wird
+     */
+    const SOURCE_DATA_HASH_KEY = 'opus.import.dataHash';
+
+    /**
+     * Name der Hashfunktion, die zur Bestimmung des Hashwerts verwendet werden soll.
+     *
+     * TODO konfigurierbar machen?
+     */
+    const HASH_FUNCTION = 'md5';
+
+    /**
+     * Konstruktor
+     */
     public function __construct()
     {
-        $this->setBibtexFieldName('_original');
-        $this->setOpusFieldName('Enrichment');
-        $this->setFn(
-            function ($value) {
-                return [
-                    'KeyName' => FieldMapping::SOURCE_DATA_HASH_KEY,
-                    'Value' => FieldMapping::HASH_FUNCTION . ':' . (FieldMapping::HASH_FUNCTION)($value)
-                ];
-            }
-        );
-        return $this;
+        $this->setBibtexField('_original');
+        $this->setOpusField('Enrichment');
+    }
+
+    /**
+     * Ermittelt den Feldwert für den OPUS-Metadatensatz.
+     *
+     * @param string $value BibTeX-Record
+     * @return array
+     */
+    protected function getValue($value)
+    {
+        return [
+            'KeyName' => self::SOURCE_DATA_HASH_KEY,
+            'Value'   => self::HASH_FUNCTION . ':' . (self::HASH_FUNCTION)($value),
+        ];
     }
 }

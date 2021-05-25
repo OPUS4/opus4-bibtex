@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of OPUS. The software OPUS has been originally developed
  * at the University of Stuttgart with funding from the German Research Net,
@@ -24,26 +25,50 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * @category    BibTeX
- * @package     Opus\Bibtex\Import\Rules
- * @author      Sascha Szott <opus-repository@saschaszott.de>
  * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
+ *
+ * @category    Tests
+ * @package     OpusTest\Bibtex\Import\Rules
+ * @author      Sascha Szott <opus-repository@saschaszott.de>
  */
 
-namespace Opus\Bibtex\Import\Rules;
+namespace OpusTest\Bibtex\Import\Rules;
 
-interface IRule
+use Opus\Bibtex\Import\Rules\ConstantValues;
+use PHPUnit\Framework\TestCase;
+
+class ConstantValuesTest extends TestCase
 {
-    /**
-     * @param $bibtexRecord BibTeX-Record, der importiert werden soll
-     * @param $documentMetadata Array von Metadatenfeldern, das schließlich in ein OPUS4-Dokument umgewandelt werden soll
-     * @return boolean Aussage über den Erfolg der Anwendung der Regel (true gdw. erfolgreiche Anwendung)
-     */
-    public function apply($bibtexRecord, &$documentMetadata);
+    public function testProcess()
+    {
+        $constantValuesRule = new ConstantValues();
+        $constantValuesRule->setOptions(
+            [
+                'language'              => 'deu',
+                'belongsToBibliography' => 1,
+            ]
+        );
 
-    /**
-     * @return gibt ein Array mit den Namen des BibTeX-Felder zurück, di bei der Regelanwendung auswertet wurden
-     */
-    public function getEvaluatedBibTexField();
+        $metadata = [];
+        $constantValuesRule->apply([], $metadata);
+
+        $this->assertEquals('deu', $metadata['Language']);
+        $this->assertTrue($metadata['BelongsToBibliography']);
+        $this->assertEmpty($constantValuesRule->getEvaluatedBibTexField());
+    }
+
+    public function testWithUnknownClass()
+    {
+        $constantValuesRule = new ConstantValues();
+        $constantValuesRule->setOptions([
+            'key' => 'value',
+        ]);
+
+        $metadata = [];
+        $constantValuesRule->apply([], $metadata);
+
+        $this->assertEquals('value', $metadata['Key']);
+        $this->assertEmpty($constantValuesRule->getEvaluatedBibTexField());
+    }
 }

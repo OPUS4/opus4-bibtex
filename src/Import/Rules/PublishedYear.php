@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of OPUS. The software OPUS has been originally developed
  * at the University of Stuttgart with funding from the German Research Net,
@@ -24,29 +25,47 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
+ * @copyright   Copyright (c) 2021, OPUS 4 development team
+ * @license     http://www.gnu.org/licenses/gpl.html General Public License
+ *
  * @category    BibTeX
  * @package     Opus\Bibtex\Import\Rules
  * @author      Sascha Szott <opus-repository@saschaszott.de>
- * @copyright   Copyright (c) 2021, OPUS 4 development team
- * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
 namespace Opus\Bibtex\Import\Rules;
 
+use function preg_replace;
+use function strlen;
+
+/**
+ * Setzt das Publikationsjahr im OPUS-Metadatenfeld PublishedYear auf Basis des BibTeX-Felds year, sofern es nur
+ * aus einer vierstelligen Ziffernfolge besteht.
+ */
 class PublishedYear extends SimpleRule
 {
+    /**
+     * Konstruktor
+     */
     public function __construct()
     {
-        $this->setBibtexFieldName('year');
-        $this->setOpusFieldName('PublishedYear');
-        $this->setFn(
-            function ($value) {
-                $value = preg_replace('/[^0-9]/', '', $value);
-                if (strlen($value) == 4) {
-                    return $value;
-                }
-            }
-        );
-        return $this;
+        $this->setBibtexField('year');
+        $this->setOpusField('PublishedYear');
+    }
+
+    /**
+     * Ermittelt den Feldwert für den OPUS-Metadatensatz.
+     *
+     * @param Feldwert $value Inhalt des BibTex-Felds
+     * @return array|null liefert null, wenn die Jahresangabe im BibTeX-Feld keine vierstellige Ziffernfolge ist;
+     *                    andernfalls wird der Feldwert für den OPUS-Metadatenfeld zurückgeliefert
+     */
+    protected function getValue($value)
+    {
+        $value = preg_replace('/[^0-9]/', '', $value);
+        if (strlen($value) === 4) {
+            return $value;
+        }
+        return null;
     }
 }

@@ -29,38 +29,55 @@
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  *
  * @category    BibTeX
- * @package     Opus\Bibtex\Import\Rules
+ * @package     Opus\Bibtex\Import\Config
  * @author      Sascha Szott <opus-repository@saschaszott.de>
  */
 
-namespace Opus\Bibtex\Import\Rules;
+namespace Opus\Bibtex\Import\Config;
+
+use function array_key_exists;
+use function file_get_contents;
+use function is_readable;
+use function json_decode;
 
 /**
- * Erlaubt das Setzen eines Feldwerts für den Haupttitel.
+ * Erlaubt das Auslesen einer JSON-Konfigurationsdatei, in der das Mapping der BibTeX-Felder auf die
+ * OPUS-Metadatenfelder definiert ist.
  */
-class TitleMain extends AbstractArrayRule
+class JsonBibtexMappingReader
 {
     /**
-     * Konstruktor
+     * @param string $fileName Name der Mapping-Konfigurationsdatei (JSON)
+     * @return BibtexMapping Instanz des BibTeX-Mappings auf Basis der Angaben in der übergebenen Konfigurationsdatei
+     * @throws BibtexConfigException Wird geworfen, wenn das konfigurierte Mapping nicht erfolgreich ausgewertet werden konnte.
      */
-    public function __construct()
+    public function getMappingConfigurationFromFile($fileName)
     {
-        $this->setBibtexField('title');
-        $this->setOpusField('TitleMain');
-    }
+        if (! is_readable($fileName)) {
+            throw new BibtexConfigException("could not read file $fileName");
+        }
 
-    /**
-     * Setzt den Haupttitel.
-     *
-     * @param string $value Wert des Haupttitels.
-     * @return array
-     */
-    protected function getValue($value)
-    {
-        return [
-            'Language' => 'eng',
-            'Value'    => $this->deleteBrace($value),
-            'Type'     => 'main',
-        ];
+        $json = file_get_contents($fileName);
+        if ($json === false) {
+            throw new BibtexConfigException("could not get content of file $fileName");
+        }
+
+        $jsonArr = json_decode($json, true);
+        if ($jsonArr === null) {
+            throw new BibtexConfigException("could not decode JSON file $fileName");
+        }
+
+        if (
+            ! (array_key_exists('name', $jsonArr) &&
+            array_key_exists('description', $jsonArr) &&
+            array_key_exists('mapping', $jsonArr))
+        ) {
+            throw new BibtexConfigException("missing key(s) in JSON file $fileName");
+        }
+
+        return (new BibtexMapping())
+            ->setName($jsonArr['name'])
+            ->setDescription($jsonArr['description'])
+            ->setRules($jsonArr['mapping']);
     }
 }

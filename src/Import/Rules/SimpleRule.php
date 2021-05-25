@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of OPUS. The software OPUS has been originally developed
  * at the University of Stuttgart with funding from the German Research Net,
@@ -24,86 +25,137 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
+ * @copyright   Copyright (c) 2021, OPUS 4 development team
+ * @license     http://www.gnu.org/licenses/gpl.html General Public License
+ *
  * @category    BibTeX
  * @package     Opus\Bibtex\Import\Rules
  * @author      Sascha Szott <opus-repository@saschaszott.de>
- * @copyright   Copyright (c) 2021, OPUS 4 development team
- * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
 namespace Opus\Bibtex\Import\Rules;
 
+use function array_key_exists;
+use function strlen;
+use function substr;
+use function trim;
+use function ucfirst;
+
 /**
  * Eine Regel, die ein Metadatenfeld auf Basis des Inhalts eines Felds des BibTeX-Records füllt.
  */
-class SimpleRule implements IRule
+class SimpleRule implements RuleInterface
 {
-    /**
-     * @var string Name des auszuwertenden BibTeX-Felds
-     */
-    protected $bibtexFieldName;
+    /** @var string Name des auszuwertenden BibTeX-Felds */
+    protected $bibtexField;
+
+    /** @var string Name des zu befüllenden OPUS4-Metadatenfelds */
+    protected $opusField;
 
     /**
-     * @var string Name des zu befüllenden OPUS4-Metadatenfelds
+     * @param string $bibtexField Name des auszuwertenden BibTeX-Felds
+     * @param string $opusField Name des zu befüllenden OPUS4-Metadatenfelds
      */
-    protected $opusFieldName;
-
-    /**
-     * @var optionale Funktion, die verwendet wird, um den Feldwert für das OPUS4-Metadatenfelds zu bestimmen
-     */
-    protected $fn;
-
-    /**
-     * @param string $bibtexFieldName Name des auszuwertenden BibTeX-Felds
-     * @param string $opusFieldName Name des zu befüllenden OPUS4-Metadatenfelds
-     */
-    public function __construct($bibtexFieldName = null, string $opusFieldName = null)
+    public function __construct($bibtexField = null, string $opusField = null)
     {
-        $this->setBibtexFieldName($bibtexFieldName);
-        $this->setOpusFieldName($opusFieldName);
-        return $this;
+        $this->setBibtexField($bibtexField);
+        $this->setOpusField($opusField);
     }
 
+    /**
+     * Anwendung der Regel auf den übergebenen BibTeX-Record.
+     *
+     * @param array $bibtexRecord
+     * @param array $documentMetadata
+     * @return bool
+     */
     public function apply($bibtexRecord, &$documentMetadata)
     {
         $result = false;
-        if (array_key_exists($this->bibtexFieldName, $bibtexRecord)) {
-            $value = $bibtexRecord[$this->bibtexFieldName];
-            if (! is_null($this->fn)) {
-                $value = ($this->fn)($value);
-            }
-            if (! is_null($value)) {
-                $documentMetadata[$this->opusFieldName] = $value;
-                $result = true;
+        if (array_key_exists($this->bibtexField, $bibtexRecord)) {
+            $value = $this->getValue($bibtexRecord[$this->bibtexField]);
+            if ($value !== null) {
+                $documentMetadata[$this->opusField] = $value;
+                $result                             = true;
             }
         }
         return $result;
     }
 
+    /**
+     * Liefert die Namen der bei der Regelanwendung ausgewerteten BibTeX-Felder zurück.
+     *
+     * @return array
+     */
     public function getEvaluatedBibTexField()
     {
-        return [$this->bibtexFieldName];
+        return [$this->bibtexField];
     }
 
-    public function setBibtexFieldName($bibtexFieldName)
+    /**
+     * Liefert den Namen des zu verwendenen BibTeX-Felds zurück.
+     *
+     * @return string
+     */
+    public function getBibtexField()
     {
-        $this->bibtexFieldName = $bibtexFieldName;
+        return $this->bibtexField;
+    }
+
+    /**
+     * Setzt das BibTeX-Feld (Quellfeld des Mappings).
+     *
+     * @param string $bibtexField Name des BibTeX-Felds
+     * @return $this
+     */
+    public function setBibtexField($bibtexField)
+    {
+        $this->bibtexField = $bibtexField;
         return $this;
     }
 
-    public function setOpusFieldName($opusFieldName)
+    /**
+     * Liefert den Namen des zu verwendenden OPUS-Metadatenfelds zurück.
+     *
+     * @return string
+     */
+    public function getOpusField()
     {
-        $this->opusFieldName = ucfirst($opusFieldName);
+        return $this->opusField;
     }
 
-    public function setFn($fn)
+    /**
+     * Setzt das OPUS-Metadatenfeld (Zielfeld des Mappings).
+     *
+     * @param string $opusField Name des OPUS-Metadatenfelds
+     * @return $this
+     */
+    public function setOpusField($opusField)
     {
-        $this->fn = $fn;
+        $this->opusField = ucfirst($opusField);
+        return $this;
     }
 
+    /**
+     * Funktion, die verwendet wird, um den Feldwert für das OPUS4-Metadatenfelds zu bestimmen.
+     *
+     * @param string $value Feldwert aus dem BibTeX-Record
+     * @return mixed
+     */
+    protected function getValue($value)
+    {
+        return $value;
+    }
+
+    /**
+     * Entfernt geschweifte Klammern am Anfang bzw. Ende des übergebenen Werts.
+     *
+     * @param string $value der von geschweiften Klammern zu reinigende Wert
+     * @return string
+     */
     protected function deleteBrace($value)
     {
-        if (strlen($value) >= 2 && substr($value, 0, 1) == '{' && substr($value, -1, 1) == '}') {
+        if (strlen($value) >= 2 && substr($value, 0, 1) === '{' && substr($value, -1, 1) === '}') {
             $value = substr($value, 1, -1);
         }
         return trim($value);

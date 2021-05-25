@@ -62,7 +62,7 @@ metadata fields. A field mapping is provided by a configuration file. At the mom
 supports configuration files in the JSON format only. It is possible to manage several
 field mappings in one OPUS4 instance. 
 
-A default field mapping is given by `default-field-mapping.json`.
+A default field mapping is given by `default-mapping.json`.
 
 The *minimal* definition of a field mapping configuration file looks like:
 
@@ -70,7 +70,7 @@ The *minimal* definition of a field mapping configuration file looks like:
 {
   "name": "default",
   "description": "Default BibTeX Mapping Configuration.",
-  "rules": [
+  "mapping": [
     {
       "name": "1stRule",
       "class": "SomeClass"
@@ -81,9 +81,9 @@ The *minimal* definition of a field mapping configuration file looks like:
 
 where `name` is the (arbitrary) name of the field mapping and `description` allows you to specify the
 intended use case for which the given field mapping is suited for. A field mapping consists of one to many
-rules, given in the `rules` list. Please note, that the order of the given rules is meaningful – rules that
-occur later in the list have a higher precedence and can overwrite previously assigned values of 
-OPUS4 document fields with new values.
+rules, given in the `mapping` list. Please note, that the order of the given mapping rules is meaningful – 
+mapping rules that occur later in the list have a higher precedence and can overwrite previously assigned
+values of OPUS4 document fields with new values.
 
 Each mapping rule must specify at lease a `name` (`1stRule` in this case) and the name of a PHP class (in
 `class`) that defines the mapping logic (`SomeClass` in this case). The PHP class has to be located in 
@@ -101,9 +101,9 @@ property values in the following manner:
 {
   "name": "volume",
   "class": "SimpleRule",
-  "properties": {
-    "bibtexFieldName": "volume",
-    "opusFieldName": "Volume"
+  "options": {
+    "bibtexField": "volume",
+    "opusField": "Volume"
   }
 }
 ```
@@ -117,9 +117,9 @@ Another example rule list entry is given by:
 ```json
 {
   "name": "belongsToBibliography",
-  "class": "ConstantValueRule",
-  "properties": {
-    "opusFieldName": "BelongsToBibliography",
+  "class": "ConstantValue",
+  "options": {
+    "opusField": "BelongsToBibliography",
     "value": "0"
   }
 }

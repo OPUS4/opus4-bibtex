@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of OPUS. The software OPUS has been originally developed
  * at the University of Stuttgart with funding from the German Research Net,
@@ -24,30 +25,42 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
+ * @copyright   Copyright (c) 2021, OPUS 4 development team
+ * @license     http://www.gnu.org/licenses/gpl.html General Public License
+ *
  * @category    BibTeX
  * @package     Opus\Bibtex\Import\Rules
  * @author      Sascha Szott <opus-repository@saschaszott.de>
- * @copyright   Copyright (c) 2021, OPUS 4 development team
- * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
 namespace Opus\Bibtex\Import\Rules;
 
-class TitleParent extends ArrayRule
+/**
+ * Erlaubt das Setzen eines Feldwerts für den übergeordneten Titel.
+ */
+class TitleParent extends AbstractArrayRule
 {
+    /**
+     * Konstruktor
+     */
     public function __construct()
     {
-        $this->setBibtexFieldName('journal');
-        $this->setOpusFieldName('TitleParent');
-        $this->setFn(
-            function ($value) {
-                return [
-                    'Language' => 'eng',
-                    'Value' => $this->deleteBrace($value),
-                    'Type' => 'parent'
-                ];
-            }
-        );
-        return $this;
+        $this->setBibtexField('journal');
+        $this->setOpusField('TitleParent');
+    }
+
+    /**
+     * Setzt den übergeordneten Titel.
+     *
+     * @param string $value Wert des übergeordneten Titels.
+     * @return array
+     */
+    protected function getValue($value)
+    {
+        return [
+            'Language' => 'eng',
+            'Value'    => $this->deleteBrace($value),
+            'Type'     => 'parent',
+        ];
     }
 }

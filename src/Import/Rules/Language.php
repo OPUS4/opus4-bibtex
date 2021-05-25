@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of OPUS. The software OPUS has been originally developed
  * at the University of Stuttgart with funding from the German Research Net,
@@ -24,25 +25,26 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * @category    Tests
- * @package     OpusTest\Bibtex\Import\Rules
- * @author      Sascha Szott <opus-repository@saschaszott.de>
  * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
+ *
+ * @category    BibTeX
+ * @package     Opus\Bibtex\Import\Rules
+ * @author      Sascha Szott <opus-repository@saschaszott.de>
  */
 
-namespace OpusTest\Bibtex\Import\Rules;
+namespace Opus\Bibtex\Import\Rules;
 
-use Opus\Bibtex\Import\Processor;
-
-class PageNumberTest extends \PHPUnit_Framework_TestCase
+/**
+ * Erlaubt das Setzen des OPUS-Metadatenfelds Language, in dem die Dokumentsprache verwaltet wird.
+ */
+class Language extends ConstantValue
 {
-    public function testProcess()
+    /**
+     * Konstruktor
+     */
+    public function __construct()
     {
-        $proc = new Processor();
-        $metadata = [];
-        $proc->handleRecord(['Pages' => '1--10'], $metadata);
-
-        $this->assertEquals('10', $metadata['PageNumber']);
+        $this->setOpusField('Language');
     }
 }

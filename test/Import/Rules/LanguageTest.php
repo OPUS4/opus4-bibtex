@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of OPUS. The software OPUS has been originally developed
  * at the University of Stuttgart with funding from the German Research Net,
@@ -24,37 +25,29 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * @category    BibTeX
- * @package     Opus\Bibtex\Import\Configuration
- * @author      Sascha Szott <opus-repository@saschaszott.de>
  * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
+ *
+ * @category    Tests
+ * @package     OpusTest\Bibtex\Import\Rules
+ * @author      Sascha Szott <opus-repository@saschaszott.de>
  */
 
-namespace Opus\Bibtex\Import\Configuration;
+namespace OpusTest\Bibtex\Import\Rules;
 
-class JsonFieldMappingReader
+use Opus\Bibtex\Import\Rules\Language;
+use PHPUnit\Framework\TestCase;
+
+class LanguageTest extends TestCase
 {
-    /**
-     * @param $fileName
-     * @return FieldMapping
-     * @throws \Exception
-     */
-    public function getMappingConfigurationFromFile($fileName)
+    public function testProcess()
     {
-        $json = file_get_contents($fileName);
-        if ($json === false) {
-            throw new \Exception("could not read file $fileName");
-        }
+        $languageRule = new Language();
+        $languageRule->setValue('eng');
 
-        $jsonArr = json_decode($json, true);
-        if (is_null($jsonArr)) {
-            throw new \Exception("could not decode JSON file $fileName");
-        }
+        $metadata = [];
+        $languageRule->apply([], $metadata);
 
-        return (new FieldMapping())
-            ->setName($jsonArr['name'])
-            ->setDescription($jsonArr['description'])
-            ->setRules($jsonArr['rules']);
+        $this->assertEquals('eng', $metadata['Language']);
     }
 }
