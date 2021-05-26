@@ -11,7 +11,7 @@ custom mappings and interpretations of the fields in the specific BibTeX file.
 
 ## Requirements
 
-For processing of special characters in BibTeX files the *pandoc* tool is needed by the BibTeX parser of OPUS4.
+For processing of special characters in BibTeX files the **Pandoc** tool is needed by the BibTeX parser of OPUS4.
 
 Please make sure that you install / use a recent version of Pandoc, at least version 2.0. The current
 implementation was not tested against older Pandoc versions.
@@ -37,7 +37,7 @@ which is shipped with recent Ubuntu versions (20.10 and 21.04).
 
 ### Import Configuration
 
-The whole import process of BibTeX records is controlled by the settings configured in `import.ini`.
+The whole import process of BibTeX files is controlled by the settings configured in `import.ini`.
 
 The default configuration is given by `src/Import/import.ini`.
 
@@ -132,6 +132,7 @@ In this case you need to specify the namespace explicitly, e.g.
 
 ```json
 {
+  "name": "year",
   "class": "Opus\\Bibtex\\Custom\\Year"
 }
 ```
@@ -186,7 +187,7 @@ OPUS4 provides a number of pre-defined rule classes (located in namespace `Opus\
 | `Isbn`                  | adds an identifier of type `isbn` |
 | `Issn`                  | adds an identifier of type `issn` |
 | `Language`              | sets OPUS document field `language` to a fixed value |
-| `Note`                  | adds a note (additionally, allows you to specify `messagePrefix` and `visibilty`) |
+| `Note`                  | adds a note (additionally, allows to specify `messagePrefix` and `visibilty`) |
 | `Pages`                 | handling of page-specific OPUS metadata fields (`PageFirst`, `PageLast`, `PageNumber`) |
 | `Person`                | adds a person |
 | `PublishedYear`         | sets the OPUS document field `publishedYear` |
@@ -199,9 +200,10 @@ OPUS4 provides a number of pre-defined rule classes (located in namespace `Opus\
 
 #### Base rule classes
 
-OPUS4 supports several ways to create custom rule implementations.
+OPUS4 supports several ways to create custom rule implementations. Each rule class has to implement the interface
+`RuleInterface`.
 
-A custom rule implementation can be created by a class that extends one of the following base rule classes:
+A custom rule implementation can be defined by creating a class that extends one of the following base rule classes:
 
 | Base Class Name       | Description |
 |-----------------------|-------------|
@@ -211,4 +213,4 @@ A custom rule implementation can be created by a class that extends one of the f
 | `AbstractArrayRule`   | abstract base class for mapping rules that create array-based OPUS4 metadata fields |
 | `AbstractComplexRule` | abstract base class for mapping rules that create or manipulate multiple OPUS4 metadata field |
 
-Alternatively, you can extend one of the pre-defined rule classes listed above.
+Alternatively, you can extend one of the pre-defined rule classes listed above and adapt it to your needs.
