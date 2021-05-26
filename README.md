@@ -1,21 +1,37 @@
 # OPUS4 BibTeX Module
 
-This module supports importing documents in the BibTeX format.
+This module supports *importing* documents in the BibTeX format.
 
-While exporting documents in BibTeX is already working in OPUS4, the code is not yet located in this module.
+While *exporting* documents' metadata in the BibTeX format is already working in OPUS4, the code is not yet located 
+in this module.
 
 Importing BibTeX without user interaction is not really possible because BibTeX files come in many flavors often
 with custom fields that are not part of any standard. Therefore, it is necessary to allow the user to decide on 
-custom mappings and interpretations of the fields in the specific file.
+custom mappings and interpretations of the fields in the specific BibTeX file.
 
 ## Requirements
 
-For processing of special characters the *pandoc* tool is needed by the BibTeX parser of OPUS4. 
-In Ubuntu / Debian based Linux systems it can be installed using `apt`.
+For processing of special characters in BibTeX files the *pandoc* tool is needed by the BibTeX parser of OPUS4.
+
+Please make sure that you install / use a recent version of Pandoc, at least version 2.0. The current
+implementation was not tested against older Pandoc versions.
+
+In Ubuntu / Debian based Linux systems Pandoc can be installed using `apt`.
 
 ```shell
 $ sudo apt install pandoc
 ```
+
+To check the version of Pandoc that has been installed, run:
+
+```shell
+$ pandoc -v
+```
+
+To check for the latest version number of Pandoc, you can browse to https://github.com/jgm/pandoc/releases.
+
+The BibTeX import in this module was developed and heavily tested against Pandoc version 2.9 (released in May 2020) 
+which is shipped with recent Ubuntu versions (20.10 and 21.04).
 
 ## Configuration Options
 
@@ -23,13 +39,17 @@ $ sudo apt install pandoc
 
 The whole import process of BibTeX records is controlled by the settings configured in `import.ini`.
 
-The configuration file `import.ini` allows you to register an arbitrary number of field mappings (see above). 
-Each field mapping is given by a separate line where the value (on the right-hand side of `=`) refers to the
-name of an external JSON field mapping configuration file:
+The default configuration is given by `src/Import/import.ini`.
+
+The configuration file `import.ini` allows you to register an arbitrary number of field mappings (see below). 
+Each field mapping is given by a separate line in `import.ini` where the value (on the right-hand side of `=`) refers 
+to the name of an external JSON field mapping configuration file:
 
 ```ini
-fieldMappings[] = custom-field-mapping.json
+fieldMappings[] = custom-mapping.json
 ```
+
+The default field mapping is given by `src/Import/default-mapping.json`.
 
 ### Document Type Mapping
 
@@ -41,7 +61,7 @@ OPUS4 document type `otype` in the following manner:
 documentTypeMapping[btype] = otype
 ```
 
-Please note that the BibTeX type names used in the type mapping are not restricted to the 14 official BibTeX types.
+Please note that BibTeX type names used in the type mapping are not restricted to the 14 official BibTeX types.
 It is allowed to define custom type mappings for unknown BibTeX types, e.g.
 
 ```ini
@@ -57,12 +77,12 @@ defaultDocumentType = misc
 
 ### Field Mapping
 
-A field mapping specifies how the values in certain BibTeX fields are mapped onto OPUS4 
+A field mapping specifies how values in certain BibTeX fields are mapped onto OPUS4 
 metadata fields. A field mapping is provided by a configuration file. At the moment OPUS4 
 supports configuration files in the JSON format only. It is possible to manage several
 field mappings in one OPUS4 instance. 
 
-A default field mapping is given by `default-mapping.json`.
+A default field mapping is given by `src/Import/default-mapping.json`.
 
 The *minimal* definition of a field mapping configuration file looks like:
 
@@ -71,10 +91,7 @@ The *minimal* definition of a field mapping configuration file looks like:
   "name": "default",
   "description": "Default BibTeX Mapping Configuration.",
   "mapping": [
-    {
-      "name": "1stRule",
-      "class": "SomeClass"
-    }    
+    …
   ]
 }
 ```
@@ -85,45 +102,113 @@ rules, given in the `mapping` list. Please note, that the order of the given map
 mapping rules that occur later in the list have a higher precedence and can overwrite previously assigned
 values of OPUS4 document fields with new values.
 
-Each mapping rule must specify at lease a `name` (`1stRule` in this case) and the name of a PHP class (in
-`class`) that defines the mapping logic (`SomeClass` in this case). The PHP class has to be located in 
-the namespace `Opus\Bibtex\Import\Rules`. OPUS4 provides you with plenty of predefined PHP classes that can 
-be reused to formulate custom field mappings, even complex ones. 
+#### Field Mapping Rules
 
-Additionally, you can even use custom PHP classes in field mappings. Please note that custom PHP classes need to
-implement the `IRule` interface and has to be located in the aforementioned namespace in order to be considered 
-by the BibTeX field mapper.
-
-If the class in use allows optional configuration (by appropriate setter methods), you can pass in configuration
-property values in the following manner:
+Each mapping rule must specify at least a name in the corresponding `name` key, e.g.
 
 ```json
 {
-  "name": "volume",
-  "class": "SimpleRule",
+  "name": "publishedYear"
+}
+```
+
+In this case the BibTeX processor tries to instantiate the class `PublishedYear` (in the default namespace
+of rule classes, `Opus\Bibtex\Import\Rules`). If the rule class does not exist, an instance of `SimpleRule`
+is created. This class performs a simple one-to-one-mapping between a BibTeX field (given in `bibtexField`)
+and an OPUS metadata field (given in `opusField`) without further processing, e.g.
+
+```json
+{
+  "name": "issue",
   "options": {
-    "bibtexField": "volume",
-    "opusField": "Volume"
+    "bibtexField": "number",
+    "opusField": "Issue"
   }
 }
 ```
 
-In this example the rule (with name `volume`) maps the BibTeX field `volume` to OPUS document field `Volume` 
-by handing the mapping process to `SimpleRule` – a class that is shipped with OPUS4 and performs trivial
-one-to-one mappings between BibTeX fields and OPUS document fields without further processing.
+You can add custom rule classes (which needs to implement `RuleInterface`), even from other namespaces.
+In this case you need to specify the namespace explicitly, e.g.
 
-Another example rule list entry is given by:
+```json
+{
+  "class": "Opus\\Bibtex\\Custom\\Year"
+}
+```
+
+OPUS4 provides you with plenty of pre-defined rule mapping classes that can be reused to formulate custom 
+field mappings, even complex ones (see below).
+
+If the rule class in use allows optional configuration (by appropriate setter methods), you can pass in 
+configuration property values in the following manner:
+
+```json
+{
+  "name": "pdfUrl",
+  "class": "Note",
+  "options": {
+    "bibtexField": "pdfurl",
+    "messagePrefix": "URL of the PDF: ",
+    "visibility": "public"
+  }
+}
+```
+
+In this example the processor maps the content of BibTeX field `pdfurl` to the value (`message`) of an OPUS `Note` 
+object by handing the mapping process over to an instance of `Note` – a class that is shipped with OPUS4. 
+Additionally, the options `messagePrefix` and `visibility` allow to add a fixed prefix to the `Note`'s message and 
+to control the visibility of the `Note`.
+
+Another example mapping entry is given by the rule:
 
 ```json
 {
   "name": "belongsToBibliography",
-  "class": "ConstantValue",
   "options": {
-    "opusField": "BelongsToBibliography",
-    "value": "0"
+    "value": false
   }
 }
 ```
 
-`ConstantValueRule` allows you to set fixed values to OPUS document fields – in this case `BelongsToBibliography`
-is set to `0` (independently of certain BibTeX fields).
+which sets the value of the `belongsToBibliography` field of an OPUS document to a fixed value (`false` in 
+this example) independently of certain BibTeX fields.
+
+#### Pre-defined rule classes
+
+OPUS4 provides a number of pre-defined rule classes (located in namespace `Opus\Bibtex\Import\Rules`):
+
+| Class Name              | Description |
+|-------------------------|-------------|
+| `Arxiv`                 | adds an identifier of type `arxiv` |
+| `BelongsToBibliography` | sets OPUS document field `belongsToBibliography` to a fixed value |
+| `DocumentType`          | sets the OPUS document type according to the configured type mapping |
+| `Doi`                   | adds an identifier of type `doi` |
+| `Isbn`                  | adds an identifier of type `isbn` |
+| `Issn`                  | adds an identifier of type `issn` |
+| `Language`              | sets OPUS document field `language` to a fixed value |
+| `Note`                  | adds a note (additionally, allows you to specify `messagePrefix` and `visibilty`) |
+| `Pages`                 | handling of page-specific OPUS metadata fields (`PageFirst`, `PageLast`, `PageNumber`) |
+| `Person`                | adds a person |
+| `PublishedYear`         | sets the OPUS document field `publishedYear` |
+| `SourceData`            | adds the imported BibTeX record to enrichment `opus.import.data` |
+| `SourceDataHash`        | adds MD5 hash sum of the imported BibTeX record to enrichment `opus.import.dataHash` |
+| `Subject`               | adds a subject (default: language `eng`, type `uncontrolled`) |
+| `TitleMain`             | adds a main title |
+| `TitleParent`           | adds a parent title |
+| `Umlauts`               | converts non-standard escaped umlauts to their corresponding unicode characters |
+
+#### Base rule classes
+
+OPUS4 supports several ways to create custom rule implementations.
+
+A custom rule implementation can be created by a class that extends one of the following base rule classes:
+
+| Base Class Name       | Description |
+|-----------------------|-------------|
+| `SimpleRule`          | defines a one-to-one mapping between BibTeX field and OPUS4 metadata field |
+| `ConstantValue`       | adds a constant value to one OPUS4 metadata field |
+| `ConstantValues`      | adds constant values to multiple OPUS4 metadata fields |
+| `AbstractArrayRule`   | abstract base class for mapping rules that create array-based OPUS4 metadata fields |
+| `AbstractComplexRule` | abstract base class for mapping rules that create or manipulate multiple OPUS4 metadata field |
+
+Alternatively, you can extend one of the pre-defined rule classes listed above.
