@@ -54,7 +54,6 @@ use function count;
 use function explode;
 use function gmdate;
 use function is_array;
-use function is_null;
 use function strlen;
 use function substr;
 use function trim;
