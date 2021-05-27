@@ -62,16 +62,22 @@ use function uniqid;
 
 class BibtexImportHelper
 {
+    /** @var string Name der BibTeX-Datei */
     private $fileName;
 
+    /** @var string Name der Mapping-Konfiguration */
     private $mappingConfiguration;
 
+    /** @var string Name der INI-Konfigurationsdatei */
     private $iniFileName;
 
+    /** @var bool Dry-Mode */
     private $dryMode;
 
+    /** @var bool ausführliche Logausgabe */
     private $verbose;
 
+    /** @var array IDs von Collections */
     private $collectionIds = [];
 
     /**
@@ -91,12 +97,12 @@ class BibtexImportHelper
     {
         if (! $this->dryMode) {
             // das Hinzufügen von Collections zu importierten OPUS-Dokumenten muss nur im Nicht-Dry-Mode betrachtet werden
-            foreach ($this->collectionIds as $collectionID) {
-                $collectionID = trim($collectionID);
+            foreach ($this->collectionIds as $collectionId) {
+                $collectionId = trim($collectionId);
                 try {
-                    $collections[] = Collection::get($collectionID);
+                    $collections[] = Collection::get($collectionId);
                 } catch (NotFoundException $nfe) {
-                    $bibtexImportResult->addMessage("Collection with ID $collectionID does not exist");
+                    $bibtexImportResult->addMessage("Collection with ID $collectionId does not exist");
                 }
             }
 
