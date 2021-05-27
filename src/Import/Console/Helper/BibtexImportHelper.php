@@ -234,14 +234,15 @@ class BibtexImportHelper
     /**
      * Erzeugt die für den BibTeX-Import erforderlichen Enrichment Keys, sofern sie nicht bereits existieren.
      *
-     * @param string $enrichmentKeyNames
+     * @param string             $enrichmentKeyNames
+     * @param BibtexImportResult $bibtexImportResult
      */
     private function createEnrichmentKeysIfMissing($enrichmentKeyNames, $bibtexImportResult)
     {
         foreach ($enrichmentKeyNames as $keyName) {
             try {
                 $sourceEnrichmentKey = EnrichmentKey::fetchByName($keyName);
-                if (is_null($sourceEnrichmentKey)) {
+                if ($sourceEnrichmentKey === null) {
                     $sourceEnrichmentKey = new EnrichmentKey();
                     $sourceEnrichmentKey->setName($keyName);
                     $sourceEnrichmentKey->store();
@@ -256,8 +257,7 @@ class BibtexImportHelper
      * Fügt zum übergebenen Dokument eine Menge von Enrichments hinzu. Die Enrichment Keys müssen in der Datenbank
      * existieren.
      *
-     * @param $document das importierte OPUS-Dokument
-     * @param $filename Name der zu importierenden BibTeX-Datei
+     * @param Document $document das importierte OPUS-Dokument
      */
     private function addImportEnrichments($document)
     {
@@ -286,7 +286,8 @@ class BibtexImportHelper
      * Prüft, ob bereits ein OPUS-Dokument importiert wurde, das den gleichen Hashwert besitzt, wie das übergebene
      * OPUS-Dokument. In diesem Fall sollte das übergebene Dokument nicht erneut importiert werden.
      *
-     * @param Document $document das zu importierende Dokument
+     * @param Document           $document das zu importierende Dokument
+     * @param BibtexImportResult $bibtexImportResult
      * @return bool true, gdw. bereits ein Dokument mit identische Hashwert in der Datenbank existiert
      */
     private function checkIfDocumentAlreadyExists($document, $bibtexImportResult)
@@ -306,7 +307,7 @@ class BibtexImportHelper
             return true; // Dokument wird nicht importiert, da der Hashvergleich nicht möglich war
         }
 
-        if (is_null($hashValue)) {
+        if ($hashValue === null) {
             $bibtexImportResult->addMessage('could not find enrichment ' . SourceDataHash::SOURCE_DATA_HASH_KEY);
             return true; // Dokument wird nicht importiert, da der Hashvergleich nicht möglich war
         }
@@ -330,7 +331,8 @@ class BibtexImportHelper
      * Gibt true zurück, wenn in der Datenbank bereits ein Dokument mit dem übergebenen Hashwert im Enrichment
      * BibtexMapping::SOURCE_DATA_HASH_KEY existiert.
      *
-     * @param string $hashValue
+     * @param string             $hashValue
+     * @param BibtexImportResult $bibtexImportResult
      * @return bool
      */
     private function checkForDocWithIdenticalHashValue($hashValue, $bibtexImportResult)
