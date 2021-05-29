@@ -49,16 +49,27 @@ class BibtexImportResult
     /** @var int Anzahl der tatsächlich erfolgreich in der Datenbank gespeicherten OPUS-Dokumente */
     private $numDocsImported = 0;
 
-    /** @var Output */
+    /** @var int Anzahl der aufgrund von Fehlern nicht importierbaren BibTeX-Records */
+    private $numErrors = 0;
+
+    /** @var int Anzahl der aufgrund von Hashwert-Übereinstimmungen nicht importierten BibTeX-Records */
+    private $numSkipped = 0;
+
+    /** @var Output Ausgabepuffer für Meldungen während des BibTeX-Imports */
     private $output;
 
     /** @var array */
     private $messages = [];
 
     /**
+     * Maximale Anzahl der Status-Indikatorzeichen in einer Bildschirmzeile
+     */
+    const STATUS_LINE_WIDTH = 80;
+
+    /**
      * Konstruktor
      *
-     * @param Output|null $output
+     * @param Output|null $output Ausgabepuffer für Meldungen während des BibTeX-Imports
      */
     public function __construct($output = null)
     {
@@ -89,11 +100,6 @@ class BibtexImportResult
         return $this->numDocsImported;
     }
 
-    public function increaseNumDocsImported()
-    {
-        $this->numDocsImported++;
-    }
-
     /**
      * @return array
      */
@@ -117,7 +123,59 @@ class BibtexImportResult
     public function outputCompletionMessage()
     {
         $this->addMessage('');
+        $this->addMessage('');
         $this->addMessage("Number of documents processed: $this->numDocsProcessed");
         $this->addMessage("Number of documents imported: $this->numDocsImported");
+
+        if ($this->numSkipped > 0) {
+            $this->addMessage("Number of skipped BibTeX records: $this->numSkipped");
+        }
+
+        if ($this->numErrors > 0) {
+            $this->addMessage("Number of discarded BibTeX records due to errors: $this->numErrors");
+        }
+    }
+
+    /**
+     * @param bool $verbose true, wenn ausführliche Logausgabe gewünscht
+     * @param bool $dryMode true, wenn keine neuen Dokumente in die Datenbank importiert werden sollen
+     */
+    public function addSuccessStatus($verbose, $dryMode)
+    {
+        $this->addStatus('.', $verbose);
+        if (! $dryMode) {
+            $this->numDocsImported++;
+        }
+    }
+
+    /**
+     * @param bool $verbose true, wenn ausführliche Logausgabe gewünscht
+     */
+    public function addErrorStatus($verbose)
+    {
+        $this->addStatus('E', $verbose);
+    }
+
+    /**
+     * @param bool $verbose true, wenn ausführliche Logausgabe gewünscht
+     */
+    public function addSkipStatus($verbose)
+    {
+        $this->addStatus('S', $verbose);
+        $this->numSkipped++;
+    }
+
+    /**
+     * @param string $statusStr auszugebender Status-Indikator (ein Zeichen)
+     * @param bool   $verbose   true, wenn ausführliche Logausgabe gewünscht
+     */
+    private function addStatus($statusStr, $verbose)
+    {
+        if (! $verbose) {
+            $this->output->write($statusStr);
+            if ($this->numDocsProcessed % self::STATUS_LINE_WIDTH === 0) {
+                $this->output->writeln(''); // neue Zeile beginnen
+            }
+        }
     }
 }

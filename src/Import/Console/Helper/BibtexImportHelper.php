@@ -36,6 +36,7 @@
 namespace Opus\Bibtex\Import\Console\Helper;
 
 use Exception;
+use Opus\Bibtex\Import\Config\BibtexConfigException;
 use Opus\Bibtex\Import\Config\BibtexService;
 use Opus\Bibtex\Import\Parser;
 use Opus\Bibtex\Import\ParserException;
@@ -54,6 +55,7 @@ use function count;
 use function explode;
 use function gmdate;
 use function is_array;
+use function is_readable;
 use function strlen;
 use function substr;
 use function trim;
@@ -61,22 +63,22 @@ use function uniqid;
 
 class BibtexImportHelper
 {
-    /** @var string Name der BibTeX-Datei */
+    /** @var string Name der zu importierenden BibTeX-Datei */
     private $fileName;
 
-    /** @var string Name der Mapping-Konfiguration */
+    /** @var string Name der Konfiguration für das Feld-Mapping */
     private $mappingConfiguration;
 
     /** @var string Name der INI-Konfigurationsdatei */
     private $iniFileName;
 
-    /** @var bool Dry-Mode */
+    /** @var bool true, wenn Dry-Mode aktiviert, bei dem die Datenbank nicht verändert wird */
     private $dryMode;
 
-    /** @var bool ausführliche Logausgabe */
+    /** @var bool true, wenn ausführliche Logausgabe während des BibTeX-Imports gewünscht ist */
     private $verbose;
 
-    /** @var array IDs von Collections */
+    /** @var array IDs von Collections (jedes importierte Dokument wird mit diesen Collections verknüpft) */
     private $collectionIds = [];
 
     /**
@@ -90,11 +92,21 @@ class BibtexImportHelper
     }
 
     /**
+     * Führt den Import der BibTeX-Records aus der Datei $fileName durch.
+     *
      * @param BibtexImportResult $bibtexImportResult
+     * @throws BibtexConfigException
      */
     public function doImport($bibtexImportResult)
     {
-        if (! $this->dryMode) {
+        if (! is_readable($this->fileName)) {
+            $bibtexImportResult->addMessage("BibTeX file '$this->fileName' does not exist or is not readable");
+            return;
+        }
+
+        if ($this->dryMode) {
+            $bibtexImportResult->addMessage("Dry mode is enabled: new documents won't be added to database");
+        } else {
             // das Hinzufügen von Collections zu importierten OPUS-Dokumenten muss nur im Nicht-Dry-Mode betrachtet werden
             foreach ($this->collectionIds as $collectionId) {
                 $collectionId = trim($collectionId);
@@ -116,71 +128,75 @@ class BibtexImportHelper
             ];
 
             $this->createEnrichmentKeysIfMissing($requiredEnrichmentKeys, $bibtexImportResult);
+        }
 
-            $parser = new Parser($this->fileName);
+        $parser = new Parser($this->fileName);
+        try {
+            $bibtexImportResult->addMessage("Start parsing of BibTeX file '$this->fileName'");
+            $bibtexRecords = $parser->parse();
+            $bibtexImportResult->addMessage("Parsing of BibTeX file '$this->fileName' returned "
+                . count($bibtexRecords) . " records");
+        } catch (ParserException $e) {
+            $bibtexImportResult->addMessage("Parsing of BibTeX file '$this->fileName' exited unsuccessfully with error message: "
+                . $e->getMessage());
+            return;
+        }
+
+        if ($bibtexRecords === null || count($bibtexRecords) === 0) {
+            $bibtexImportResult->addMessage("No records found in BibTeX file '$this->fileName'");
+            return;
+        }
+
+        $fieldMapping  = null;
+        $bibtexService = BibtexService::getInstance($this->iniFileName);
+        if ($this->mappingConfiguration !== null) {
+            $fieldMapping = $bibtexService->getFieldMapping($this->mappingConfiguration);
+        }
+        $processor = new Processor($fieldMapping);
+
+        // BibTeX-Records werden einzeln importiert: im Fehlerfall wird zum zum nächsten BibTeX-Record gesprungen
+        foreach ($bibtexRecords as $bibtexRecord) {
+            $bibtexImportResult->increaseNumDocsProcessed();
+            $metadata = [];
             try {
-                $bibtexRecords = $parser->parse();
-                $bibtexImportResult->addMessage("Parsing of BibTeX file '$this->fileName' returned " . count($bibtexRecords) . " records");
-            } catch (ParserException $e) {
-                $bibtexImportResult->addMessage("Parsing of BibTeX file '$this->fileName' exited unsuccessfully with error message: " . $e->getMessage());
-                return;
+                $processor->handleRecord($bibtexRecord, $metadata);
+            } catch (Exception $e) {
+                $bibtexImportResult->addErrorStatus($this->verbose);
+                continue; // springe zum nächsten Record
             }
 
-            if ($bibtexRecords === null || count($bibtexRecords) === 0) {
-                $bibtexImportResult->addMessage("No records found in BibTex file '$this->fileName'");
-                return;
-            }
-
-            $fieldMapping  = null;
-            $bibtexService = BibtexService::getInstance($this->iniFileName);
-            if ($this->mappingConfiguration !== null) {
-                $fieldMapping = $bibtexService->getFieldMapping($this->mappingConfiguration);
-            }
-            $processor = new Processor($fieldMapping);
-
-            // BibTeX-Records werden einzeln importiert: im Fehlerfall -> springe zum nächsten Record
-            foreach ($bibtexRecords as $bibtexRecord) {
-                $bibtexImportResult->increaseNumDocsProcessed();
-                $metadata = [];
-                try {
-                    $fieldsEvaluated = $processor->handleRecord($bibtexRecord, $metadata);
-                } catch (Exception $e) {
-                    $bibtexImportResult->addMessage('E');
-                    continue; // springe zum nächsten Record
+            try {
+                $doc = Document::fromArray($metadata);
+                if ($this->checkIfDocumentAlreadyExists($doc, $bibtexImportResult)) {
+                    $bibtexImportResult->addSkipStatus($this->verbose);
+                    continue; // Dokument wurde bereits importiert: springe zum nächsten Record
                 }
 
-                try {
-                    $doc = Document::fromArray($metadata);
-                    if ($this->checkIfDocumentAlreadyExists($doc, $bibtexImportResult)) {
-                        $bibtexImportResult->addMessage('S');
-                        continue; // Dokument wurde bereits importiert: springe zum nächsten Record
+                if (! $this->dryMode) {
+                    foreach ($collections as $collection) {
+                        $doc->addCollection($collection);
                     }
 
-                    if (! $this->dryMode) {
-                        foreach ($collections as $collection) {
-                            $doc->addCollection($collection);
+                    $this->addImportEnrichments($doc);
+
+                    try {
+                        $doc = Document::get($doc->store());
+                        if ($this->verbose) {
+                            $bibtexImportResult->addMessage("Successful import of OPUS document " . $doc->getId());
                         }
-                        $this->addImportEnrichments($doc);
-                        try {
-                            $doc = Document::get($doc->store());
-                            if ($this->verbose) {
-                                $bibtexImportResult->addMessage("Successful import of OPUS document " . $doc->getId());
-                            }
-                            $bibtexImportResult->increaseNumDocsImported();
-                        } catch (ModelException $ome) {
-                            if ($this->verbose) {
-                                $bibtexImportResult->addMessage('Unexpected error: ' . $ome->getMessage());
-                            }
-                            $bibtexImportResult->addMessage('E');
-                            continue; // zum nächsten Record springen
+                    } catch (ModelException $ome) {
+                        if ($this->verbose) {
+                            $bibtexImportResult->addMessage('Unexpected error: ' . $ome->getMessage());
                         }
+                        $bibtexImportResult->addErrorStatus($this->verbose);
+                        continue; // Verarbeitung des nächsten BibTeX-Record aus der zu importierenden Datei
                     }
-                } catch (Exception $e) {
-                    $bibtexImportResult->addMessage('E');
-                    continue;
                 }
-                $bibtexImportResult->addMessage('.');
+            } catch (Exception $e) {
+                $bibtexImportResult->addErrorStatus($this->verbose);
+                continue;
             }
+            $bibtexImportResult->addSuccessStatus($this->verbose, $this->dryMode);
         }
     }
 
@@ -312,7 +328,7 @@ class BibtexImportHelper
         }
 
         if ($this->checkForDocWithIdenticalHashValue($hashValue, $bibtexImportResult)) {
-            return true; // Import des Dokuments wird verhindert
+            return true; // Import des Dokuments wird verhindert, weil es bereits in der Datenbank existiert
         }
 
         // in der ersten Version des BibTeX-Imports wurde die Hashfunktion nicht als Präfix im Enrichment-Wert (Hashwert)
@@ -328,7 +344,7 @@ class BibtexImportHelper
 
     /**
      * Gibt true zurück, wenn in der Datenbank bereits ein Dokument mit dem übergebenen Hashwert im Enrichment
-     * BibtexMapping::SOURCE_DATA_HASH_KEY existiert.
+     * SourceDataHash::SOURCE_DATA_HASH_KEY existiert.
      *
      * @param string             $hashValue
      * @param BibtexImportResult $bibtexImportResult
@@ -340,7 +356,8 @@ class BibtexImportHelper
         $finder->setEnrichmentKeyValue(SourceDataHash::SOURCE_DATA_HASH_KEY, $hashValue);
         if ($finder->count() > 0) {
             if ($this->verbose) {
-                $bibtexImportResult->addMessage('Found existing OPUS document ' . $finder->ids()[0] . " with same hash value ($hashValue)");
+                $bibtexImportResult->addMessage('Found existing OPUS document ' . $finder->ids()[0]
+                    . " with same hash value ($hashValue)");
             }
             return true; // Dokument mit identischem Hashwert existiert bereits in der Datenbank
         }
