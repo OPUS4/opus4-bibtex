@@ -94,17 +94,17 @@ class Parser
             }
         } catch (ParserException $e) {
             // Fehler beim Parsen des BibTeX
-            throw new \Opus\Bibtex\Import\ParserException();
+            throw new \Opus\Bibtex\Import\ParserException($e->getMessage());
         } catch (ErrorException $e) {
             // Fehler beim Einlesen der übergebenen Datei
-            throw new \Opus\Bibtex\Import\ParserException();
+            throw new \Opus\Bibtex\Import\ParserException($e->getMessage());
         }
 
         try {
             $result = $listener->export();
         } catch (ProcessorException $e) {
             // im Feldinhalt eines Felds befindet sich ein unerwartetes Zeichen
-            throw new \Opus\Bibtex\Import\ParserException();
+            throw new \Opus\Bibtex\Import\ParserException($e->getMessage());
         }
         return $result;
     }
