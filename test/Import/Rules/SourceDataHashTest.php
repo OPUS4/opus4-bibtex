@@ -41,6 +41,7 @@ use Opus\Bibtex\Import\Rules\SourceDataHash;
 use PHPUnit\Framework\TestCase;
 
 use function json_encode;
+use function ksort;
 
 class SourceDataHashTest extends TestCase
 {

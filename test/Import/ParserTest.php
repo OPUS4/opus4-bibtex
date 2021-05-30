@@ -54,6 +54,7 @@ use function preg_split;
 use function strpos;
 use function strtolower;
 use function trim;
+use function json_encode;
 
 use const DIRECTORY_SEPARATOR;
 use const PREG_SPLIT_DELIM_CAPTURE;
@@ -998,7 +999,7 @@ class ParserTest extends TestCase
      */
     public function testProcessor()
     {
-        $bibtex       = "@misc{Nobody06,\n       author = \"Nobody, Jr\",\n       title = \"My Article\",\n       year = \"2006\"}";
+        $bibtex = "@misc{Nobody06,\n       author = \"Nobody, Jr\",\n       title = \"My Article\",\n       year = \"2006\"}";
 
         $processor   = new Processor();
         $bibtexArray = [
