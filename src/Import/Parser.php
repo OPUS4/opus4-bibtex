@@ -36,8 +36,10 @@
 namespace Opus\Bibtex\Import;
 
 use ErrorException;
+use RenanBr\BibTexParser\Exception\ParserException as BibTexParserException;
 use RenanBr\BibTexParser\Exception\ProcessorException;
 use RenanBr\BibTexParser\Listener;
+use RenanBr\BibTexParser\Parser as BibTexParser;
 use RenanBr\BibTexParser\Processor\LatexToUnicodeProcessor;
 
 use function array_keys;
@@ -77,7 +79,7 @@ class Parser
      */
     public function parse()
     {
-        $parser = new \RenanBr\BibTexParser\Parser();
+        $parser = new BibTexParser();
 
         $listener = new Listener();
         $listener->addProcessor(new LatexToUnicodeProcessor()); // behandelt alle Felder (weil leere Blacklist)
@@ -90,7 +92,7 @@ class Parser
             } else {
                 $parser->parseString($this->bibtex);
             }
-        } catch (\RenanBr\BibTexParser\Exception\ParserException $e) {
+        } catch (BibTexParserException $e) {
             // Fehler beim Parsen des BibTeX
             throw new ParserException($e->getMessage());
         } catch (ErrorException $e) {
