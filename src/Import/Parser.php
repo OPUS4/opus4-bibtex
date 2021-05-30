@@ -36,7 +36,6 @@
 namespace Opus\Bibtex\Import;
 
 use ErrorException;
-use RenanBr\BibTexParser\Exception\ParserException;
 use RenanBr\BibTexParser\Exception\ProcessorException;
 use RenanBr\BibTexParser\Listener;
 use RenanBr\BibTexParser\Processor\LatexToUnicodeProcessor;
@@ -91,7 +90,7 @@ class Parser
             } else {
                 $parser->parseString($this->bibtex);
             }
-        } catch (ParserException $e) {
+        } catch (\RenanBr\BibTexParser\Exception\ParserException $e) {
             // Fehler beim Parsen des BibTeX
             throw new ParserException($e->getMessage());
         } catch (ErrorException $e) {
