@@ -35,29 +35,41 @@
 
 namespace OpusTest\Bibtex\Import\Rules;
 
+use Opus\Bibtex\Import\Parser;
 use Opus\Bibtex\Import\Processor;
-use Opus\Bibtex\Import\Rules\SourceData;
 use Opus\Bibtex\Import\Rules\SourceDataHash;
 use PHPUnit\Framework\TestCase;
 
 use function json_encode;
 
-class RawDataTest extends TestCase
+class SourceDataHashTest extends TestCase
 {
     public function testProcess()
     {
+        $bibtex =
+            '@article{citekey,
+                year     = 2020,
+                author   = "John Doe",                
+                doi      = "10.1002/0470841559.ch1"                
+            }';
+
+        $parser        = new Parser($bibtex);
+        $bibTexRecords = $parser->parse();
+        $bibTexRecord  = $bibTexRecords[0];
+        unset($bibTexRecord['_type']);
+        unset($bibTexRecord['_original']);
+        ksort($bibTexRecord);
+
         $proc     = new Processor();
         $metadata = [];
-        $proc->handleRecord(['_original' => '@article{...}'], $metadata);
+        $proc->handleRecord($bibTexRecord, $metadata);
 
-        $hashFunction = SourceDataHash::HASH_FUNCTION;
-        $hashValue    = $hashFunction(json_encode([]));
-        $this->assertEquals(
-            [
-                ['KeyName' => SourceData::SOURCE_DATA_KEY, 'Value' => '@article{...}'],
-                ['KeyName' => SourceDataHash::SOURCE_DATA_HASH_KEY, 'Value' => $hashFunction . ':' . $hashValue],
-            ],
-            $metadata['Enrichment']
-        );
+        $expectedHash = (SourceDataHash::HASH_FUNCTION) . ':'
+            . (SourceDataHash::HASH_FUNCTION)(json_encode($bibTexRecord));
+        foreach ($metadata['Enrichment'] as $enrichment) {
+            if ($enrichment['KeyName'] === SourceDataHash::SOURCE_DATA_HASH_KEY) {
+                $this->assertEquals($expectedHash, $enrichment['Value']);
+            }
+        }
     }
 }

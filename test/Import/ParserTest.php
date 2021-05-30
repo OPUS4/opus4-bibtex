@@ -216,9 +216,14 @@ class ParserTest extends TestCase
             $bibtexRecord,
             $enrichments[0]
         );
+
+        $resultSorted = $result[0];
+        ksort($resultSorted);
+        unset($resultSorted['_type']);
+        unset($resultSorted['_original']);
         $this->assertEnrichment(
             SourceDataHash::SOURCE_DATA_HASH_KEY,
-            SourceDataHash::HASH_FUNCTION . ':' . (SourceDataHash::HASH_FUNCTION)($bibtexRecord),
+            SourceDataHash::HASH_FUNCTION . ':' . (SourceDataHash::HASH_FUNCTION)(json_encode($resultSorted)),
             $enrichments[1]
         );
     }
@@ -994,8 +999,6 @@ class ParserTest extends TestCase
     public function testProcessor()
     {
         $bibtex       = "@misc{Nobody06,\n       author = \"Nobody, Jr\",\n       title = \"My Article\",\n       year = \"2006\"}";
-        $hashFunction = SourceDataHash::HASH_FUNCTION;
-        $bibtexHash   = $hashFunction($bibtex);
 
         $processor   = new Processor();
         $bibtexArray = [
@@ -1006,6 +1009,11 @@ class ParserTest extends TestCase
             'year'         => '2006',
             '_original'    => $bibtex,
         ];
+
+        $bibtexArraySorted = $bibtexArray;
+        unset($bibtexArraySorted['_original']);
+        ksort($bibtexArraySorted);
+        $bibtexHash = (SourceDataHash::HASH_FUNCTION)(json_encode($bibtexArraySorted));
 
         $opus = [
             'BelongsToBibliography' => false,
@@ -1033,7 +1041,7 @@ class ParserTest extends TestCase
                 ],
                 [
                     'KeyName' => SourceDataHash::SOURCE_DATA_HASH_KEY,
-                    'Value'   => $hashFunction . ':' . $bibtexHash,
+                    'Value'   => SourceDataHash::HASH_FUNCTION . ':' . $bibtexHash,
                 ],
             ],
         ];
