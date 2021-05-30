@@ -38,6 +38,8 @@ namespace Opus\Bibtex\Import\Console\Helper;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\Output;
 
+use const PHP_EOL;
+
 class BibtexImportResult
 {
     /**
@@ -58,8 +60,8 @@ class BibtexImportResult
     /** @var Output Ausgabepuffer für Meldungen während des BibTeX-Imports */
     private $output;
 
-    /** @var array */
-    private $messages = [];
+    /** @var string speichert die Ausgaben während der Verarbeitung */
+    private $messages = '';
 
     /**
      * Maximale Anzahl der Status-Indikatorzeichen in einer Bildschirmzeile
@@ -80,7 +82,7 @@ class BibtexImportResult
     }
 
     /**
-     * @return int
+     * @return int Anzahl der verarbeiteten Dokumente
      */
     public function getNumDocsProcessed()
     {
@@ -93,7 +95,7 @@ class BibtexImportResult
     }
 
     /**
-     * @return int
+     * @return int Anzahl der importierten Dokumente
      */
     public function getNumDocsImported()
     {
@@ -101,7 +103,23 @@ class BibtexImportResult
     }
 
     /**
-     * @return array
+     * @return int Anzahl der aufgrund von Fehlern nicht importierten BibTeX-Records
+     */
+    public function getNumErrors()
+    {
+        return $this->numErrors;
+    }
+
+    /**
+     * @return int Anzahl der aufgrund von Hashwert-Übereinstimmung nicht importierten BibTeX-Records
+     */
+    public function getNumSkipped()
+    {
+        return $this->numSkipped;
+    }
+
+    /**
+     * @return string
      */
     public function getMessages()
     {
@@ -114,7 +132,7 @@ class BibtexImportResult
     public function addMessage($message)
     {
         $this->output->writeln($message);
-        $this->messages[] = $message;
+        $this->messages .= $message . PHP_EOL;
     }
 
     /**
@@ -173,8 +191,10 @@ class BibtexImportResult
     {
         if (! $verbose) {
             $this->output->write($statusStr);
+            $this->messages .= $statusStr;
             if ($this->numDocsProcessed % self::STATUS_LINE_WIDTH === 0) {
                 $this->output->writeln(''); // neue Zeile beginnen
+                $this->messages .= PHP_EOL;
             }
         }
     }
