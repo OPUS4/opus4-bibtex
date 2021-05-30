@@ -49,12 +49,12 @@ use function array_keys;
 use function array_map;
 use function file_get_contents;
 use function in_array;
+use function json_encode;
 use function ksort;
 use function preg_split;
 use function strpos;
 use function strtolower;
 use function trim;
-use function json_encode;
 
 use const DIRECTORY_SEPARATOR;
 use const PREG_SPLIT_DELIM_CAPTURE;
