@@ -123,7 +123,7 @@ class DocumentTypeMapping
      * zurückgegeben. Ist kein Default-Typ definiert, so wird null zurückgegeben.
      *
      * @param string $bibtexType Name des BibTeX-Typs
-     * @param bool $useDefaultAsFallback False deaktiviert Fallback auf Defaulttyp.
+     * @param bool   $useDefaultAsFallback False deaktiviert Fallback auf Defaulttyp.
      * @return string|null Name des zugehörigen OPUS-Dokumenttyps (oder null, wenn kein Mapping möglich)
      *
      * TODO macht $useDefaultAsFallback Sinn? Wie/wo wird es verwendet?

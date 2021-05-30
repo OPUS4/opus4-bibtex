@@ -73,7 +73,7 @@ class Parser
      * von BibTeX-Feldnamen auf die zugehörigen Werte zurück.
      *
      * @return array
-     * @throws \Opus\Bibtex\Import\ParserException Wird geworfen, wenn beim Parsing Fehler aufgetreten sind, z.B. weil
+     * @throws ParserException Wird geworfen, wenn beim Parsing Fehler aufgetreten sind, z.B. weil
      *                                             die BibTeX-Datei nicht lesbar ist oder im BibTeX-Record Formatfehler
      *                                             existieren.
      */
@@ -94,17 +94,17 @@ class Parser
             }
         } catch (ParserException $e) {
             // Fehler beim Parsen des BibTeX
-            throw new \Opus\Bibtex\Import\ParserException($e->getMessage());
+            throw new ParserException($e->getMessage());
         } catch (ErrorException $e) {
             // Fehler beim Einlesen der übergebenen Datei
-            throw new \Opus\Bibtex\Import\ParserException($e->getMessage());
+            throw new ParserException($e->getMessage());
         }
 
         try {
             $result = $listener->export();
         } catch (ProcessorException $e) {
             // im Feldinhalt eines Felds befindet sich ein unerwartetes Zeichen
-            throw new \Opus\Bibtex\Import\ParserException($e->getMessage());
+            throw new ParserException($e->getMessage());
         }
         return $result;
     }

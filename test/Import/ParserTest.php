@@ -226,7 +226,7 @@ class ParserTest extends TestCase
     /**
      * @param string $keyName Expected key
      * @param string $value Expected value
-     * @param array $enrichment Parsed BibTeX data
+     * @param array  $enrichment Parsed BibTeX data
      */
     private function assertEnrichment($keyName, $value, $enrichment)
     {
@@ -238,7 +238,7 @@ class ParserTest extends TestCase
      * @param string $role Expected role of person, like "author"
      * @param string $firstName Expected first name
      * @param string $lastName Expected last name
-     * @param array $person Parsed BibTeX data
+     * @param array  $person Parsed BibTeX data
      */
     private function assertPerson($role, $firstName, $lastName, $person)
     {
@@ -254,7 +254,7 @@ class ParserTest extends TestCase
     /**
      * @param string $titleType Expected type of title
      * @param string $titleValue Expected value of title
-     * @param array $title Parsed BibTeX data
+     * @param array  $title Parsed BibTeX data
      */
     private function assertTitle($titleType, $titleValue, $title)
     {
@@ -265,7 +265,7 @@ class ParserTest extends TestCase
 
     /**
      * @param string $value Expected value
-     * @param array $subject Parsed BibTeX data
+     * @param array  $subject Parsed BibTeX data
      */
     private function assertSubject($value, $subject)
     {
@@ -276,7 +276,7 @@ class ParserTest extends TestCase
 
     /**
      * @param string $message Expected message
-     * @param array $note Parsed BibTeX data
+     * @param array  $note Parsed BibTeX data
      */
     private function assertNote($message, $note)
     {

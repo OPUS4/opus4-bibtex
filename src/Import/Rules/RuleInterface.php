@@ -41,7 +41,7 @@ interface RuleInterface
      * @param array $bibtexRecord BibTeX-Record (als Array von BibTeX-Feldern), der importiert werden soll
      * @param array $documentMetadata OPUS-Metadatensatz (als Array von Metadatenfeldern), der unter Nutzung der
      *                                Funktion fromArray in ein OPUS4-Dokument umgewandelt werden soll
-     * @return boolean Aussage über den Erfolg der Anwendung der Regel (true gdw. erfolgreiche Anwendung)
+     * @return bool Aussage über den Erfolg der Anwendung der Regel (true gdw. erfolgreiche Anwendung)
      */
     public function apply($bibtexRecord, &$documentMetadata);
 

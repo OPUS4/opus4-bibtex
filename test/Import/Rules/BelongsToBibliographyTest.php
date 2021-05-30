@@ -58,7 +58,7 @@ class BelongsToBibliographyTest extends TestCase
 
     /**
      * @param mixed $arg Test config value
-     * @param bool $res Expected result
+     * @param bool  $res Expected result
      * @dataProvider dataProvider
      */
     public function testProcess($arg, $res)
