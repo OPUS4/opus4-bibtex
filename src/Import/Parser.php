@@ -73,9 +73,8 @@ class Parser
      * von BibTeX-Feldnamen auf die zugehörigen Werte zurück.
      *
      * @return array
-     * @throws ParserException Wird geworfen, wenn beim Parsing Fehler aufgetreten sind, z.B. weil
-     *                                             die BibTeX-Datei nicht lesbar ist oder im BibTeX-Record Formatfehler
-     *                                             existieren.
+     * @throws ParserException Wird geworfen, wenn beim Parsing Fehler aufgetreten sind, z.B. weil die BibTeX-Datei
+     *                         nicht lesbar ist oder im BibTeX-Record Formatfehler existieren.
      */
     public function parse()
     {

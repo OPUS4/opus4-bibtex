@@ -61,7 +61,7 @@ class BibtexService
      */
     const INI_FILE = 'import.ini';
 
-    /** @var BibtexService|null interne Instanz der Klasse (für Durchsetzung des Singleton-Patterns) */
+    /** @var self|null interne Instanz der Klasse (für Durchsetzung des Singleton-Patterns) */
     private static $instance;
 
     /** @var string Name der auszuwertenden INI-Konfigurationsdatei. */
@@ -80,9 +80,9 @@ class BibtexService
     /**
      * Liefert eine Instanz der Klasse zurück; erzeugt eine Instanz, wenn bislang noch keine Instanz erzeugt wurde.
      *
-     * @param null $iniFileName Name der INI-Datei, die zur Konfiguration genutzt werden soll (wenn nicht gesetzt, so
-     *                          wird die Standardkonfigurationsdate verwendet)
-     * @return BibtexService
+     * @param null|string $iniFileName Name der INI-Datei, die zur Konfiguration genutzt werden soll
+     *                                 (wenn nicht gesetzt, so wird die Standardkonfigurationsdate verwendet)
+     * @return self
      * @throws BibtexConfigException
      */
     public static function getInstance($iniFileName = null)
