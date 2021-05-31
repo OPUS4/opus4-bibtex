@@ -35,40 +35,42 @@
 
 namespace OpusTest\Bibtex\Import\Rules;
 
-use Opus\Bibtex\Import\Rules\BelongsToBibliography;
+use Opus\Bibtex\Import\Parser;
+use Opus\Bibtex\Import\Processor;
+use Opus\Bibtex\Import\Rules\SourceDataHash;
 use PHPUnit\Framework\TestCase;
 
-class BelongsToBibliographyTest extends TestCase
+use function json_encode;
+use function ksort;
+
+class SourceDataHashTest extends TestCase
 {
-    public function dataProvider(): array
+    public function testProcess()
     {
-        return [
-            ['on', true],
-            ['off', false],
-            ['true', true],
-            ['false', false],
-            [true, true],
-            [false, false],
-            ['1', true],
-            ['0', false],
-            [1, true],
-            [0, false],
-        ];
-    }
+        $bibtex =
+            '@article{citekey,
+                year     = 2020,
+                author   = "John Doe",                
+                doi      = "10.1002/0470841559.ch1"                
+            }';
 
-    /**
-     * @param mixed $arg Test config value
-     * @param bool  $res Expected result
-     * @dataProvider dataProvider
-     */
-    public function testProcess($arg, $res)
-    {
-        $belongsToBibliographyRule = new BelongsToBibliography();
-        $belongsToBibliographyRule->setValue($arg);
+        $parser        = new Parser($bibtex);
+        $bibTexRecords = $parser->parse();
+        $bibTexRecord  = $bibTexRecords[0];
+        unset($bibTexRecord['_type']);
+        unset($bibTexRecord['_original']);
+        ksort($bibTexRecord);
 
+        $proc     = new Processor();
         $metadata = [];
-        $belongsToBibliographyRule->apply([], $metadata);
+        $proc->handleRecord($bibTexRecord, $metadata);
 
-        $this->assertEquals($res, $metadata['BelongsToBibliography']);
+        $expectedHash = (SourceDataHash::HASH_FUNCTION) . ':'
+            . (SourceDataHash::HASH_FUNCTION)(json_encode($bibTexRecord));
+        foreach ($metadata['Enrichment'] as $enrichment) {
+            if ($enrichment['KeyName'] === SourceDataHash::SOURCE_DATA_HASH_KEY) {
+                $this->assertEquals($expectedHash, $enrichment['Value']);
+            }
+        }
     }
 }

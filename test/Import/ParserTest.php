@@ -49,6 +49,7 @@ use function array_keys;
 use function array_map;
 use function file_get_contents;
 use function in_array;
+use function json_encode;
 use function ksort;
 use function preg_split;
 use function strpos;
@@ -216,9 +217,14 @@ class ParserTest extends TestCase
             $bibtexRecord,
             $enrichments[0]
         );
+
+        $resultSorted = $result[0];
+        ksort($resultSorted);
+        unset($resultSorted['_type']);
+        unset($resultSorted['_original']);
         $this->assertEnrichment(
             SourceDataHash::SOURCE_DATA_HASH_KEY,
-            SourceDataHash::HASH_FUNCTION . ':' . (SourceDataHash::HASH_FUNCTION)($bibtexRecord),
+            SourceDataHash::HASH_FUNCTION . ':' . (SourceDataHash::HASH_FUNCTION)(json_encode($resultSorted)),
             $enrichments[1]
         );
     }
@@ -226,7 +232,7 @@ class ParserTest extends TestCase
     /**
      * @param string $keyName Expected key
      * @param string $value Expected value
-     * @param array $enrichment Parsed BibTeX data
+     * @param array  $enrichment Parsed BibTeX data
      */
     private function assertEnrichment($keyName, $value, $enrichment)
     {
@@ -238,7 +244,7 @@ class ParserTest extends TestCase
      * @param string $role Expected role of person, like "author"
      * @param string $firstName Expected first name
      * @param string $lastName Expected last name
-     * @param array $person Parsed BibTeX data
+     * @param array  $person Parsed BibTeX data
      */
     private function assertPerson($role, $firstName, $lastName, $person)
     {
@@ -254,7 +260,7 @@ class ParserTest extends TestCase
     /**
      * @param string $titleType Expected type of title
      * @param string $titleValue Expected value of title
-     * @param array $title Parsed BibTeX data
+     * @param array  $title Parsed BibTeX data
      */
     private function assertTitle($titleType, $titleValue, $title)
     {
@@ -265,7 +271,7 @@ class ParserTest extends TestCase
 
     /**
      * @param string $value Expected value
-     * @param array $subject Parsed BibTeX data
+     * @param array  $subject Parsed BibTeX data
      */
     private function assertSubject($value, $subject)
     {
@@ -276,7 +282,7 @@ class ParserTest extends TestCase
 
     /**
      * @param string $message Expected message
-     * @param array $note Parsed BibTeX data
+     * @param array  $note Parsed BibTeX data
      */
     private function assertNote($message, $note)
     {
@@ -993,9 +999,7 @@ class ParserTest extends TestCase
      */
     public function testProcessor()
     {
-        $bibtex       = "@misc{Nobody06,\n       author = \"Nobody, Jr\",\n       title = \"My Article\",\n       year = \"2006\"}";
-        $hashFunction = SourceDataHash::HASH_FUNCTION;
-        $bibtexHash   = $hashFunction($bibtex);
+        $bibtex = "@misc{Nobody06,\n       author = \"Nobody, Jr\",\n       title = \"My Article\",\n       year = \"2006\"}";
 
         $processor   = new Processor();
         $bibtexArray = [
@@ -1006,6 +1010,11 @@ class ParserTest extends TestCase
             'year'         => '2006',
             '_original'    => $bibtex,
         ];
+
+        $bibtexArraySorted = $bibtexArray;
+        unset($bibtexArraySorted['_original']);
+        ksort($bibtexArraySorted);
+        $bibtexHash = (SourceDataHash::HASH_FUNCTION)(json_encode($bibtexArraySorted));
 
         $opus = [
             'BelongsToBibliography' => false,
@@ -1033,7 +1042,7 @@ class ParserTest extends TestCase
                 ],
                 [
                     'KeyName' => SourceDataHash::SOURCE_DATA_HASH_KEY,
-                    'Value'   => $hashFunction . ':' . $bibtexHash,
+                    'Value'   => SourceDataHash::HASH_FUNCTION . ':' . $bibtexHash,
                 ],
             ],
         ];

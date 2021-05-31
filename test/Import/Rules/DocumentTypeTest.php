@@ -58,7 +58,6 @@ class DocumentTypeTest extends TestCase
      *
      * @param string $arg Value to check given by the data provider
      * @param string $res expected mapping-result
-     * @return void
      * @dataProvider dataProvider
      */
     public function testProcessMapping($arg, $res)
@@ -164,7 +163,7 @@ class DocumentTypeTest extends TestCase
 
     /**
      * @param string $docType Document type
-     * @param array $bibtexBlock BibTeX data
+     * @param array  $bibtexBlock BibTeX data
      * @param string $expectedType Expected document type
      */
     private function assertTypeField($docType, $bibtexBlock, $expectedType)

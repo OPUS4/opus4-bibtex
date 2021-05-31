@@ -71,7 +71,7 @@ class Umlauts extends AbstractComplexRule
      * Wandelt jeden speziell angegebenen Umlaut im übergebenen Feldwert in das zugehörige Unicode-Zeichen um.
      *
      * @param string $value Feldwert, der ggf. umzuwandelnde Umlaute enthält
-     * @return string|boolean liefert den umgewandelten Wert oder false, falls keine Umwandlung von Zeichen erfolgt ist
+     * @return string|bool liefert den umgewandelten Wert oder false, falls keine Umwandlung von Zeichen erfolgt ist
      */
     protected function convertUmlauts($value)
     {
@@ -119,7 +119,7 @@ class Umlauts extends AbstractComplexRule
      *
      * @param string $fieldName Feldname
      * @param string $fieldValue Feldwert
-     * @param array $documentMetadata OPUS-Metadatensatz
+     * @param array  $documentMetadata OPUS-Metadatensatz
      */
     private function setSimpleField($fieldName, $fieldValue, &$documentMetadata)
     {
@@ -137,8 +137,8 @@ class Umlauts extends AbstractComplexRule
      * werden soll.
      *
      * @param string $fieldName Feldname
-     * @param array $fieldValue Feldwert
-     * @param array $documentMetadata OPUS-Metadatensatz
+     * @param array  $fieldValue Feldwert
+     * @param array  $documentMetadata OPUS-Metadatensatz
      */
     private function setArrayField($fieldName, $fieldValue, &$documentMetadata)
     {
@@ -158,7 +158,7 @@ class Umlauts extends AbstractComplexRule
     /**
      * Prüft, ob das Metadatenfeld bei der Umlautbehandlung berücksichtigt werden soll.
      *
-     * @param string $fieldName Feldbezeichnung
+     * @param string       $fieldName Feldbezeichnung
      * @param string|array $fieldValue Feldwert
      * @return bool Liefert true, gdw. das Feld bei der Umlautbehandlung nicht berücksichtigt werden soll.
      */

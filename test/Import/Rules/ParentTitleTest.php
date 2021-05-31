@@ -52,7 +52,7 @@ class ParentTitleTest extends TestCase
     /**
      * Test Mapping of Publication-types.
      *
-     * @param mixed $arg Value to check given by the data provider
+     * @param mixed  $arg Value to check given by the data provider
      * @param string $res expected mapping-result
      * @dataProvider dataProvider
      */

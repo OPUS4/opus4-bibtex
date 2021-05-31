@@ -40,6 +40,8 @@ use Opus\Bibtex\Import\Rules\SourceData;
 use Opus\Bibtex\Import\Rules\SourceDataHash;
 use PHPUnit\Framework\TestCase;
 
+use function json_encode;
+
 class RawDataTest extends TestCase
 {
     public function testProcess()
@@ -49,7 +51,7 @@ class RawDataTest extends TestCase
         $proc->handleRecord(['_original' => '@article{...}'], $metadata);
 
         $hashFunction = SourceDataHash::HASH_FUNCTION;
-        $hashValue    = $hashFunction('@article{...}');
+        $hashValue    = $hashFunction(json_encode([]));
         $this->assertEquals(
             [
                 ['KeyName' => SourceData::SOURCE_DATA_KEY, 'Value' => '@article{...}'],

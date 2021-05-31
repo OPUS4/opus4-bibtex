@@ -51,7 +51,7 @@ class TitleTest extends TestCase
     /**
      * Test title-rule.
      *
-     * @param mixed $arg Value to check given by the data provider
+     * @param mixed  $arg Value to check given by the data provider
      * @param string $res expected mapping-result
      * @dataProvider dataProvider
      */

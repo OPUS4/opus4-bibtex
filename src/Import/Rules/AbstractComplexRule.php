@@ -80,6 +80,9 @@ abstract class AbstractComplexRule implements RuleInterface
                     unset($this->fieldsEvaluated[$fieldName]);
                 }
             }
+        } else {
+            // es können alle Felder des BibTeX-Records ausgewertet werden
+            $fieldValues = $bibtexRecord;
         }
         // FIXME wir können nicht wirklich sicherstellen, dass beim Aufruf von setFields tatsächlich auf die in
         //       $fieldValues angegebenen Werte des BibTeX-Records zugegriffen wird
@@ -98,7 +101,7 @@ abstract class AbstractComplexRule implements RuleInterface
 
     /**
      * Diese Methode muss von Klassen, die AbstractComplexRule ableiten, überschrieben / definiert werden.
-     * Die Methode bestimmt erlaubt das Setzen der OPUS-Metadatenfelder auf Basis der übergebenen Werte von
+     * Die Methode erlaubt das Setzen der OPUS-Metadatenfelder auf Basis der übergebenen Werte von
      * BibTeX-Feldern.
      *
      * @param array $fieldValues Werte von BibTeX-Feldern

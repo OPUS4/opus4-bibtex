@@ -36,9 +36,10 @@
 namespace Opus\Bibtex\Import;
 
 use ErrorException;
-use RenanBr\BibTexParser\Exception\ParserException;
+use RenanBr\BibTexParser\Exception\ParserException as BibTexParserException;
 use RenanBr\BibTexParser\Exception\ProcessorException;
 use RenanBr\BibTexParser\Listener;
+use RenanBr\BibTexParser\Parser as BibTexParser;
 use RenanBr\BibTexParser\Processor\LatexToUnicodeProcessor;
 
 use function array_keys;
@@ -73,13 +74,12 @@ class Parser
      * von BibTeX-Feldnamen auf die zugehörigen Werte zurück.
      *
      * @return array
-     * @throws \Opus\Bibtex\Import\ParserException Wird geworfen, wenn beim Parsing Fehler aufgetreten sind, z.B. weil
-     *                                             die BibTeX-Datei nicht lesbar ist oder im BibTeX-Record Formatfehler
-     *                                             existieren.
+     * @throws ParserException Wird geworfen, wenn beim Parsing Fehler aufgetreten sind, z.B. weil die BibTeX-Datei
+     *                         nicht lesbar ist oder im BibTeX-Record Formatfehler existieren.
      */
     public function parse()
     {
-        $parser = new \RenanBr\BibTexParser\Parser();
+        $parser = new BibTexParser();
 
         $listener = new Listener();
         $listener->addProcessor(new LatexToUnicodeProcessor()); // behandelt alle Felder (weil leere Blacklist)
@@ -92,19 +92,19 @@ class Parser
             } else {
                 $parser->parseString($this->bibtex);
             }
-        } catch (ParserException $e) {
+        } catch (BibTexParserException $e) {
             // Fehler beim Parsen des BibTeX
-            throw new \Opus\Bibtex\Import\ParserException();
+            throw new ParserException($e->getMessage());
         } catch (ErrorException $e) {
             // Fehler beim Einlesen der übergebenen Datei
-            throw new \Opus\Bibtex\Import\ParserException();
+            throw new ParserException($e->getMessage());
         }
 
         try {
             $result = $listener->export();
         } catch (ProcessorException $e) {
             // im Feldinhalt eines Felds befindet sich ein unerwartetes Zeichen
-            throw new \Opus\Bibtex\Import\ParserException();
+            throw new ParserException($e->getMessage());
         }
         return $result;
     }

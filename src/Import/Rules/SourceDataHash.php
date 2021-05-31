@@ -35,11 +35,17 @@
 
 namespace Opus\Bibtex\Import\Rules;
 
+use function array_key_exists;
+use function array_keys;
+use function json_encode;
+use function ksort;
+use function strpos;
+
 /**
  * Setzt den Hashwert des importierten BibTeX-Record als Wert des Enrichments opus.import.dataHash.
  * Hierbei wird standardmäßig die MD5-Hashfunktion verwendet.
  */
-class SourceDataHash extends AbstractArrayRule
+class SourceDataHash extends AbstractComplexRule
 {
     /**
      * Name des Enrichments, in dem der Hashwert (auf Basis der Hashfunktion HASH_FUNCTION) des importierten
@@ -55,25 +61,30 @@ class SourceDataHash extends AbstractArrayRule
     const HASH_FUNCTION = 'md5';
 
     /**
-     * Konstruktor
+     * @param array $fieldValues
+     * @param array $documentMetadata
      */
-    public function __construct()
+    protected function setFields($fieldValues, &$documentMetadata)
     {
-        $this->setBibtexField('_original');
-        $this->setOpusField('Enrichment');
-    }
+        // Spezialfelder des Parsers sollen bei der Hashwert-Bestimmung nicht betrachtet werden
+        foreach (array_keys($fieldValues) as $key) {
+            if (strpos($key, '_') === 0) {
+                unset($fieldValues[$key]);
+            }
+        }
 
-    /**
-     * Ermittelt den Feldwert für den OPUS-Metadatensatz.
-     *
-     * @param string $value BibTeX-Record
-     * @return array
-     */
-    protected function getValue($value)
-    {
-        return [
+        // Sortierung der Schlüssel
+        ksort($fieldValues);
+
+        // json_encode ist schneller als serialize und erzeugt ein kompakteres Ergebnis
+        $hashValue = self::HASH_FUNCTION . ':' . (self::HASH_FUNCTION)(json_encode($fieldValues));
+
+        $enrichments   = array_key_exists('Enrichment', $documentMetadata) ? $documentMetadata['Enrichment'] : [];
+        $enrichments[] = [
             'KeyName' => self::SOURCE_DATA_HASH_KEY,
-            'Value'   => self::HASH_FUNCTION . ':' . (self::HASH_FUNCTION)($value),
+            'Value'   => $hashValue,
         ];
+
+        $documentMetadata['Enrichment'] = $enrichments;
     }
 }

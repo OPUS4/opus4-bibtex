@@ -136,7 +136,7 @@ class BibtexMapping
      * wird vor der Ausführung aller anderen Regeln ausgeführt. Existiert bereits eine Regel mit dem
      * übergebenen Namen, so wird diese Regel vor dem Hinzufügen der übergebenen Regel entfernt.
      *
-     * @param string $name Name der Regel
+     * @param string             $name Name der Regel
      * @param RuleInterface|null $rule die hinzuzufügende Regel (wenn null, dann wird die Regel aus dem Namen abgeleitet)
      * @return $this
      */
@@ -156,7 +156,7 @@ class BibtexMapping
      * wird erst nach der Ausführung aller anderen Regeln ausgeführt. Existiert bereits eine Regel mit dem
      * übergebenen Namen, so wird diese Regel vor dem Hinzufügen der übergebenen Regel entfernt.
      *
-     * @param string $name Name der Regel
+     * @param string             $name Name der Regel
      * @param RuleInterface|null $rule die hinzuzufügende Regel (wenn null, dann wird die Regel aus dem Namen abgeleitet)
      * @return $this
      */
@@ -175,8 +175,8 @@ class BibtexMapping
      * Überschreibt die unter dem Namen registrierte Regel oder fügt die Regel am Ende der Regelliste hinzu, falls
      * unter dem übergebenen Namen noch keine Regel existiert.
      *
-     * @param string $name Name der Regel
-     * @param RuleInterface $rule die zu ersetzende (oder hinzuzufügende) Regel
+     * @param string             $name Name der Regel
+     * @param null|RuleInterface $rule die zu ersetzende (oder hinzuzufügende) Regel
      * @return $this
      */
     public function updateRule($name, $rule = null)

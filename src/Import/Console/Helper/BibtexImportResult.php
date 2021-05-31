@@ -38,6 +38,8 @@ namespace Opus\Bibtex\Import\Console\Helper;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\Output;
 
+use const PHP_EOL;
+
 class BibtexImportResult
 {
     /**
@@ -49,16 +51,27 @@ class BibtexImportResult
     /** @var int Anzahl der tatsächlich erfolgreich in der Datenbank gespeicherten OPUS-Dokumente */
     private $numDocsImported = 0;
 
-    /** @var Output */
+    /** @var int Anzahl der aufgrund von Fehlern nicht importierbaren BibTeX-Records */
+    private $numErrors = 0;
+
+    /** @var int Anzahl der aufgrund von Hashwert-Übereinstimmungen nicht importierten BibTeX-Records */
+    private $numSkipped = 0;
+
+    /** @var Output Ausgabepuffer für Meldungen während des BibTeX-Imports */
     private $output;
 
-    /** @var array */
-    private $messages = [];
+    /** @var string speichert die Ausgaben während der Verarbeitung */
+    private $messages = '';
+
+    /**
+     * Maximale Anzahl der Status-Indikatorzeichen in einer Bildschirmzeile
+     */
+    const STATUS_LINE_WIDTH = 80;
 
     /**
      * Konstruktor
      *
-     * @param Output|null $output
+     * @param Output|null $output Ausgabepuffer für Meldungen während des BibTeX-Imports
      */
     public function __construct($output = null)
     {
@@ -69,7 +82,7 @@ class BibtexImportResult
     }
 
     /**
-     * @return int
+     * @return int Anzahl der verarbeiteten Dokumente
      */
     public function getNumDocsProcessed()
     {
@@ -82,20 +95,31 @@ class BibtexImportResult
     }
 
     /**
-     * @return int
+     * @return int Anzahl der importierten Dokumente
      */
     public function getNumDocsImported()
     {
         return $this->numDocsImported;
     }
 
-    public function increaseNumDocsImported()
+    /**
+     * @return int Anzahl der aufgrund von Fehlern nicht importierten BibTeX-Records
+     */
+    public function getNumErrors()
     {
-        $this->numDocsImported++;
+        return $this->numErrors;
     }
 
     /**
-     * @return array
+     * @return int Anzahl der aufgrund von Hashwert-Übereinstimmung nicht importierten BibTeX-Records
+     */
+    public function getNumSkipped()
+    {
+        return $this->numSkipped;
+    }
+
+    /**
+     * @return string
      */
     public function getMessages()
     {
@@ -108,7 +132,7 @@ class BibtexImportResult
     public function addMessage($message)
     {
         $this->output->writeln($message);
-        $this->messages[] = $message;
+        $this->messages .= $message . PHP_EOL;
     }
 
     /**
@@ -117,7 +141,61 @@ class BibtexImportResult
     public function outputCompletionMessage()
     {
         $this->addMessage('');
+        $this->addMessage('');
         $this->addMessage("Number of documents processed: $this->numDocsProcessed");
         $this->addMessage("Number of documents imported: $this->numDocsImported");
+
+        if ($this->numSkipped > 0) {
+            $this->addMessage("Number of skipped BibTeX records: $this->numSkipped");
+        }
+
+        if ($this->numErrors > 0) {
+            $this->addMessage("Number of discarded BibTeX records due to errors: $this->numErrors");
+        }
+    }
+
+    /**
+     * @param bool $verbose true, wenn ausführliche Logausgabe gewünscht
+     * @param bool $dryMode true, wenn keine neuen Dokumente in die Datenbank importiert werden sollen
+     */
+    public function addSuccessStatus($verbose, $dryMode)
+    {
+        $this->addStatus('.', $verbose);
+        if (! $dryMode) {
+            $this->numDocsImported++;
+        }
+    }
+
+    /**
+     * @param bool $verbose true, wenn ausführliche Logausgabe gewünscht
+     */
+    public function addErrorStatus($verbose)
+    {
+        $this->addStatus('E', $verbose);
+    }
+
+    /**
+     * @param bool $verbose true, wenn ausführliche Logausgabe gewünscht
+     */
+    public function addSkipStatus($verbose)
+    {
+        $this->addStatus('S', $verbose);
+        $this->numSkipped++;
+    }
+
+    /**
+     * @param string $statusStr auszugebender Status-Indikator (ein Zeichen)
+     * @param bool   $verbose   true, wenn ausführliche Logausgabe gewünscht
+     */
+    private function addStatus($statusStr, $verbose)
+    {
+        if (! $verbose) {
+            $this->output->write($statusStr);
+            $this->messages .= $statusStr;
+            if ($this->numDocsProcessed % self::STATUS_LINE_WIDTH === 0) {
+                $this->output->writeln(''); // neue Zeile beginnen
+                $this->messages .= PHP_EOL;
+            }
+        }
     }
 }

@@ -53,10 +53,10 @@ class SimpleRule implements RuleInterface
     protected $opusField;
 
     /**
-     * @param string $bibtexField Name des auszuwertenden BibTeX-Felds
-     * @param string $opusField Name des zu befüllenden OPUS4-Metadatenfelds
+     * @param null|string $bibtexField Name des auszuwertenden BibTeX-Felds
+     * @param null|string $opusField Name des zu befüllenden OPUS4-Metadatenfelds
      */
-    public function __construct($bibtexField = null, string $opusField = null)
+    public function __construct($bibtexField = null, $opusField = null)
     {
         $this->setBibtexField($bibtexField);
         $this->setOpusField($opusField);
