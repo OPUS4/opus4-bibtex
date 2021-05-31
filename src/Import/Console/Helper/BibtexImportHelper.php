@@ -154,6 +154,12 @@ class BibtexImportHelper
         }
         $processor = new Processor($fieldMapping);
 
+        $importId   = uniqid('', true);
+        $importDate = gmdate('c');
+
+        $bibtexImportResult->addMessage('Unique ID of import run: ' . $importId);
+        $bibtexImportResult->addMessage('Date of import: ' . $importDate);
+
         // BibTeX-Records werden einzeln importiert: im Fehlerfall wird zum zum nächsten BibTeX-Record gesprungen
         foreach ($bibtexRecords as $bibtexRecord) {
             $bibtexImportResult->increaseNumDocsProcessed();
@@ -177,7 +183,7 @@ class BibtexImportHelper
                         $doc->addCollection($collection);
                     }
 
-                    $this->addImportEnrichments($doc);
+                    $this->addImportEnrichments($doc, $importId, $importDate);
 
                     try {
                         $doc = Document::get($doc->store());
@@ -273,13 +279,15 @@ class BibtexImportHelper
      * existieren.
      *
      * @param Document $document das importierte OPUS-Dokument
+     * @param string   $importId eindeutige ID des Import-Durchlaufs
+     * @param string   $importDate Datum des Imports
      */
-    private function addImportEnrichments($document)
+    private function addImportEnrichments($document, $importId, $importDate)
     {
-        $this->createEnrichment($document, 'opus.import.date', gmdate('c'));
+        $this->createEnrichment($document, 'opus.import.date', $importDate);
         $this->createEnrichment($document, 'opus.import.file', $this->fileName);
         $this->createEnrichment($document, 'opus.import.format', 'bibtex');
-        $this->createEnrichment($document, 'opus.import.id', uniqid('', true));
+        $this->createEnrichment($document, 'opus.import.id', $importId);
     }
 
     /**
