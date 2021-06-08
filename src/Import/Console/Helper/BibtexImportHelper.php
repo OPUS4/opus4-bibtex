@@ -104,6 +104,8 @@ class BibtexImportHelper
             return;
         }
 
+        $collections = [];
+
         if ($this->dryMode) {
             $bibtexImportResult->addMessage("Dry mode is enabled: new documents won't be added to database");
         } else {
@@ -255,7 +257,7 @@ class BibtexImportHelper
     /**
      * Erzeugt die für den BibTeX-Import erforderlichen Enrichment Keys, sofern sie nicht bereits existieren.
      *
-     * @param string             $enrichmentKeyNames
+     * @param array              $enrichmentKeyNames
      * @param BibtexImportResult $bibtexImportResult
      */
     private function createEnrichmentKeysIfMissing($enrichmentKeyNames, $bibtexImportResult)
