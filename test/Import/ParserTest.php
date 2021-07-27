@@ -1051,6 +1051,28 @@ class ParserTest extends TestCase
         $processor->handleRecord($bibtexArray, $metadata);
         $this->assertEquals($opus, $metadata);
     }
+    
+    /**
+     * Regression Test of OPUSVIER-4555
+     */
+    public function testLongFieldValue()
+    {
+        $bibtex =
+            '@article{citekey,
+                author = "0123456789 0123456789 0123456789 0123456789 0123456789 0123456789 0123456789 0123456789"
+            }';
+
+        $parser        = new Parser($bibtex);
+        $bibTexRecords = $parser->parse();
+
+        $proc     = new Processor();
+        $metadata = [];
+        $proc->handleRecord($bibTexRecords[0], $metadata);
+
+        $persons = $metadata['Person'];
+        $this->assertCount(1, $persons);
+        $this->assertPerson('author', '0123456789 0123456789 0123456789 0123456789 0123456789 0123456789 0123456789 0123456789', $persons[0]);
+    }
 
     /**
      * @param string $fileName Name of file
