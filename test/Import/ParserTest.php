@@ -1051,7 +1051,7 @@ class ParserTest extends TestCase
         $processor->handleRecord($bibtexArray, $metadata);
         $this->assertEquals($opus, $metadata);
     }
-    
+
     /**
      * Regression Test of OPUSVIER-4555
      */
