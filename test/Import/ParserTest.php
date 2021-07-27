@@ -1059,7 +1059,7 @@ class ParserTest extends TestCase
     {
         $bibtex =
             '@article{citekey,
-                author = "0123456789 0123456789 0123456789 0123456789 0123456789 0123456789 0123456789 0123456789"
+                author = "Aaaaa, A. and Bbbbbbbbb, B. and Cccc, C. and Ddddddd, D. and Eeeee, E. and Ffffff, F."
             }';
 
         $parser        = new Parser($bibtex);
@@ -1070,8 +1070,13 @@ class ParserTest extends TestCase
         $proc->handleRecord($bibTexRecords[0], $metadata);
 
         $persons = $metadata['Person'];
-        $this->assertCount(1, $persons);
-        $this->assertPerson('author', '0123456789 0123456789 0123456789 0123456789 0123456789 0123456789 0123456789 0123456789', $persons[0]);
+        $this->assertCount(6, $persons);
+        $this->assertPerson('author', 'A.', 'Aaaaa', $persons[0]);
+        $this->assertPerson('author', 'B.', 'Bbbbbbbbb', $persons[1]);
+        $this->assertPerson('author', 'C.', 'Cccc', $persons[2]);
+        $this->assertPerson('author', 'D.', 'Ddddddd', $persons[3]);
+        $this->assertPerson('author', 'E.', 'Eeeee', $persons[4]);
+        $this->assertPerson('author', 'F.', 'Ffffff', $persons[5]);
     }
 
     /**
