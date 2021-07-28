@@ -1053,6 +1053,33 @@ class ParserTest extends TestCase
     }
 
     /**
+     * Regression Test of OPUSVIER-4555
+     */
+    public function testLongFieldValue()
+    {
+        $bibtex =
+            '@article{citekey,
+                author = "Aaaaa, A. and Bbbbbbbbb, B. and Cccc, C. and Ddddddd, D. and Eeeee, E. and Ffffff, F."
+            }';
+
+        $parser        = new Parser($bibtex);
+        $bibTexRecords = $parser->parse();
+
+        $proc     = new Processor();
+        $metadata = [];
+        $proc->handleRecord($bibTexRecords[0], $metadata);
+
+        $persons = $metadata['Person'];
+        $this->assertCount(6, $persons);
+        $this->assertPerson('author', 'A.', 'Aaaaa', $persons[0]);
+        $this->assertPerson('author', 'B.', 'Bbbbbbbbb', $persons[1]);
+        $this->assertPerson('author', 'C.', 'Cccc', $persons[2]);
+        $this->assertPerson('author', 'D.', 'Ddddddd', $persons[3]);
+        $this->assertPerson('author', 'E.', 'Eeeee', $persons[4]);
+        $this->assertPerson('author', 'F.', 'Ffffff', $persons[5]);
+    }
+
+    /**
      * @param string $fileName Name of file
      * @return string Path to file
      */
