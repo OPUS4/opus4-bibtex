@@ -47,6 +47,7 @@ use PHPUnit\Framework\TestCase;
 use function array_diff;
 use function array_keys;
 use function array_map;
+use function count;
 use function file_get_contents;
 use function in_array;
 use function json_encode;
@@ -55,7 +56,6 @@ use function preg_split;
 use function strpos;
 use function strtolower;
 use function trim;
-use function count;
 
 use const DIRECTORY_SEPARATOR;
 use const PREG_SPLIT_DELIM_CAPTURE;
