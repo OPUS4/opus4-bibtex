@@ -55,6 +55,7 @@ use function preg_split;
 use function strpos;
 use function strtolower;
 use function trim;
+use function count;
 
 use const DIRECTORY_SEPARATOR;
 use const PREG_SPLIT_DELIM_CAPTURE;
