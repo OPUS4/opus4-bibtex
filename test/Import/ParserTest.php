@@ -1080,6 +1080,24 @@ class ParserTest extends TestCase
     }
 
     /**
+     * Regression Test of OPUSVIER-4557: Filter BibTeX fields with empty field value.
+     */
+    public function testProcessEmptyFields()
+    {
+        $testfile = $this->getPath('empty-fields.bib');
+
+        $parser = new Parser($testfile);
+        $result = $parser->parse();
+        $this->assertCount(1, $result);
+        $bibTexRecord = $result[0];
+        $this->assertEquals('article', $bibTexRecord['type']);
+        $this->assertEquals('article', $bibTexRecord['_type']);
+        $this->assertEquals('Foo2021', $bibTexRecord['citation-key']);
+        $this->assertArrayHasKey('_original', $bibTexRecord);
+        $this->assertEquals(4, count($bibTexRecord));
+    }
+
+    /**
      * @param string $fileName Name of file
      * @return string Path to file
      */
