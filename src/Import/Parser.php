@@ -45,6 +45,7 @@ use RenanBr\BibTexParser\Processor\LatexToUnicodeProcessor;
 use function array_keys;
 use function is_file;
 use function substr;
+use function trim;
 
 /**
  * Liest eine übergebene BibTeX-Datei bzw. eine Zeichenkette, die ein oder mehrere BibTeX-Records enthält ein und
@@ -106,6 +107,8 @@ class Parser
             // im Feldinhalt eines Felds befindet sich ein unerwartetes Zeichen
             throw new ParserException($e->getMessage());
         }
+
+        $this->removeEmptyFields($result);
         return $result;
     }
 
@@ -127,5 +130,22 @@ class Parser
             $result[] = $fieldName;
         }
         return $result;
+    }
+
+    /**
+     * Entfernt in den übergenenen BibTeX-Records alle BibTeX-Felder, die einen leeren Feldinhalt besitzen.
+     *
+     * @param array $bibtexRecords Array von BibTeX-Records
+     */
+    private function removeEmptyFields(&$bibtexRecords)
+    {
+        foreach ($bibtexRecords as $index => $bibtexRecord) {
+            foreach ($bibtexRecord as $key => $value) {
+                if (trim($value) === '') {
+                    unset($bibtexRecord[$key]);
+                }
+            }
+            $bibtexRecords[$index] = $bibtexRecord;
+        }
     }
 }
