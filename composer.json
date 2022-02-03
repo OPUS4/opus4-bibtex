@@ -48,5 +48,10 @@
     "cs-report": "phpcs -n --report=checkstyle --report-file=build/checkstyle.xml",
     "cs-fix": "phpcbf",
     "metrics": "phpmetrics --report-html=build/metrics --junit=build/phpunit.xml ."
+  },
+  "config": {
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true
+    }
   }
 }
