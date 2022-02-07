@@ -1,9 +1,11 @@
 # ignore any third-party library
 vendor
+.vagrant
 
 # ignore composer runtime
 composer.phar
 composer.lock
+bin/composer
 
 # IDE files
 .idea
@@ -12,3 +14,6 @@ nbproject
 
 # Build files
 build
+
+# Other
+**/.DS_Store
