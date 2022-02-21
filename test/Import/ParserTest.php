@@ -47,6 +47,7 @@ use PHPUnit\Framework\TestCase;
 use function array_diff;
 use function array_keys;
 use function array_map;
+use function count;
 use function file_get_contents;
 use function in_array;
 use function json_encode;
@@ -1077,6 +1078,24 @@ class ParserTest extends TestCase
         $this->assertPerson('author', 'D.', 'Ddddddd', $persons[3]);
         $this->assertPerson('author', 'E.', 'Eeeee', $persons[4]);
         $this->assertPerson('author', 'F.', 'Ffffff', $persons[5]);
+    }
+
+    /**
+     * Regression Test of OPUSVIER-4557: Filter BibTeX fields with empty field value.
+     */
+    public function testProcessEmptyFields()
+    {
+        $testfile = $this->getPath('empty-fields.bib');
+
+        $parser = new Parser($testfile);
+        $result = $parser->parse();
+        $this->assertCount(1, $result);
+        $bibTexRecord = $result[0];
+        $this->assertEquals('article', $bibTexRecord['type']);
+        $this->assertEquals('article', $bibTexRecord['_type']);
+        $this->assertEquals('Foo2021', $bibTexRecord['citation-key']);
+        $this->assertArrayHasKey('_original', $bibTexRecord);
+        $this->assertEquals(4, count($bibTexRecord));
     }
 
     /**
