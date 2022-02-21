@@ -39,7 +39,7 @@ use Opus\Bibtex\Import\Parser;
 use Opus\Bibtex\Import\Processor;
 use PHPUnit\Framework\TestCase;
 
-class PersonsTest extends TestCase
+class PersonTest extends TestCase
 {
     public function testProcessAuthors()
     {
@@ -99,5 +99,22 @@ class PersonsTest extends TestCase
             ],
             $metadata['Person']
         );
+    }
+
+    public function testApply()
+    {
+        $this->markTestIncomplete();
+
+        $record = [
+            'Author' => 'Wang, Y. and Xie and Steffen, S.'
+        ];
+
+        $rule = new Person();
+
+        $result = [];
+
+        $rule->apply($record, $result);
+
+        // var_dump($result);
     }
 }
