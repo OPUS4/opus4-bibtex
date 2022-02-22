@@ -35,15 +35,14 @@ which is shipped with recent Ubuntu versions (20.10 and 21.04).
 
 ## Configuration Options
 
-### Import Configuration
+The default settings for the import of BibTeX files are located in `src\Import\import.ini`. That file should
+not be edited locally. It is possible to extend or modify the settings in the global OPUS 4 configuration.
 
-The whole import process of BibTeX files is controlled by the settings configured in `import.ini`.
+### Field Mappings 
 
-The default configuration is given by `src/Import/import.ini`.
-
-The configuration file `import.ini` allows you to register an arbitrary number of field mappings (see below). 
-Each field mapping is given by a separate line in `import.ini` where the value (on the right-hand side of `=`) refers 
-to the name of an external JSON field mapping configuration file:
+You can register an arbitrary number of field mappings (see below). Each field mapping is given by a separate line 
+in `import.ini` where the value (on the right-hand side of `=`) refers to the name of an external JSON field mapping 
+configuration file:
 
 ```ini
 fieldMappings[] = custom-mapping.json
@@ -54,28 +53,28 @@ The default field mapping is given by `src/Import/default-mapping.json`.
 ### Document Type Mapping
 
 An important step in mapping BibTex records to OPUS4 metadata documents is to determine the OPUS document type 
-a given BibTex type is mapped to. `import.ini` allows you to define a mapping between BibTeX type `btype` and 
-OPUS4 document type `otype` in the following manner:
+a given BibTex type is mapped to. You can define custom mappings between a BibTeX type `btype` and 
+a OPUS4 document type `otype` in the following manner:
 
 ```ini
-documentTypeMapping[btype] = otype
+bibtex.entryTypes.btype = otype
 ```
 
 Please note that BibTeX type names used in the type mapping are not restricted to the 14 official BibTeX types.
 It is allowed to define custom type mappings for unknown BibTeX types, e.g.
 
 ```ini
-documentTypeMapping[journal] = article
+bibtex.entryTypes.journal = article
 ```
 
 In case the type of a BibTeX record is not contained in the document type mapping, you can provide a default
-OPUS4 document type that is used as a fallback:
+OPUS4 document type that is used as a fallback. The default fallback is `misc`.
 
 ```ini
-defaultDocumentType = misc
+bibtex.defaultDocumentType = misc
 ```
 
-### Field Mapping
+## Field Mapping
 
 A field mapping specifies how values in certain BibTeX fields are mapped onto OPUS4 
 metadata fields. A field mapping is provided by a configuration file. At the moment OPUS4 
@@ -102,7 +101,7 @@ rules, given in the `mapping` list. Please note, that the order of the given map
 mapping rules that occur later in the list have a higher precedence and can overwrite previously assigned
 values of OPUS4 document fields with new values.
 
-#### Field Mapping Rules
+### Field Mapping Rules
 
 Each mapping rule must specify at least a name in the corresponding `name` key, e.g.
 
@@ -174,7 +173,7 @@ Another example mapping entry is given by the rule:
 which sets the value of the `belongsToBibliography` field of an OPUS document to a fixed value (`false` in 
 this example) independently of certain BibTeX fields.
 
-#### Pre-defined rule classes
+### Pre-defined rule classes
 
 OPUS4 provides a number of pre-defined rule classes (located in namespace `Opus\Bibtex\Import\Rules`):
 
@@ -198,7 +197,7 @@ OPUS4 provides a number of pre-defined rule classes (located in namespace `Opus\
 | `TitleParent`           | adds a parent title |
 | `Umlauts`               | converts non-standard escaped umlauts to their corresponding unicode characters |
 
-#### Base rule classes
+### Base rule classes
 
 OPUS4 supports several ways to create custom rule implementations. Each rule class has to implement the interface
 `RuleInterface`.

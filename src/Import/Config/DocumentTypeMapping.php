@@ -27,18 +27,17 @@
  *
  * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
- *
- * @category    BibTeX
- * @package     Opus\Bibtex\Import\Config
- * @author      Sascha Szott <opus-repository@saschaszott.de>
  */
 
 namespace Opus\Bibtex\Import\Config;
 
+use Opus\Config;
 use function array_key_exists;
 
 /**
  * Hält die Konfigurationseinstellungen zum Mapping von BibTeX-Typen auf OPUS-Dokumenttypen.
+ *
+ * TODO initialize with default mapping
  */
 class DocumentTypeMapping
 {
@@ -114,6 +113,12 @@ class DocumentTypeMapping
      */
     public function getDefaultType()
     {
+        $config = $this->getConfig();
+
+        if (isset($config->bibtex->defaultDocumentType)) {
+            return $config->bibtex->defaultDocumentType;
+        }
+
         return $this->defaultType;
     }
 
@@ -127,15 +132,26 @@ class DocumentTypeMapping
      * @return string|null Name des zugehörigen OPUS-Dokumenttyps (oder null, wenn kein Mapping möglich)
      *
      * TODO macht $useDefaultAsFallback Sinn? Wie/wo wird es verwendet?
+     * TODO check if mapped document type exists?
+     *
      */
     public function getOpusType($bibtexType, $useDefaultAsFallback = true)
     {
+        $config = $this->getConfig();
+
+        // Check if a custom mapping has been configured
+        if (isset($config->bibtex->entryTypes->$bibtexType)) {
+            return $config->bibtex->entryTypes->$bibtexType;
+        }
+
+        // Use standard mapping
         if (array_key_exists($bibtexType, $this->typeMap)) {
             return $this->typeMap[$bibtexType];
         }
 
+        // Use default mapping
         if ($useDefaultAsFallback) {
-            return $this->defaultType;
+            return $this->getDefaultType();
         }
 
         return null;
@@ -149,5 +165,10 @@ class DocumentTypeMapping
     public function getMappings()
     {
         return $this->typeMap;
+    }
+
+    public function getConfig()
+    {
+        return Config::get();
     }
 }
