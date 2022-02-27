@@ -27,20 +27,18 @@
  *
  * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
- *
- * @category    Tests
- * @package     OpusTest\Bibtex\Import\Rules\DocumentType
- * @author      Sascha Szott <opus-repository@saschaszott.de>
  */
 
-namespace OpusTest\Bibtex\Import\Rules\DocumentType;
+namespace OpusTest\Bibtex\Import\Config;
 
 use Opus\Bibtex\Import\Config\BibtexMapping;
 use Opus\Bibtex\Import\Config\BibtexService;
 use Opus\Bibtex\Import\Config\DocumentTypeMapping;
 use Opus\Bibtex\Import\Processor;
 use Opus\Bibtex\Import\Rules\DocumentType;
+use Opus\Config;
 use PHPUnit\Framework\TestCase;
+use Zend_Config;
 
 class DocumentTypeMappingTest extends TestCase
 {
@@ -212,5 +210,39 @@ class DocumentTypeMappingTest extends TestCase
         $documentTypeMappingFromConfig = BibtexService::getInstance()->getTypeMapping();
         $this->assertEquals($documentTypeMapping->getDefaultType(), $documentTypeMappingFromConfig->getDefaultType());
         $this->assertEquals($documentTypeMapping->getMappings(), $documentTypeMappingFromConfig->getMappings());
+    }
+
+    public function testCustomMapping()
+    {
+        $customType = 'report';
+
+        $mapping = new DocumentTypeMapping();
+        $mapping->setMapping('manual', 'article');
+
+        $this->assertEquals('article', $mapping->getOpusType('manual'));
+
+        Config::set(new Zend_Config([
+            'bibtex' => ['entryTypes' => ['manual' => $customType]],
+        ]));
+
+        $this->assertEquals($customType, $mapping->getOpusType('manual'));
+    }
+
+    public function testCustomDefaultMapping()
+    {
+        $defaultType = 'defaultType';
+
+        $mapping = new DocumentTypeMapping();
+        $mapping->setDefaultType($defaultType);
+
+        $this->assertEquals($defaultType, $mapping->getDefaultType());
+        $this->assertEquals($defaultType, $mapping->getOpusType('article'));
+
+        Config::set(new Zend_Config([
+            'bibtex' => ['defaultDocumentType' => 'article'],
+        ]));
+
+        $this->assertEquals('article', $mapping->getDefaultType());
+        $this->assertEquals('article', $mapping->getOpusType('book'));
     }
 }

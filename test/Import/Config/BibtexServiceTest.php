@@ -27,20 +27,21 @@
  *
  * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
- *
- * @category    Tests
- * @package     OpusTest\Bibtex\Import\Config
- * @author      Sascha Szott <opus-repository@saschaszott.de>
  */
 
 namespace OpusTest\Bibtex\Import\Config;
 
 use Opus\Bibtex\Import\Config\BibtexConfigException;
 use Opus\Bibtex\Import\Config\BibtexService;
+use Opus\Config;
 use PHPUnit\Framework\TestCase;
+use Zend_Config;
 
 use function count;
 
+/**
+ * TODO review and modify the for new design of BibtexService configuration
+ */
 class BibtexServiceTest extends TestCase
 {
     public function testListAvailableMappingsDefault()
@@ -68,17 +69,17 @@ class BibtexServiceTest extends TestCase
         $bibtexService     = BibtexService::getInstance(__DIR__ . '/../_files/import.ini');
         $availableMappings = $bibtexService->listAvailableMappings();
         $this->assertEquals(2, count($availableMappings));
-        $this->assertEquals('test', $availableMappings[0]);
-        $this->assertEquals('other-mapping', $availableMappings[1]);
+        $this->assertEquals('default', $availableMappings[0]);
+        $this->assertEquals('other', $availableMappings[1]);
     }
 
     public function testRegisterMapping()
     {
         $bibtexService = BibtexService::getInstance(__DIR__ . '/../_files/import-single.ini');
-        $bibtexService->registerMapping('mapping.json');
+        $bibtexService->registerMapping('test', 'mapping.json');
         $availableMappings = $bibtexService->listAvailableMappings();
         $this->assertEquals(2, count($availableMappings));
-        $this->assertEquals('other-mapping', $availableMappings[0]);
+        $this->assertEquals('other', $availableMappings[0]);
         $this->assertEquals('test', $availableMappings[1]);
     }
 
@@ -115,7 +116,7 @@ class BibtexServiceTest extends TestCase
     public function testGetFieldMappingSingle()
     {
         $bibtexService = BibtexService::getInstance(__DIR__ . '/../_files/import-single.ini');
-        $fieldMapping  = $bibtexService->getFieldMapping('other-mapping');
+        $fieldMapping  = $bibtexService->getFieldMapping('other');
         $this->assertEquals('other-mapping', $fieldMapping->getName());
         $this->assertEquals('Another Test BibTeX Mapping Configuration.', $fieldMapping->getDescription());
         $this->assertFalse(empty($fieldMapping->getRules()));
@@ -124,14 +125,76 @@ class BibtexServiceTest extends TestCase
     public function testGetFieldMapping()
     {
         $bibtexService = BibtexService::getInstance(__DIR__ . '/../_files/import.ini');
-        $fieldMapping  = $bibtexService->getFieldMapping('other-mapping');
+        $fieldMapping  = $bibtexService->getFieldMapping('other');
         $this->assertEquals('other-mapping', $fieldMapping->getName());
         $this->assertEquals('Another Test BibTeX Mapping Configuration.', $fieldMapping->getDescription());
         $this->assertFalse(empty($fieldMapping->getRules()));
 
-        $fieldMapping = $bibtexService->getFieldMapping('test');
+        $fieldMapping = $bibtexService->getFieldMapping('default');
         $this->assertEquals('test', $fieldMapping->getName());
         $this->assertEquals('Test BibTeX Mapping Configuration.', $fieldMapping->getDescription());
         $this->assertFalse(empty($fieldMapping->getRules()));
+    }
+
+    public function testCustomMappings()
+    {
+        Config::set(new Zend_Config([
+            'bibtex' => [
+                'mappings' => [
+                    'other' => ['file' => __DIR__ . '/../_files/other-mapping.json'],
+                ],
+            ],
+        ]));
+
+        $bibtex = BibtexService::getInstance();
+
+        $mappings = $bibtex->listAvailableMappings();
+
+        $this->assertCount(2, $mappings);
+        $this->assertContains('default', $mappings);
+        $this->assertContains('other', $mappings);
+    }
+
+    public function testCustomDefaultMapping()
+    {
+        Config::set(new Zend_Config([
+            'bibtex' => [
+                'mappings' => [
+                    'default' => ['file' => __DIR__ . '/../_files/other-mapping.json'],
+                ],
+            ],
+        ]));
+
+        $bibtex = BibtexService::getInstance();
+
+        $mappings = $bibtex->listAvailableMappings();
+
+        $this->assertCount(1, $mappings);
+        $this->assertContains('default', $mappings);
+
+        $mapping = $bibtex->getFieldMapping();
+
+        $this->assertNotNull($mapping);
+        $this->assertEquals('other-mapping', $mapping->getName());
+    }
+
+    public function testCustomMappingBasePath()
+    {
+        Config::set(new Zend_Config([
+            'bibtex' => [
+                'mappingsBasePath' => __DIR__ . '/../_files/',
+                'mappings'         => [
+                    'other' => ['file' => 'other-mapping.json'],
+                ],
+            ],
+        ]));
+
+        $bibtex = BibtexService::getInstance();
+
+        $mappings = $bibtex->listAvailableMappings();
+
+        $this->assertCount(2, $mappings);
+        $this->assertContains('default', $mappings);
+        $this->assertContains('other', $mappings);
     }
 }

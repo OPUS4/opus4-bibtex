@@ -35,11 +35,14 @@
 
 namespace Opus\Bibtex\Import\Config;
 
+use Opus\Config;
+use Zend_Config_Ini;
+
 use function array_key_exists;
 use function array_keys;
 use function dirname;
 use function is_readable;
-use function parse_ini_file;
+use function rtrim;
 use function strpos;
 use function substr;
 
@@ -52,6 +55,12 @@ use const DIRECTORY_SEPARATOR;
  * Die Klasse ist als Singleton definiert.
  *
  * FIXME use dependency injection capabilities of Laminas ServiceManager
+ *
+ * TODO move into package Opus\Bibtex - this is not just a "config" class
+ * TODO import.ini should just be the default configuration provided by opus4-bibtex (fixed)
+ *      custom configuration happens through application config
+ * TODO LAMINAS decentralized configuration?
+ * TODO on-demand initialization of type mappings (do not load all of them always)
  */
 class BibtexService
 {
@@ -81,7 +90,7 @@ class BibtexService
      * Liefert eine Instanz der Klasse zurück; erzeugt eine Instanz, wenn bislang noch keine Instanz erzeugt wurde.
      *
      * @param null|string $iniFileName Name der INI-Datei, die zur Konfiguration genutzt werden soll
-     *                                 (wenn nicht gesetzt, so wird die Standardkonfigurationsdate verwendet)
+     *                                 (wenn nicht gesetzt, so wird die Standardkonfigurationsdatei verwendet)
      * @return self
      * @throws BibtexConfigException
      */
@@ -146,24 +155,31 @@ class BibtexService
      * Registriert ein BibTeX-Feld-Mapping aus der Mapping-Konfigurationsdatei (JSON) mit dem übergebenen Namen
      * und liefert die aus der Konfigurationsdatei erzeugte Mappingkonfiguration zurück.
      *
+     * @param string $name Name (ID) des Mappings
      * @param string $fileName Name der Mapping-Konfigurationsdatei
      * @return BibtexMapping|null Feld-Mapping-Instanz, die aus der Mapping-Konfigurationsdatei erzeugt wurde (liefert
      *                            null, wenn Instanz nicht erfolgreich erzeugt werden konnte)
      * @throws BibtexConfigException
      */
-    public function registerMapping($fileName)
+    public function registerMapping($name, $fileName)
     {
         $mapping     = null;
-        $mappingFile = dirname($this->iniFileName) . DIRECTORY_SEPARATOR . $fileName;
+        $mappingFile = $fileName;
 
-        if (is_readable($mappingFile)) {
-            // TODO zukünftig weitere Konfigurationsformate unterstützen?
-            if (substr($fileName, -5) === '.json') {
-                $mapping = (new JsonBibtexMappingReader())->getMappingConfigurationFromFile($mappingFile);
-
-                $this->mappings[$mapping->getName()] = $mapping;
+        if (! is_readable($mappingFile)) {
+            $mappingFile = dirname($this->iniFileName) . DIRECTORY_SEPARATOR . $fileName;
+            if (! is_readable($mappingFile)) {
+                return null;
             }
         }
+
+        // TODO zukünftig weitere Konfigurationsformate unterstützen?
+        if (substr($fileName, -5) === '.json') {
+            $mapping = (new JsonBibtexMappingReader())->getMappingConfigurationFromFile($mappingFile);
+
+            $this->mappings[$name] = $mapping;
+        }
+
         return $mapping;
     }
 
@@ -171,24 +187,52 @@ class BibtexService
      * Initialisiert die in der INI-Datei angegebenen BibTeX-Feld-Mappings und registriert sie unter ihren Namen für
      * die spätere Verwendung.
      *
+     * TODO use global configuation for custom mappings
+     * TODO use import.ini setting as default
+     * TODO no directory scanning for now - mappings have to be configured
+     * TODO only init on-demand (getMapping, getAllMappings)
+     *
      * @throws BibtexConfigException Wird geworfen, wenn die Initialisierung nicht erfolgreich durchgeführt werden konnte.
      */
-    private function initMappings()
+    protected function initMappings()
     {
         $this->mappings = [];
 
         $fieldMappings = $this->getConfiguration('fieldMappings');
-        foreach ($fieldMappings as $mappingFileName) {
-            $this->registerMapping($mappingFileName);
+
+        foreach ($fieldMappings as $name => $options) {
+            if (isset($options->file)) {
+                $this->registerMapping($name, dirname($this->iniFileName) . DIRECTORY_SEPARATOR . $options->file);
+            }
+        }
+
+        // load custom mappings
+        $config = Config::get();
+
+        if (isset($config->bibtex->mappingsBasePath)) {
+            $basePath = rtrim($config->bibtex->mappingsBasePath, '/') . '/';
+        } else {
+            $basePath = '';
+        }
+
+        if (isset($config->bibtex->mappings)) {
+            $mappings = $config->bibtex->mappings;
+            foreach ($mappings as $name => $options) {
+                if (isset($options->file)) {
+                    $this->registerMapping($name, $basePath . $options->file);
+                }
+            }
         }
     }
 
     /**
      * Initialisiert das Mapping von BibTeX-Typen auf OPUS-Dokumenttypen auf Basis der INI-Konfigurationsdatei.
      *
+     * TODO move setup of mappings into DocumentTypeMapping class (BibtexService should not be responsible)
+     *
      * @throws BibtexConfigException Wird geworfen, wenn die Initialisierung nicht erfolgreich durchgeführt werden konnte.
      */
-    private function initTypeMapping()
+    protected function initTypeMapping()
     {
         $this->typeMapping = new DocumentTypeMapping();
 
@@ -205,6 +249,8 @@ class BibtexService
      * Gibt die Konfigurationseinstellung aus der INI-Datei zurück, die unter dem übergebenen Schlüsselnamen abgelegt
      * ist.
      *
+     * TODO read configuration file only once
+     *
      * @param string $keyName Name des Konfigurationsschlüssels
      * @return mixed
      * @throws BibtexConfigException Falls INI-Datei nicht existent, nicht lesbar oder der Schlüsselname nicht existiert.
@@ -217,16 +263,16 @@ class BibtexService
             throw new BibtexConfigException("could not find or read ini file '$fileName'");
         }
 
-        $conf = parse_ini_file($fileName);
+        $conf = new Zend_Config_Ini($fileName);
         if ($conf === false) {
             throw new BibtexConfigException("could not parse ini file '$fileName'");
         }
 
-        if (! array_key_exists($keyName, $conf)) {
+        if (! isset($conf->$keyName)) {
             throw new BibtexConfigException("could not find configuration key '$keyName' in ini file '$fileName'");
         }
 
-        return $conf[$keyName];
+        return $conf->$keyName;
     }
 
     /**
