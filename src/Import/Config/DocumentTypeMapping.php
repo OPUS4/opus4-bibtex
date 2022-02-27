@@ -32,6 +32,8 @@
 namespace Opus\Bibtex\Import\Config;
 
 use Opus\Config;
+use Zend_Config;
+
 use function array_key_exists;
 
 /**
@@ -133,7 +135,6 @@ class DocumentTypeMapping
      *
      * TODO macht $useDefaultAsFallback Sinn? Wie/wo wird es verwendet?
      * TODO check if mapped document type exists?
-     *
      */
     public function getOpusType($bibtexType, $useDefaultAsFallback = true)
     {
@@ -167,6 +168,9 @@ class DocumentTypeMapping
         return $this->typeMap;
     }
 
+    /**
+     * @return Zend_Config
+     */
     public function getConfig()
     {
         return Config::get();

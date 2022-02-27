@@ -40,12 +40,15 @@ not be edited locally. It is possible to extend or modify the settings in the gl
 
 ### Field Mappings 
 
-You can register an arbitrary number of field mappings (see below). Each field mapping is given by a separate line 
-in `import.ini` where the value (on the right-hand side of `=`) refers to the name of an external JSON field mapping 
-configuration file:
+You can register an arbitrary number of field mappings (see below). Each field mapping needs a name, that is part of 
+the key. You can use the name `default` to replace the default mappingThe only option supported right now is `file` 
+for the name of an external JSON field mapping configuration file. If the file is not specified with an absolute path,
+the base path needs to be specified in `bibtex.mappingsBasePath`.
 
 ```ini
-fieldMappings[] = custom-mapping.json
+bibtex.mappingsBasePath = APPLICATION_PATH "/application/config/bibtex"
+bibtex.mappings.default.file = custom-default-mapping.json
+bibtex.mappings.custom1.file = custom-mapping.json
 ```
 
 The default field mapping is given by `src/Import/default-mapping.json`.

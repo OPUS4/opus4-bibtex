@@ -64,6 +64,8 @@ class Parser
      *
      * @param string $bibtex Name (optional mit Pfadangabe) einer BibTeX-Datei oder alternativ eine Zeichenkette, die
      *                       aus einem oder mehreren BibTeX-Records besteht
+     *
+     * TODO make $bibtex a parameter of parse function
      */
     public function __construct($bibtex)
     {
@@ -80,10 +82,13 @@ class Parser
      */
     public function parse()
     {
-        $parser = new BibTexParser();
+        // TODO errors within BibTexParser lead to output in terminal - Can that be avoided?
+        $parser = new BibTexParser(); // TODO move into factory method
 
-        $listener = new Listener();
-        $listener->addProcessor(new LatexToUnicodeProcessor()); // behandelt alle Felder (weil leere Blacklist)
+        $listener       = new Listener();
+        $latexProcessor = new LatexToUnicodeProcessor();
+        $latexProcessor->setTagCoverage(['doi', 'url'], 'blacklist'); // TODO get blacklist from mapping
+        $listener->addProcessor($latexProcessor);
         // LTUProcessor schneidet führende und abschließende Leerzeichen in den Feldinhalten ab
         $parser->addListener($listener);
 

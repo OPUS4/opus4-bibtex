@@ -38,6 +38,7 @@ use Opus\Bibtex\Import\Processor;
 use Opus\Bibtex\Import\Rules\DocumentType;
 use Opus\Config;
 use PHPUnit\Framework\TestCase;
+use Zend_Config;
 
 class DocumentTypeMappingTest extends TestCase
 {
@@ -220,8 +221,8 @@ class DocumentTypeMappingTest extends TestCase
 
         $this->assertEquals('article', $mapping->getOpusType('manual'));
 
-        Config::set(new \Zend_Config([
-            'bibtex' => ['entryTypes' => ['manual' => $customType]]
+        Config::set(new Zend_Config([
+            'bibtex' => ['entryTypes' => ['manual' => $customType]],
         ]));
 
         $this->assertEquals($customType, $mapping->getOpusType('manual'));
@@ -237,8 +238,8 @@ class DocumentTypeMappingTest extends TestCase
         $this->assertEquals($defaultType, $mapping->getDefaultType());
         $this->assertEquals($defaultType, $mapping->getOpusType('article'));
 
-        Config::set(new \Zend_Config([
-            'bibtex' => ['defaultDocumentType' => 'article']
+        Config::set(new Zend_Config([
+            'bibtex' => ['defaultDocumentType' => 'article'],
         ]));
 
         $this->assertEquals('article', $mapping->getDefaultType());

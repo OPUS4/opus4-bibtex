@@ -61,6 +61,11 @@ use function substr;
 use function trim;
 use function uniqid;
 
+/**
+ * TODO documentation - What is the role of this class? Too many roles?
+ * TODO this is the actual class performing the import (should not be part of console namespace)
+ * TODO needs an interface, so another bibtex importer class can be implemented
+ */
 class BibtexImportHelper
 {
     /** @var string Name der zu importierenden BibTeX-Datei */
@@ -96,6 +101,8 @@ class BibtexImportHelper
      *
      * @param BibtexImportResult $bibtexImportResult
      * @throws BibtexConfigException
+     *
+     * TODO this function is very long (too many responsibilities?) - yes, break it apart
      */
     public function doImport($bibtexImportResult)
     {
@@ -132,7 +139,7 @@ class BibtexImportHelper
             $this->createEnrichmentKeysIfMissing($requiredEnrichmentKeys, $bibtexImportResult);
         }
 
-        $parser = new Parser($this->fileName);
+        $parser = new Parser($this->fileName); // TODO move creation into factory method
         try {
             $bibtexImportResult->addMessage("Start parsing of BibTeX file '$this->fileName'");
             $bibtexRecords = $parser->parse();
@@ -151,6 +158,8 @@ class BibtexImportHelper
 
         $fieldMapping  = null;
         $bibtexService = BibtexService::getInstance($this->iniFileName);
+
+        // TODO this should not happen here - use getMapping() or something like it
         if ($this->mappingConfiguration !== null) {
             $fieldMapping = $bibtexService->getFieldMapping($this->mappingConfiguration);
         }
@@ -226,6 +235,8 @@ class BibtexImportHelper
 
     /**
      * @param string $mappingConfiguration Name der Feld-Mapping-Konfiguration
+     *
+     * TODO rename setMappingName or something like that
      */
     public function setMappingConfiguration($mappingConfiguration)
     {

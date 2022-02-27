@@ -47,6 +47,8 @@ use function substr;
  * Bildet die Werte von BibTeX-Feldern auf konfigurierte OPUS-Metadatenfelder ab. Das Feld-Mapping wird hierbei in einer
  * Konfigurationsdatei vorgebeben. Es existiert mit default-mapping.json eine Standardkonfiguration für die Abbildung
  * der Felder. In der README.md sind die Konfigurationsmöglichkeiten detailliert beschrieben.
+ *
+ * TODO this needs an interface - this is a Rules-based processor, there could be other implementations
  */
 class Processor
 {

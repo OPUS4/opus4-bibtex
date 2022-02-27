@@ -25,12 +25,8 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * @copyright   Copyright (c) 2021, OPUS 4 development team
+ * @copyright   Copyright (c) 2021-2022, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
- *
- * @category    BibTeX
- * @package     Opus\Bibtex\Import\Console
- * @author      Sascha Szott <opus-repository@saschaszott.de>
  */
 
 namespace Opus\Bibtex\Import\Console;
@@ -78,37 +74,34 @@ class BibtexImportCommand extends Command
      */
     const OPTION_MAPPING_CONFIGURATION = 'mapping';
 
-    /**
-     * Option, mit der der Name der INI-Datei gesetzt werden kann. Wird diese Option nicht gesetzt, so wird die
-     * Default-INI-Datei import.ino verwendet.
-     */
-    const OPTION_INI_FILENAME = 'iniFileName';
-
     protected function configure()
     {
         $help = <<<EOT
-The <fg=green>import:bibtex</> command can be used to import a BibTeX file that contains an arbitrary number of BibTeX
-records (document metadata only). The name of the BibTeX file (*.bib) must be provided as an argument.
-Each BibTeX record is converted into an OPUS document by applying a so called mapping configuration. 
-A mapping configuration is constituted by a number of rules.
-In case of failures, the current BibTeX record is skipped and processing continues with the next BibTeX record.
+The <fg=green>bibtex:import</> command can be used to import a BibTeX file 
+that contains an arbitrary number of BibTeX records (document metadata only).
+The name of the BibTeX file (*.bib) must be provided as an argument. 
 
-To check the successful parsing of the BibTeX file at hand without changing the current database state,
-the processing can be run in dry mode by providing the option <fg=green>--dry</> or <fg=green>-d</>.
+Each BibTeX record is converted into an OPUS 4 document by applying a mapping 
+configuration. A mapping configuration consists of rules defined in a JSON
+file. 
 
-The import configuration file name (defaults to 'import.ini') can be overwritten by the option
-<fg=green>--iniFileName</> or <fg=green>-i</>.
+In case of failures, the current BibTeX record is skipped and processing
+continues with the next BibTeX record.
 
-The name of the field mapping that is applied in the import process (defaults to 'default') can be overwritten by the
-option <fg=green>--mapping</> or <fg=green>-m</>. The field mapping is given by a JSON file that has to be registered
-in the import configuration.
+The parsing of the BibTeX file can be checked without changing the database 
+state by using the dry (<fg=green>--dry</> or <fg=green>-d</>).
 
-The (repeatable) option <fg=green>--collection</> or <fg=green>-c</> allows to specify IDs of collections each
-successfully imported document is assigned to. IDs that do not match with IDs of existing collection are ignored 
-silently.
+The name of the field mapping that is applied in the import process (defaults
+to 'default') can be overwritten by the option <fg=green>--mapping</> or 
+<fg=green>-m</>. The field mapping is defined by a JSON file that has to be 
+registered in the configuration.
+
+The (repeatable) option <fg=green>--collection</> or <fg=green>-c</> allows to 
+specify IDs of collections each successfully imported document is assigned to.
+IDs that do not match with IDs of existing collection are ignored silently.
 EOT;
 
-        $this->setName('import:bibtex')
+        $this->setName('bibtex:import')
             ->setDescription('Import records in given BibTeX file')
             ->setHelp($help)
             ->addArgument(
@@ -123,12 +116,6 @@ EOT;
                 'Dry mode (processing of the given BibTeX file without changing OPUS database)'
             )
             ->addOption(
-                self::OPTION_INI_FILENAME,
-                'i',
-                InputOption::VALUE_REQUIRED,
-                'Name of INI configuration file name to be used'
-            )
-            ->addOption(
                 self::OPTION_MAPPING_CONFIGURATION,
                 'm',
                 InputOption::VALUE_REQUIRED,
@@ -138,7 +125,7 @@ EOT;
                 self::OPTION_COLLECTION,
                 'c',
                 InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
-                'ID of collection each imported document is assigned to'
+                'Collection IDs (comma-separated) that documents will be assigned to'
             );
     }
 
@@ -156,11 +143,6 @@ EOT;
         $mappingConfiguration = $input->getOption(self::OPTION_MAPPING_CONFIGURATION);
         if ($mappingConfiguration !== null) {
             $bibtexImportHelper->setMappingConfiguration($mappingConfiguration);
-        }
-
-        $iniFileName = $input->getOption(self::OPTION_INI_FILENAME);
-        if ($iniFileName !== null) {
-            $bibtexImportHelper->setIniFilename($iniFileName);
         }
 
         if ($input->getOption(self::OPTION_DRYMODE)) {
