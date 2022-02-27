@@ -70,8 +70,8 @@ It is allowed to define custom type mappings for unknown BibTeX types, e.g.
 bibtex.entryTypes.journal = article
 ```
 
-In case the type of a BibTeX record is not contained in the document type mapping, you can provide a default
-OPUS4 document type that is used as a fallback. The default fallback is `misc`.
+You can provide a default OPUS4 document type that is used when no mapping has been defined for a BibTeX entry type. 
+The default fallback is `misc`.
 
 ```ini
 bibtex.defaultDocumentType = misc
