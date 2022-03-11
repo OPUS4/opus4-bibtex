@@ -63,6 +63,9 @@ class BibtexImportResult
     /** @var string speichert die Ausgaben während der Verarbeitung */
     private $messages = '';
 
+    /** @var bool Verbose output */
+    private $verbose = false;
+
     /**
      * Maximale Anzahl der Status-Indikatorzeichen in einer Bildschirmzeile
      */
@@ -79,6 +82,22 @@ class BibtexImportResult
             $output = new NullOutput();
         }
         $this->output = $output;
+    }
+
+    /**
+     * @param bool $verbose true - Verbose output enabled
+     */
+    public function setVerboseEnabled($verbose)
+    {
+        $this->verbose = $verbose;
+    }
+
+    /**
+     * @return bool true - if verbose output enabled
+     */
+    public function getVerboseEnabled()
+    {
+        return $this->verbose;
     }
 
     /**
@@ -155,41 +174,33 @@ class BibtexImportResult
     }
 
     /**
-     * @param bool $verbose true, wenn ausführliche Logausgabe gewünscht
      * @param bool $dryMode true, wenn keine neuen Dokumente in die Datenbank importiert werden sollen
      */
-    public function addSuccessStatus($verbose, $dryMode)
+    public function addSuccessStatus($dryMode)
     {
-        $this->addStatus('.', $verbose);
+        $this->addStatus('.');
         if (! $dryMode) {
             $this->numDocsImported++;
         }
     }
 
-    /**
-     * @param bool $verbose true, wenn ausführliche Logausgabe gewünscht
-     */
-    public function addErrorStatus($verbose)
+    public function addErrorStatus()
     {
-        $this->addStatus('E', $verbose);
+        $this->addStatus('E');
     }
 
-    /**
-     * @param bool $verbose true, wenn ausführliche Logausgabe gewünscht
-     */
-    public function addSkipStatus($verbose)
+    public function addSkipStatus()
     {
-        $this->addStatus('S', $verbose);
+        $this->addStatus('S');
         $this->numSkipped++;
     }
 
     /**
      * @param string $statusStr auszugebender Status-Indikator (ein Zeichen)
-     * @param bool   $verbose   true, wenn ausführliche Logausgabe gewünscht
      */
-    private function addStatus($statusStr, $verbose)
+    private function addStatus($statusStr)
     {
-        if (! $verbose) {
+        if ($this->getVerboseEnabled()) {
             $this->output->write($statusStr);
             $this->messages .= $statusStr;
             if ($this->numDocsProcessed % self::STATUS_LINE_WIDTH === 0) {

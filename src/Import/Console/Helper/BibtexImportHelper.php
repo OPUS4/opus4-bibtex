@@ -65,6 +65,7 @@ use function uniqid;
  * TODO documentation - What is the role of this class? Too many roles?
  * TODO this is the actual class performing the import (should not be part of console namespace)
  * TODO needs an interface, so another bibtex importer class can be implemented
+ * TODO use Symfony Console functions for verbosity handling
  */
 class BibtexImportHelper
 {
@@ -178,14 +179,14 @@ class BibtexImportHelper
             try {
                 $processor->handleRecord($bibtexRecord, $metadata);
             } catch (Exception $e) {
-                $bibtexImportResult->addErrorStatus($this->verbose);
+                $bibtexImportResult->addErrorStatus();
                 continue; // springe zum nächsten Record
             }
 
             try {
                 $doc = Document::fromArray($metadata);
                 if ($this->checkIfDocumentAlreadyExists($doc, $bibtexImportResult)) {
-                    $bibtexImportResult->addSkipStatus($this->verbose);
+                    $bibtexImportResult->addSkipStatus();
                     continue; // Dokument wurde bereits importiert: springe zum nächsten Record
                 }
 
@@ -205,15 +206,15 @@ class BibtexImportHelper
                         if ($this->verbose) {
                             $bibtexImportResult->addMessage('Unexpected error: ' . $ome->getMessage());
                         }
-                        $bibtexImportResult->addErrorStatus($this->verbose);
+                        $bibtexImportResult->addErrorStatus();
                         continue; // Verarbeitung des nächsten BibTeX-Record aus der zu importierenden Datei
                     }
                 }
             } catch (Exception $e) {
-                $bibtexImportResult->addErrorStatus($this->verbose);
+                $bibtexImportResult->addErrorStatus();
                 continue;
             }
-            $bibtexImportResult->addSuccessStatus($this->verbose, $this->dryMode);
+            $bibtexImportResult->addSuccessStatus($this->dryMode);
         }
     }
 
@@ -247,6 +248,8 @@ class BibtexImportHelper
 
     /**
      * @param string $iniFileName Name der INI-Datei
+     *
+     * TODO remove, not needed (don't use INI files for custom dynamic config)
      */
     public function setIniFileName($iniFileName)
     {
@@ -255,11 +258,17 @@ class BibtexImportHelper
         }
     }
 
+    /**
+     * TODO change name to setDryModeEnabled with parameter
+     */
     public function enableDryMode()
     {
         $this->dryMode = true;
     }
 
+    /**
+     * TODO change name to setVerboseEnabled with parameter
+     */
     public function enableVerbose()
     {
         $this->verbose = true;
