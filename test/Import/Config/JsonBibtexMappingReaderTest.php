@@ -25,12 +25,8 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * @copyright   Copyright (c) 2021, OPUS 4 development team
+ * @copyright   Copyright (c) 2021-2022, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
- *
- * @category    Tests
- * @package     OpusTest\Bibtex\Import\Config
- * @author      Sascha Szott <opus-repository@saschaszott.de>
  */
 
 namespace OpusTest\Bibtex\Import\Config;
@@ -47,6 +43,7 @@ use Opus\Bibtex\Import\Rules\Language;
 use Opus\Bibtex\Import\Rules\Note;
 use Opus\Bibtex\Import\Rules\Pages;
 use Opus\Bibtex\Import\Rules\Person;
+use Opus\Bibtex\Import\Rules\RuleInterface;
 use Opus\Bibtex\Import\Rules\SimpleRule;
 use Opus\Bibtex\Import\Rules\TitleParent;
 use PHPUnit\Framework\TestCase;
@@ -250,5 +247,38 @@ class JsonBibtexMappingReaderTest extends TestCase
 
         $ruleInstance = $bibtexMapping->getRules()['constantsTestRule'];
         $this->assertInstanceOf(ConstantValues::class, $ruleInstance);
+    }
+
+    public function testMapEnrichment()
+    {
+        $mappingParser = new JsonBibtexMappingReader();
+        $mapping       = $mappingParser->parseMapping(<<<JSON
+{
+  "name": "test",
+  "description": "test mapping",
+  "mapping": [
+    {
+      "name": "LocalId",
+      "class": "Enrichment",
+      "options": {
+        "bibtexField": "localId",
+        "enrichmentKey": "local-id"
+      }
+    }
+  ]
+}
+JSON
+        );
+
+        $this->assertEquals('test', $mapping->getName());
+        $this->assertEquals('test mapping', $mapping->getDescription());
+
+        $rule = $mapping->getRule('LocalId');
+
+        $this->assertNotNull($rule);
+        $this->assertInstanceOf(RuleInterface::class, $rule);
+
+        $this->assertEquals('local-id', $rule->getEnrichmentKey());
+        $this->assertEquals('localId', $rule->getBibtexField());
     }
 }
