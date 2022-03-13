@@ -13,7 +13,7 @@ custom mappings and interpretations of the fields in the specific BibTeX file.
 
 For processing of special characters in BibTeX files the **Pandoc** tool is needed by the BibTeX parser of OPUS4.
 
-Please make sure that you install / use a recent version of Pandoc, at least version 2.0. The current
+Please make sure that you install / use a recent version of Pandoc, at least version 2.17. The current
 implementation was not tested against older Pandoc versions.
 
 In Ubuntu / Debian based Linux systems Pandoc can be installed using `apt`.
@@ -176,6 +176,24 @@ Another example mapping entry is given by the rule:
 which sets the value of the `belongsToBibliography` field of an OPUS document to a fixed value (`false` in 
 this example) independently of certain BibTeX fields.
 
+### Mapping to Enrichments
+
+BibTeX fields can be mapped to enrichment fields. The mapping needs a unique *name* and the mapping class is called
+`Enrichment`. The name of the BibTeX field and the enrichment key need to be specified as options. 
+
+```JSON
+{
+    "name": "LocalId",
+    "class": "Enrichment",
+    "options": {
+        "bibtexField": "LocalId",
+        "enrichmentKey": "local-id"
+    }
+}
+```
+
+In the example above a custom BibTeX field "LocalId" will be mapped to the enrichment "local-id". 
+
 ### Pre-defined rule classes
 
 OPUS4 provides a number of pre-defined rule classes (located in namespace `Opus\Bibtex\Import\Rules`):
@@ -186,6 +204,7 @@ OPUS4 provides a number of pre-defined rule classes (located in namespace `Opus\
 | `BelongsToBibliography` | sets OPUS document field `belongsToBibliography` to a fixed value |
 | `DocumentType`          | sets the OPUS document type according to the configured type mapping |
 | `Doi`                   | adds an identifier of type `doi` |
+| `Enrichment`            | Maps to enrichment |
 | `Isbn`                  | adds an identifier of type `isbn` |
 | `Issn`                  | adds an identifier of type `issn` |
 | `Language`              | sets OPUS document field `language` to a fixed value |

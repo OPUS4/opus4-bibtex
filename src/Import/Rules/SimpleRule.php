@@ -27,10 +27,6 @@
  *
  * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
- *
- * @category    BibTeX
- * @package     Opus\Bibtex\Import\Rules
- * @author      Sascha Szott <opus-repository@saschaszott.de>
  */
 
 namespace Opus\Bibtex\Import\Rules;
@@ -55,6 +51,8 @@ class SimpleRule implements RuleInterface
     /**
      * @param null|string $bibtexField Name des auszuwertenden BibTeX-Felds
      * @param null|string $opusField Name des zu befüllenden OPUS4-Metadatenfelds
+     *
+     * TODO review usage of constructor parameters - refactor if necessary
      */
     public function __construct($bibtexField = null, $opusField = null)
     {
@@ -153,8 +151,9 @@ class SimpleRule implements RuleInterface
      * @param string $value der von geschweiften Klammern zu reinigende Wert
      * @return string
      */
-    protected function deleteBrace($value)
+    public function deleteBrace($value)
     {
+        // only remove braces if present at start and end of string
         if (strlen($value) >= 2 && substr($value, 0, 1) === '{' && substr($value, -1, 1) === '}') {
             $value = substr($value, 1, -1);
         }

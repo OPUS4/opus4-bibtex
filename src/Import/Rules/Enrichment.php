@@ -25,47 +25,58 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * @copyright   Copyright (c) 2021-2022, OPUS 4 development team
+ * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
+ *
+ * @category    BibTeX
+ * @package     Opus\Bibtex\Import\Rules
+ * @author      Sascha Szott <opus-repository@saschaszott.de>
  */
 
 namespace Opus\Bibtex\Import\Rules;
 
-use function array_key_exists;
-use function array_push;
-use function count;
-use function is_array;
-
 /**
- * Eine Regel, die verwendet werden kann, um ein mehrwertiges Metadatenfeld (Feldwert ist hierbei ein Array) zu füllen.
+ * TODO add option for enrichment name
+ * TODO modify apply to create data structure for enrichment (check how identifier are handled - multiplicity!)
  */
-abstract class AbstractArrayRule extends SimpleRule
+class Enrichment extends AbstractArrayRule
 {
+    /** @var string Enrichment key */
+    private $enrichmentKey;
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->setOpusField('Enrichment');
+    }
+
+    /**
+     * @param string $key Enrichment key
+     */
+    public function setEnrichmentKey($key)
+    {
+        $this->enrichmentKey = $key;
+    }
+
+    /**
+     * @return string|null Enrichment key
+     */
+    public function getEnrichmentKey()
+    {
+        return $this->enrichmentKey;
+    }
+
     /**
      * Anwendung der Regel auf den übergebenen BibTeX-Record.
      *
-     * @param array $bibtexRecord BibTeX-Record (Array von BibTeX-Feldern)
-     * @param array $documentMetadata OPUS-Metadatensatz (Array von Metadatenfeldern)
-     * @return bool liefert true, wenn die Regel erfolgreich angewendet werden konnte
+     * @param string $bibtexValue Value of BibTeX field
+     * @return array
      */
-    public function apply($bibtexRecord, &$documentMetadata)
+    public function getValue($bibtexValue)
     {
-        $result = false;
-        if (array_key_exists($this->bibtexField, $bibtexRecord)) {
-            $fieldValue = $this->getValue($bibtexRecord[$this->bibtexField]);
-            if (count($fieldValue) > 0) {
-                $result = true;
-                if (array_key_exists(0, $fieldValue) && is_array($fieldValue[0])) {
-                    // $fieldValue ist ein mehrdimensionales Array
-                    if (! array_key_exists($this->opusField, $documentMetadata)) {
-                        $documentMetadata[$this->opusField] = [];
-                    }
-                    array_push($documentMetadata[$this->opusField], ...$fieldValue);
-                } else {
-                    $documentMetadata[$this->opusField][] = $fieldValue;
-                }
-            }
-        }
-        return $result;
+        return [
+            'KeyName' => $this->getEnrichmentKey(),
+            'Value'   => $bibtexValue,
+        ];
     }
 }

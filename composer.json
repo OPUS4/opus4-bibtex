@@ -10,6 +10,7 @@
   "homepage": "https://www.opus-repository.org",
   "require": {
     "php" : ">=7.0",
+    "ext-json" : "*",
     "renanbr/bibtex-parser": "^2.1.2",
     "ryakad/pandoc-php": "~1.0",
     "opus4-repo/framework": "dev-master",

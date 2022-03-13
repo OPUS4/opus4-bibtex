@@ -149,11 +149,13 @@ EOT;
             $bibtexImportHelper->enableDryMode();
         }
 
+        $bibtexImportResult = new BibtexImportResult($output);
+
         if ($input->getOption(self::OPTION_VERBOSE)) {
+            $bibtexImportResult->setVerboseEnabled(true);
             $bibtexImportHelper->enableVerbose();
         }
 
-        $bibtexImportResult = new BibtexImportResult($output);
         $bibtexImportHelper->doImport($bibtexImportResult);
         $bibtexImportResult->outputCompletionMessage();
     }

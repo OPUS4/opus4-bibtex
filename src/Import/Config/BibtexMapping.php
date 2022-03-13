@@ -25,12 +25,8 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * @copyright   Copyright (c) 2021, OPUS 4 development team
+ * @copyright   Copyright (c) 2021-2022, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
- *
- * @category    BibTeX
- * @package     Opus\Bibtex\Import\Config
- * @author      Sascha Szott <opus-repository@saschaszott.de>
  */
 
 namespace Opus\Bibtex\Import\Config;
@@ -132,6 +128,15 @@ class BibtexMapping
     }
 
     /**
+     * @param string $name Name of rule
+     * @return RuleInterface|null
+     */
+    public function getRule($name)
+    {
+        return $this->rules[$name];
+    }
+
+    /**
      * Fügt die übergebene Regel am Anfang der Regelliste hinzu, d.h. die übergebene Regel
      * wird vor der Ausführung aller anderen Regeln ausgeführt. Existiert bereits eine Regel mit dem
      * übergebenen Namen, so wird diese Regel vor dem Hinzufügen der übergebenen Regel entfernt.
@@ -225,7 +230,9 @@ class BibtexMapping
      * @param array $rules
      * @return $this
      *
-     * TODO remove dependency on ConstantValues - move responsiblity for processing options into class
+     * TODO remove dependency on ConstantValues - move responsibility for processing options into class
+     * TODO setRules should be setting an array of RuleInterface objects
+     * TODO parsing of array and creating RuleInterface objects should happen elsewhere
      */
     public function setRules($rules)
     {
