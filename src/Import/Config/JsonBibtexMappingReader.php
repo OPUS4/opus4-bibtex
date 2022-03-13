@@ -25,12 +25,8 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * @copyright   Copyright (c) 2021, OPUS 4 development team
+ * @copyright   Copyright (c) 2021-2022, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
- *
- * @category    BibTeX
- * @package     Opus\Bibtex\Import\Config
- * @author      Sascha Szott <opus-repository@saschaszott.de>
  */
 
 namespace Opus\Bibtex\Import\Config;
@@ -62,17 +58,28 @@ class JsonBibtexMappingReader
             throw new BibtexConfigException("could not get content of file $fileName");
         }
 
+        return $this->parseMapping($json);
+    }
+
+    /**
+     * @param string $json Mapping configuration in JSON format
+     * @return BibtexMapping
+     * @throws BibtexConfigException
+     */
+    public function parseMapping($json)
+    {
         $jsonArr = json_decode($json, true);
+
         if ($jsonArr === null) {
-            throw new BibtexConfigException("could not decode JSON file $fileName");
+            throw new BibtexConfigException("could not decode JSON");
         }
 
         if (
             ! (array_key_exists('name', $jsonArr) &&
-            array_key_exists('description', $jsonArr) &&
-            array_key_exists('mapping', $jsonArr))
+                array_key_exists('description', $jsonArr) &&
+                array_key_exists('mapping', $jsonArr))
         ) {
-            throw new BibtexConfigException("missing key(s) in JSON file $fileName");
+            throw new BibtexConfigException("missing key(s) in JSON");
         }
 
         return (new BibtexMapping())
