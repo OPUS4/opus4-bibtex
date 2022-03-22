@@ -39,6 +39,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use function count;
+
 /**
  * Befehl zum Import einer BibTeX-Datei (in der beliebig viele BibTeX-Records enthalten sein können).
  *

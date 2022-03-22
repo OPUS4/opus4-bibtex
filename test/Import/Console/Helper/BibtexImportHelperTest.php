@@ -33,17 +33,17 @@ namespace OpusTest\Bibtex\Import\Console\Helper;
 
 use Opus\Bibtex\Import\Console\Helper\BibtexImportHelper;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 
 class BibtexImportHelperTest extends TestCase
 {
-
     public function testSetCollectionIds()
     {
         $helper = new BibtexImportHelper('test.bib');
 
         $helper->setCollectionIds('12345,67890');
 
-        $refHelper = new \ReflectionClass(BibtexImportHelper::class);
+        $refHelper      = new ReflectionClass(BibtexImportHelper::class);
         $refCollections = $refHelper->getProperty('collectionIds');
 
         $refCollections->setAccessible(true);

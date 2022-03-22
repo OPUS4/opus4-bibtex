@@ -33,11 +33,11 @@ namespace OpusTest\Bibtex\Import\Console;
 
 use Opus\Bibtex\Import\Console\BibtexImportCommand;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 use Symfony\Component\Console\Tester\CommandTester;
 
 class BibtexImportCommandTest extends TestCase
 {
-
     public function testCollectionsOption()
     {
         $this->markTestIncomplete('TODO implement');
@@ -45,15 +45,14 @@ class BibtexImportCommandTest extends TestCase
         $command = new BibtexImportCommand();
 
         $input = [
-            '-d' => '',
-            '-c' => ['12345,12564'],
-            'fileName' => 'test.bib'
+            '-d'       => '',
+            '-c'       => ['12345,12564'],
+            'fileName' => 'test.bib',
         ];
 
         $tester = new CommandTester($command);
         $tester->execute($input);
 
-        $ref = new \ReflectionClass(BibtexImportCommand::class);
-
+        $ref = new ReflectionClass(BibtexImportCommand::class);
     }
 }
