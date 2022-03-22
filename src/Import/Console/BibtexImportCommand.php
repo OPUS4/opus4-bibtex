@@ -39,8 +39,13 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use function count;
+
 /**
  * Befehl zum Import einer BibTeX-Datei (in der beliebig viele BibTeX-Records enthalten sein können).
+ *
+ * TODO class is hard to test, because options are not stored in properties that can be checked
+ *      should use function like processArguments
  */
 class BibtexImportCommand extends Command
 {
@@ -137,6 +142,9 @@ EOT;
 
         $collectionIds = $input->getOption(self::OPTION_COLLECTION);
         if ($collectionIds !== null) {
+            if (count($collectionIds) === 1) {
+                $collectionIds = $collectionIds[0];
+            }
             $bibtexImportHelper->setCollectionIds($collectionIds);
         }
 
