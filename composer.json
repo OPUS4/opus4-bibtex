@@ -23,6 +23,7 @@
     "phpmetrics/phpmetrics": "2.7.4"
   },
   "minimum-stability": "dev",
+  "prefer-stable": true,
   "autoload": {
     "psr-4": {
       "Opus\\Bibtex\\": "src/"
