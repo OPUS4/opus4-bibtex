@@ -31,7 +31,7 @@
 
 namespace Opus\Bibtex\Import\Config;
 
-use Opus\Config;
+use Opus\Common\Config;
 use Zend_Config;
 
 use function array_key_exists;

@@ -33,7 +33,7 @@ namespace OpusTest\Bibtex\Import\Config;
 
 use Opus\Bibtex\Import\Config\BibtexConfigException;
 use Opus\Bibtex\Import\Config\BibtexService;
-use Opus\Config;
+use Opus\Common\Config;
 use PHPUnit\Framework\TestCase;
 use Zend_Config;
 
