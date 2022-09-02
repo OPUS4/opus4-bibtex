@@ -183,6 +183,9 @@ class JsonBibtexMappingReaderTest extends TestCase
             )
             ->addRule(
                 'collections'
+            )
+            ->addRule(
+                'licences'
             );
     }
 
