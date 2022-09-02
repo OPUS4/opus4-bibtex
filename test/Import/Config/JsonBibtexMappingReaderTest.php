@@ -180,6 +180,9 @@ class JsonBibtexMappingReaderTest extends TestCase
             )
             ->addRule(
                 'umlauts'
+            )
+            ->addRule(
+                'collections'
             );
     }
 
