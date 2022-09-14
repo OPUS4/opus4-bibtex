@@ -148,6 +148,12 @@
     },
     {
       "name": "umlauts"
+    },
+    {
+      "name": "collections"
+    },
+    {
+      "name": "licences"
     }
   ]
 }
