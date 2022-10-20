@@ -25,7 +25,7 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * @copyright   Copyright (c) 2021-2022, OPUS 4 development team
+ * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
@@ -39,13 +39,13 @@ use Opus\Bibtex\Import\ParserException;
 use Opus\Bibtex\Import\Processor;
 use Opus\Bibtex\Import\Rules\SourceData;
 use Opus\Bibtex\Import\Rules\SourceDataHash;
-use Opus\Collection;
-use Opus\Document;
-use Opus\DocumentFinder;
-use Opus\Enrichment;
-use Opus\EnrichmentKey;
-use Opus\Model\ModelException;
-use Opus\Model\NotFoundException;
+use Opus\Common\Collection;
+use Opus\Common\Document;
+use Opus\Common\Enrichment;
+use Opus\Common\EnrichmentKey;
+use Opus\Common\Model\ModelException;
+use Opus\Common\Model\NotFoundException;
+use Opus\Common\Repository;
 
 use function count;
 use function explode;
@@ -284,7 +284,7 @@ class BibtexImportHelper
             try {
                 $sourceEnrichmentKey = EnrichmentKey::fetchByName($keyName);
                 if ($sourceEnrichmentKey === null) {
-                    $sourceEnrichmentKey = new EnrichmentKey();
+                    $sourceEnrichmentKey = EnrichmentKey::new();
                     $sourceEnrichmentKey->setName($keyName);
                     $sourceEnrichmentKey->store();
                 }
@@ -319,7 +319,7 @@ class BibtexImportHelper
      */
     private function createEnrichment($document, $keyName, $value)
     {
-        $enrichment = new Enrichment();
+        $enrichment = Enrichment::new();
         $enrichment->setKeyName($keyName);
         $enrichment->setValue($value);
         $document->addEnrichment($enrichment);
@@ -380,11 +380,11 @@ class BibtexImportHelper
      */
     private function checkForDocWithIdenticalHashValue($hashValue, $bibtexImportResult)
     {
-        $finder = new DocumentFinder();
-        $finder->setEnrichmentKeyValue(SourceDataHash::SOURCE_DATA_HASH_KEY, $hashValue);
-        if ($finder->count() > 0) {
+        $finder = Repository::getInstance()->getDocumentFinder();
+        $finder->setEnrichmentValue(SourceDataHash::SOURCE_DATA_HASH_KEY, $hashValue);
+        if ($finder->getCount() > 0) {
             if ($this->verbose) {
-                $bibtexImportResult->addMessage('Found existing OPUS document ' . $finder->ids()[0]
+                $bibtexImportResult->addMessage('Found existing OPUS document ' . $finder->getIds()[0]
                     . " with same hash value ($hashValue)");
             }
             return true; // Dokument mit identischem Hashwert existiert bereits in der Datenbank
