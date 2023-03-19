@@ -57,7 +57,7 @@ class Isbn extends AbstractArrayRule
      */
     protected function getValue($value)
     {
-        $isbns = explode(', ', $value);
+        $isbns  = explode(', ', $value);
         $result = [];
         foreach ($isbns as $isbn) {
             $result[] = [
