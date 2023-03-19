@@ -57,9 +57,14 @@ class Isbn extends AbstractArrayRule
      */
     protected function getValue($value)
     {
-        return [
-            'Value' => $value,
-            'Type'  => 'isbn',
-        ];
+        $isbns = explode(', ', $value);
+        $result   = [];
+        foreach ($isbns as $isbn) {
+            $result[] = [
+                'Value'    => $this->deleteBrace($isbn),
+                'Type'     => 'isbn',
+            ];
+        }
+        return $result;
     }
 }
