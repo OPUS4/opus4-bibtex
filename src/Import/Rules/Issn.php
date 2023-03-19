@@ -57,8 +57,8 @@ class Issn extends AbstractArrayRule
      */
     protected function getValue($value)
     {
-        $issns = explode(', ', $value);
-        $result   = [];
+        $issns  = explode(', ', $value);
+        $result = [];
         foreach ($issns as $issn) {
             $result[] = [
                 'Value'    => $this->deleteBrace($issn),
