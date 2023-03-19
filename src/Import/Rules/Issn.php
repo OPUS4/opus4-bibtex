@@ -61,8 +61,8 @@ class Issn extends AbstractArrayRule
         $result = [];
         foreach ($issns as $issn) {
             $result[] = [
-                'Value'    => $this->deleteBrace($issn),
-                'Type'     => 'issn',
+                'Value' => $this->deleteBrace($issn),
+                'Type'  => 'issn',
             ];
         }
         return $result;
