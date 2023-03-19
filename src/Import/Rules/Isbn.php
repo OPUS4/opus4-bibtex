@@ -61,8 +61,8 @@ class Isbn extends AbstractArrayRule
         $result   = [];
         foreach ($isbns as $isbn) {
             $result[] = [
-                'Value'    => $this->deleteBrace($isbn),
-                'Type'     => 'isbn',
+                'Value' => $this->deleteBrace($isbn),
+                'Type'  => 'isbn',
             ];
         }
         return $result;
