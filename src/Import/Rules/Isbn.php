@@ -31,7 +31,7 @@
 
 namespace Opus\Bibtex\Import\Rules;
 
-use explode;
+use function explode;
 
 /**
  * Verarbeitung von Identifiern vom Typ ISBN.
