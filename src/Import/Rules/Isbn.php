@@ -27,13 +27,11 @@
  *
  * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
- *
- * @category    BibTeX
- * @package     Opus\Bibtex\Import\Rules
- * @author      Sascha Szott <opus-repository@saschaszott.de>
  */
 
 namespace Opus\Bibtex\Import\Rules;
+
+use explode;
 
 /**
  * Verarbeitung von Identifiern vom Typ ISBN.
