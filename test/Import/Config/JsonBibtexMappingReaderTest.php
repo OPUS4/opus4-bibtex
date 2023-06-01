@@ -39,6 +39,7 @@ use Opus\Bibtex\Import\Rules\BelongsToBibliography;
 use Opus\Bibtex\Import\Rules\ConstantValue;
 use Opus\Bibtex\Import\Rules\ConstantValues;
 use Opus\Bibtex\Import\Rules\DocumentType;
+use Opus\Bibtex\Import\Rules\Identifier;
 use Opus\Bibtex\Import\Rules\Language;
 use Opus\Bibtex\Import\Rules\Note;
 use Opus\Bibtex\Import\Rules\Pages;
@@ -89,7 +90,8 @@ class JsonBibtexMappingReaderTest extends TestCase
                 'publishedYear'
             )
             ->addRule(
-                'issn'
+                'issn',
+                (new Identifier())->setBibtexField('issn')
             )
             ->addRule(
                 'isbn'

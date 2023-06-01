@@ -25,23 +25,83 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * @copyright   Copyright (c) 2021, OPUS 4 development team
+ * @copyright   Copyright (c) 2023, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
 namespace Opus\Bibtex\Import\Rules;
 
+use function explode;
+use function strtolower;
+use function trim;
+
 /**
- * Verarbeitung von Identifiern vom Typ ISSN.
+ * Verarbeitung von Identifiern vom Typ ISBN.
  */
-class Issn extends Identifier
+class Identifier extends AbstractArrayRule
 {
+    /** @var string Type of identifier */
+    private $identifierType;
+
     /**
      * Konstruktor
      */
     public function __construct()
     {
         parent::__construct();
-        $this->setBibtexField('issn');
+        $this->setOpusField('Identifier');
+    }
+
+    /**
+     * Bestimmt den aus dem BibTeX-Record abgeleiteten Wert des Identifiers.
+     *
+     * @param string $value Feldwert aus BibTeX-Record
+     * @return array
+     */
+    protected function getValue($value)
+    {
+        $values = explode(', ', $value);
+        $result = [];
+        foreach ($values as $identifier) {
+            $result[] = [
+                'Value' => trim($identifier),
+                'Type'  => $this->identifierType,
+            ];
+        }
+        return $result;
+    }
+
+    /**
+     * @param string $bibtexField
+     * @return $this
+     */
+    public function setBibtexField($bibtexField)
+    {
+        if ($this->getIdentifierType() === null) {
+            $this->setIdentifierType($bibtexField);
+        }
+        return parent::setBibtexField($bibtexField);
+    }
+
+    /**
+     * @param string $type Identifier type
+     * @return $this
+     */
+    public function setIdentifierType($type)
+    {
+        if ($type !== null) {
+            $this->identifierType = strtolower(trim($type));
+        } else {
+            $this->identifierType = null;
+        }
+        return $this;
+    }
+
+    /**
+     * @return string Identifier type
+     */
+    public function getIdentifierType()
+    {
+        return $this->identifierType;
     }
 }

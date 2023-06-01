@@ -70,4 +70,37 @@ class IdentifierTest extends TestCase
 
         $this->assertEquals(ksort($expected), ksort($metadata['Identifier']));
     }
+
+    public function testMultipleIdentifiersOfSameType()
+    {
+        $proc        = new Processor();
+        $metadata    = [];
+        $bibtexBlock = [
+            'issn' => '1100-0011,2200-0022,3300-0033',
+            'issn' => '4400-0044',
+        ];
+
+        $proc->handleRecord($bibtexBlock, $metadata);
+
+        $expected = [
+            [
+                'Value' => '1100-0011',
+                'Type'  => 'issn',
+            ],
+            [
+                'Value' => '2200-0022',
+                'Type'  => 'issn',
+            ],
+            [
+                'Value' => '3300-0033',
+                'Type'  => 'issn',
+            ],
+            [
+                'Value' => '4400-0044',
+                'Type'  => 'issn',
+            ],
+        ];
+
+        $this->assertEquals(ksort($expected), ksort($metadata['Identifier']));
+    }
 }

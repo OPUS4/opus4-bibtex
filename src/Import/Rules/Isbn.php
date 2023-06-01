@@ -27,10 +27,6 @@
  *
  * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
- *
- * @category    BibTeX
- * @package     Opus\Bibtex\Import\Rules
- * @author      Sascha Szott <opus-repository@saschaszott.de>
  */
 
 namespace Opus\Bibtex\Import\Rules;
@@ -38,28 +34,14 @@ namespace Opus\Bibtex\Import\Rules;
 /**
  * Verarbeitung von Identifiern vom Typ ISBN.
  */
-class Isbn extends AbstractArrayRule
+class Isbn extends Identifier
 {
     /**
      * Konstruktor
      */
     public function __construct()
     {
+        parent::__construct();
         $this->setBibtexField('isbn');
-        $this->setOpusField('Identifier');
-    }
-
-    /**
-     * Bestimmt den aus dem BibTeX-Record abgeleiteten Wert des Identifiers.
-     *
-     * @param string $value Feldwert aus BibTeX-Record
-     * @return array
-     */
-    protected function getValue($value)
-    {
-        return [
-            'Value' => $value,
-            'Type'  => 'isbn',
-        ];
     }
 }

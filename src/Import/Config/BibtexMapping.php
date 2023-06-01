@@ -38,6 +38,7 @@ use Opus\Bibtex\Import\Rules\SimpleRule;
 use function array_key_exists;
 use function array_merge;
 use function class_exists;
+use function method_exists;
 use function strpos;
 use function ucfirst;
 
@@ -241,6 +242,16 @@ class BibtexMapping
         foreach ($rules as $rule) {
             $name         = $rule['name'];
             $ruleInstance = $this->getRuleInstance($rule);
+
+            // Automatically set BibtexField option if present and not set by class constructor
+            // TODO use interface? Not all rule classes have a bibtexField option
+            if (method_exists($ruleInstance, 'getBibtexField')) {
+                $bibtexField = $ruleInstance->getBibtexField();
+                if ($bibtexField === null) {
+                    $ruleInstance->setBibtexField($name);
+                }
+            }
+
             $this->addRule($name, $ruleInstance);
             if (array_key_exists('options', $rule)) {
                 $options = $rule['options'];
