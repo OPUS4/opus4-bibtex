@@ -41,7 +41,7 @@ class Isbn extends Identifier
      */
     public function __construct()
     {
+        parent::__construct();
         $this->setBibtexField('isbn');
-        $this->setOpusField('Identifier');
     }
 }

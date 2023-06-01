@@ -32,6 +32,7 @@
 namespace Opus\Bibtex\Import\Rules;
 
 use function explode;
+use function strtolower;
 use function trim;
 
 /**
@@ -48,10 +49,6 @@ class Identifier extends AbstractArrayRule
     public function __construct()
     {
         parent::__construct();
-        // TODO automatically set BibTeX field
-        // TODO automatically set identifier type === BibTeX field
-
-        $this->setBibtexField('isbn');
         $this->setOpusField('Identifier');
     }
 
@@ -68,9 +65,43 @@ class Identifier extends AbstractArrayRule
         foreach ($values as $identifier) {
             $result[] = [
                 'Value' => trim($identifier),
-                'Type'  => 'isbn',
+                'Type'  => $this->identifierType,
             ];
         }
         return $result;
+    }
+
+    /**
+     * @param string $bibtexField
+     * @return $this
+     */
+    public function setBibtexField($bibtexField)
+    {
+        if ($this->getIdentifierType() === null) {
+            $this->setIdentifierType($bibtexField);
+        }
+        return parent::setBibtexField($bibtexField);
+    }
+
+    /**
+     * @param string $type Identifier type
+     * @return $this
+     */
+    public function setIdentifierType($type)
+    {
+        if ($type !== null) {
+            $this->identifierType = strtolower(trim($type));
+        } else {
+            $this->identifierType = null;
+        }
+        return $this;
+    }
+
+    /**
+     * @return string Identifier type
+     */
+    public function getIdentifierType()
+    {
+        return $this->identifierType;
     }
 }

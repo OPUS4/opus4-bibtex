@@ -29,7 +29,8 @@
       "name": "publishedYear"
     },
     {
-      "name": "issn"
+      "name": "issn",
+      "class": "Identifier"
     },
     {
       "name": "isbn"
