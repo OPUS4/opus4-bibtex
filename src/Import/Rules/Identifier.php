@@ -25,23 +25,52 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * @copyright   Copyright (c) 2021, OPUS 4 development team
+ * @copyright   Copyright (c) 2023, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
 namespace Opus\Bibtex\Import\Rules;
 
+use function explode;
+use function trim;
+
 /**
  * Verarbeitung von Identifiern vom Typ ISBN.
  */
-class Isbn extends Identifier
+class Identifier extends AbstractArrayRule
 {
+    /** @var string Type of identifier */
+    private $identifierType;
+
     /**
      * Konstruktor
      */
     public function __construct()
     {
+        parent::__construct();
+        // TODO automatically set BibTeX field
+        // TODO automatically set identifier type === BibTeX field
+
         $this->setBibtexField('isbn');
         $this->setOpusField('Identifier');
+    }
+
+    /**
+     * Bestimmt den aus dem BibTeX-Record abgeleiteten Wert des Identifiers.
+     *
+     * @param string $value Feldwert aus BibTeX-Record
+     * @return array
+     */
+    protected function getValue($value)
+    {
+        $values = explode(', ', $value);
+        $result = [];
+        foreach ($values as $identifier) {
+            $result[] = [
+                'Value' => trim($identifier),
+                'Type'  => 'isbn',
+            ];
+        }
+        return $result;
     }
 }
