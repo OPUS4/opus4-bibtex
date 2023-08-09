@@ -60,7 +60,7 @@ class Doi extends AbstractArrayRule
      * @param string $value Feldwert aus BibTeX-Record
      * @return array
      */
-    protected function getValue($value)
+    public function getValue($value)
     {
         if (strtolower(substr($value, 0, 4)) === 'doi:') {
             $value = trim(substr($value, 4)); // Präfix doi: abschneiden

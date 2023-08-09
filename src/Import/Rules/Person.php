@@ -63,7 +63,7 @@ class Person extends AbstractArrayRule
      * @param string $value Wert des BibTeX-Felds
      * @return array
      */
-    protected function getValue($value)
+    public function getValue($value)
     {
         $persons = explode(' and ', $value);
         $result  = [];

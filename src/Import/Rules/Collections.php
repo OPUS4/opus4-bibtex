@@ -51,7 +51,7 @@ class Collections extends AbstractArrayRule
      * @param string $bibtexValue
      * @return array
      */
-    protected function getValue($bibtexValue)
+    public function getValue($bibtexValue)
     {
         $collectionIds = explode(',', $bibtexValue);
 

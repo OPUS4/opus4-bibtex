@@ -140,7 +140,7 @@ class SimpleRule implements RuleInterface
      * @param string $value Feldwert aus dem BibTeX-Record
      * @return mixed
      */
-    protected function getValue($value)
+    public function getValue($value)
     {
         return $value;
     }

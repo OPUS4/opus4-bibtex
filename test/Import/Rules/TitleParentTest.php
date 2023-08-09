@@ -25,38 +25,24 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * @copyright   Copyright (c) 2022, OPUS 4 development team
+ * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace Opus\Bibtex\Import\Rules;
+namespace OpusTest\Bibtex\Import\Rules;
 
-use function array_map;
-use function explode;
-use function trim;
+use Opus\Bibtex\Import\Rules\TitleParent;
+use PHPUnit\Framework\TestCase;
 
-/**
- * Imports IDs in custom BibTeX field 'collections'.
- */
-class Licences extends Collections
+class TitleParentTest extends TestCase
 {
-    public function __construct()
+    public function testConstruct()
     {
-        parent::__construct();
-        $this->setBibtexField('licences');
-        $this->setOpusField('Licence');
-    }
+        $mapping = new TitleParent();
 
-    /**
-     * @param string $bibtexValue
-     * @return array
-     */
-    public function getValue($bibtexValue)
-    {
-        $licenceIds = explode(',', $bibtexValue);
-
-        return array_map(function ($value) {
-            return ['Id' => trim($value)];
-        }, $licenceIds);
+        $this->assertEquals('parent', $mapping->getTitleType());
+        $this->assertEquals('journal', $mapping->getBibtexField());
+        $this->assertEquals('eng', $mapping->getLanguage());
+        $this->assertEquals('TitleParent', $mapping->getOpusField());
     }
 }

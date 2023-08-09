@@ -105,7 +105,7 @@ class Subject extends AbstractArrayRule
      * @param string $value kommaseparierte Liste von Schlagworten
      * @return array
      */
-    protected function getValue($value)
+    public function getValue($value)
     {
         $keywords = explode(', ', $value);
         $result   = [];

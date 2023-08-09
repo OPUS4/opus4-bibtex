@@ -86,7 +86,7 @@ class DocumentType extends SimpleRule
      * @param string $value Name des BibTeX-Typs
      * @return string Name des OPUS-Dokumenttyps
      */
-    protected function getValue($value)
+    public function getValue($value)
     {
         if ($this->documentTypeMapping === null) {
             $this->documentTypeMapping = BibtexService::getInstance()->getTypeMapping();

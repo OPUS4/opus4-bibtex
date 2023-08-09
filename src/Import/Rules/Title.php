@@ -31,53 +31,80 @@
 
 namespace Opus\Bibtex\Import\Rules;
 
+use function strtolower;
+use function ucfirst;
+
 /**
- * Erlaubt das Setzen eines Feldwerts fuer einen zu definierenden Titel.
+ * Configurable mapping of titles.
+ *
+ * TODO verify configured title type against centrally maintained list of valid values
  */
 class Title extends AbstractArrayRule
 {
-    /** @var string Sprache des Titels (Default: eng) */
-    private $titleLanguage = 'eng';
+    /** @var string Language of title */
+    private $language = 'eng';
 
-    /**
-     * Gibt die gesetzte Sprache des Titels zurueck.
-     * @return string
-     */
-    public function getLanguage()
-    {
-        return $this->titleLanguage;
-    }
-
-    /**
-     * Erlaubt das Setzen der Sprache fuer den Titel.
-     * @param string $titleLanguage Sprache
-     * @return $this
-     */
-    public function setLanguage($titleLanguage)
-    {
-        $this->titleLanguage = $titleLanguage;
-        return $this;
-    }
+    /** @var string Type of title for OPUS 4 data model (main,parent,sub,additional) */
+    private $titleType = 'main';
 
     /**
      * Konstruktor
      */
     public function __construct()
     {
-        $this->setOpusField('TitleMain');
+        parent::__construct();
+        $this->setBibtexField('title');
+        $this->setTitleType('main');
     }
 
     /**
-     * Setzt den Titel und die gewuenschte Sprache.
-     * @param string $value Wert des Titels
+     * @return string
+     */
+    public function getLanguage()
+    {
+        return $this->language;
+    }
+
+    /**
+     * @param string $language
+     * @return $this
+     */
+    public function setLanguage($language)
+    {
+        $this->language = $language;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTitleType()
+    {
+        return $this->titleType;
+    }
+
+    /**
+     * @return $this
+     */
+    public function setTitleType(string $type)
+    {
+        $this->titleType = strtolower($type);
+        $this->setOpusField('Title' . ucfirst($this->titleType));
+        return $this;
+    }
+
+    /**
+     * Returns array containing title properties.
+     *
+     * @param string $value BibTeX string for title
      * @return array
      */
-    protected function getValue($value)
+    public function getValue($value)
     {
         return [
-            'Language' => $this->titleLanguage,
-            'Value' => $this->deleteBrace($value),
-            'Type' => 'main',
+            'Language' => $this->getLanguage(),
+            'Value'    => $this->deleteBrace($value),
+            'Type'     => $this->getTitleType(),
         ];
     }
 }

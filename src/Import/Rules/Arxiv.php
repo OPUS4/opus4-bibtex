@@ -61,7 +61,7 @@ class Arxiv extends AbstractArrayRule
      * @param string $value Feldwert aus BibTeX-Record
      * @return array
      */
-    protected function getValue($value)
+    public function getValue($value)
     {
         $type = 'url';
 

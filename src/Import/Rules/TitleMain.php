@@ -27,40 +27,13 @@
  *
  * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
- *
- * @category    BibTeX
- * @package     Opus\Bibtex\Import\Rules
- * @author      Sascha Szott <opus-repository@saschaszott.de>
  */
 
 namespace Opus\Bibtex\Import\Rules;
 
 /**
- * Erlaubt das Setzen eines Feldwerts für den Haupttitel.
+ * Convenience class for configuring default TitleMain mapping.
  */
-class TitleMain extends AbstractArrayRule
+class TitleMain extends Title
 {
-    /**
-     * Konstruktor
-     */
-    public function __construct()
-    {
-        $this->setBibtexField('title');
-        $this->setOpusField('TitleMain');
-    }
-
-    /**
-     * Setzt den Haupttitel.
-     *
-     * @param string $value Wert des Haupttitels.
-     * @return array
-     */
-    protected function getValue($value)
-    {
-        return [
-            'Language' => 'eng',
-            'Value'    => $this->deleteBrace($value),
-            'Type'     => 'main',
-        ];
-    }
 }

@@ -105,7 +105,7 @@ class Note extends AbstractArrayRule
      * @param string $value auszuwertender Wert aus BibTeX-Feld
      * @return array
      */
-    protected function getValue($value)
+    public function getValue($value)
     {
         return [
             'Visibility' => $this->visibility,
