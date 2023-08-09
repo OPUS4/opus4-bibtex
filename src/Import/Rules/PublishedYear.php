@@ -60,7 +60,7 @@ class PublishedYear extends SimpleRule
      * @return array|null liefert null, wenn die Jahresangabe im BibTeX-Feld keine vierstellige Ziffernfolge ist;
      *                    andernfalls wird der Feldwert für den OPUS-Metadatenfeld zurückgeliefert
      */
-    protected function getValue($value)
+    public function getValue($value)
     {
         $value = preg_replace('/[^0-9]/', '', $value);
         if (strlen($value) === 4) {

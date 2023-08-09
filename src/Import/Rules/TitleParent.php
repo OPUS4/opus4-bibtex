@@ -27,40 +27,19 @@
  *
  * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
- *
- * @category    BibTeX
- * @package     Opus\Bibtex\Import\Rules
- * @author      Sascha Szott <opus-repository@saschaszott.de>
  */
 
 namespace Opus\Bibtex\Import\Rules;
 
 /**
- * Erlaubt das Setzen eines Feldwerts für den übergeordneten Titel.
+ * Convenience class for configuring default TitleParent mapping.
  */
-class TitleParent extends AbstractArrayRule
+class TitleParent extends Title
 {
-    /**
-     * Konstruktor
-     */
     public function __construct()
     {
+        parent::__construct();
         $this->setBibtexField('journal');
-        $this->setOpusField('TitleParent');
-    }
-
-    /**
-     * Setzt den übergeordneten Titel.
-     *
-     * @param string $value Wert des übergeordneten Titels.
-     * @return array
-     */
-    protected function getValue($value)
-    {
-        return [
-            'Language' => 'eng',
-            'Value'    => $this->deleteBrace($value),
-            'Type'     => 'parent',
-        ];
+        $this->setTitleType('parent'); // TODO use constants from Opus\Common\Title
     }
 }

@@ -60,7 +60,7 @@ class SourceData extends AbstractArrayRule
      * @param Feldwert $value BibTeX-Record
      * @return array
      */
-    protected function getValue($value)
+    public function getValue($value)
     {
         return [
             'KeyName' => self::SOURCE_DATA_KEY,

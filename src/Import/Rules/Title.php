@@ -25,38 +25,86 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * @copyright   Copyright (c) 2022, OPUS 4 development team
+ * @copyright   Copyright (c) 2023, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
 namespace Opus\Bibtex\Import\Rules;
 
-use function array_map;
-use function explode;
-use function trim;
+use function strtolower;
+use function ucfirst;
 
 /**
- * Imports IDs in custom BibTeX field 'collections'.
+ * Configurable mapping of titles.
+ *
+ * TODO verify configured title type against centrally maintained list of valid values
  */
-class Licences extends Collections
+class Title extends AbstractArrayRule
 {
+    /** @var string Language of title */
+    private $language = 'eng';
+
+    /** @var string Type of title for OPUS 4 data model (main,parent,sub,additional) */
+    private $titleType = 'main';
+
+    /**
+     * Konstruktor
+     */
     public function __construct()
     {
         parent::__construct();
-        $this->setBibtexField('licences');
-        $this->setOpusField('Licence');
+        $this->setBibtexField('title');
+        $this->setTitleType('main');
     }
 
     /**
-     * @param string $bibtexValue
+     * @return string
+     */
+    public function getLanguage()
+    {
+        return $this->language;
+    }
+
+    /**
+     * @param string $language
+     * @return $this
+     */
+    public function setLanguage($language)
+    {
+        $this->language = $language;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTitleType()
+    {
+        return $this->titleType;
+    }
+
+    /**
+     * @return $this
+     */
+    public function setTitleType(string $type)
+    {
+        $this->titleType = strtolower($type);
+        $this->setOpusField('Title' . ucfirst($this->titleType));
+        return $this;
+    }
+
+    /**
+     * Returns array containing title properties.
+     *
+     * @param string $value BibTeX string for title
      * @return array
      */
-    public function getValue($bibtexValue)
+    public function getValue($value)
     {
-        $licenceIds = explode(',', $bibtexValue);
-
-        return array_map(function ($value) {
-            return ['Id' => trim($value)];
-        }, $licenceIds);
+        return [
+            'Language' => $this->getLanguage(),
+            'Value'    => $this->deleteBrace($value),
+            'Type'     => $this->getTitleType(),
+        ];
     }
 }

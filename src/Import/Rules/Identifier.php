@@ -58,7 +58,7 @@ class Identifier extends AbstractArrayRule
      * @param string $value Feldwert aus BibTeX-Record
      * @return array
      */
-    protected function getValue($value)
+    public function getValue($value)
     {
         $values = explode(', ', $value);
         $result = [];

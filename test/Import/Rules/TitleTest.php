@@ -27,15 +27,12 @@
  *
  * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
- *
- * @category    Tests
- * @package     OpusTest\Bibtex\Import\Rules
- * @author      Sascha Szott <opus-repository@saschaszott.de>
  */
 
 namespace OpusTest\Bibtex\Import\Rules;
 
 use Opus\Bibtex\Import\Processor;
+use Opus\Bibtex\Import\Rules\Title;
 use PHPUnit\Framework\TestCase;
 
 class TitleTest extends TestCase
@@ -71,5 +68,31 @@ class TitleTest extends TestCase
             ],
             $metadata['TitleMain']
         );
+    }
+
+    public function testConstruct()
+    {
+        $title = new Title();
+
+        $this->assertEquals('main', $title->getTitleType());
+        $this->assertEquals('TitleMain', $title->getOpusField());
+        $this->assertEquals('title', $title->getBibtexField());
+        $this->assertEquals('eng', $title->getLanguage());
+    }
+
+    public function testGetValue()
+    {
+        $title = new Title();
+        $title->setBibtexField('journal');
+        $title->setTitleType('parent');
+        $title->setLanguage('deu');
+
+        $value = $title->getValue('Der Titel');
+
+        $this->assertEquals([
+            'Language' => 'deu',
+            'Value'    => 'Der Titel',
+            'Type'     => 'parent',
+        ], $value);
     }
 }
