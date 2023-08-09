@@ -27,19 +27,19 @@
  *
  * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
- *
- * @category    BibTeX
- * @package     Opus\Bibtex\Import\Rules
- * @author      Sascha Szott <opus-repository@saschaszott.de>
  */
 
 namespace Opus\Bibtex\Import\Rules;
 
 use function array_merge;
+use function count;
 use function explode;
+use function preg_match;
+use function stripos;
 use function strlen;
 use function strpos;
 use function strrpos;
+use function strtolower;
 use function substr;
 use function trim;
 
@@ -48,12 +48,34 @@ use function trim;
  */
 class Person extends AbstractArrayRule
 {
-    /**
-     * Konstruktor
-     */
+    /** @var string Role of persons, i.e. 'author', default is name of BibTeX field */
+    private $role;
+
     public function __construct()
     {
         $this->setOpusField('Person');
+    }
+
+    /**
+     * @return string
+     */
+    public function getRole()
+    {
+        if ($this->role === null) {
+            return strtolower($this->getBibtexField());
+        } else {
+            return $this->role;
+        }
+    }
+
+    /**
+     * @param string|null $role
+     * @return $this
+     */
+    public function setRole($role)
+    {
+        $this->role = strtolower($role);
+        return $this;
     }
 
     /**
@@ -68,7 +90,7 @@ class Person extends AbstractArrayRule
         $persons = explode(' and ', $value);
         $result  = [];
         foreach ($persons as $person) {
-            $result[] = array_merge(['Role' => $this->bibtexField], $this->extractNameParts($person));
+            $result[] = array_merge(['Role' => $this->getRole()], $this->extractNameParts($person));
         }
         return $result;
     }
@@ -81,14 +103,41 @@ class Person extends AbstractArrayRule
      */
     private function extractNameParts($name)
     {
-        $name          = trim($name);
+        $name = trim($name);
+
+        // check for identifiers in brackets
+        if (preg_match('/(.*)\((.*)\)/', $name, $matches)) {
+            if (count($matches) === 3) {
+                $identifiers = $matches[2];
+                $parts       = explode(',', $identifiers);
+            }
+            $parts[] = $matches[1];
+        } else {
+            $parts = explode('+', $name);
+        }
+
+        $result = [];
+
+        if (count($parts) > 1) {
+            foreach ($parts as $part) {
+                $part = trim($part);
+                if (stripos($part, 'ORCID:') === 0) {
+                    $result['IdentifierOrcid'] = trim(substr($part, strpos($part, ':') + 1));
+                } elseif (stripos($part, 'GND:') === 0) {
+                    $result['IdentifierGnd'] = trim(substr($part, strpos($part, ':') + 1));
+                } elseif (stripos($part, 'MISC:') === 0) {
+                    $result['IdentifierMisc'] = trim(substr($part, strpos($part, ':') + 1));
+                } else {
+                    $name = $part;
+                }
+            }
+        }
+
         $posFirstComma = strpos($name, ',');
         if ($posFirstComma !== false) {
             // Nachname getrennt durch Komma mit Vorname(n)
             // alles nach dem ersten Komma wird hierbei als Vorname interpretiert
-            $result = [
-                'LastName' => trim(substr($name, 0, $posFirstComma)),
-            ];
+            $result['LastName'] = trim(substr($name, 0, $posFirstComma));
             if ($posFirstComma < strlen($name) - 1) {
                 $result['FirstName'] = trim(substr($name, $posFirstComma + 1));
             }
@@ -100,24 +149,21 @@ class Person extends AbstractArrayRule
         // kommt kein Leerzeichen wird, so wurde vermutlich nur der Nachname angegeben
         $posFirstSpace = strpos($name, ' ');
         if ($posFirstSpace === false) {
-            return [
-                'LastName' => $name,
-            ];
+            $result['LastName'] = $name;
+            return $result;
         }
 
         $posLastPeriod = strrpos($name, '.');
         if ($posLastPeriod === false) {
             // letztes Zeichen kann kein Leerzeichen sein, daher kein Vergleich der Länge von $name mit $posFirstSpace
-            return [
-                'FirstName' => trim(substr($name, 0, $posFirstSpace)),
-                'LastName'  => trim(substr($name, $posFirstSpace + 1)),
-            ];
+            $result['FirstName'] = trim(substr($name, 0, $posFirstSpace));
+            $result['LastName']  = trim(substr($name, $posFirstSpace + 1));
+
+            return $result;
         }
 
         // falls Namensbestandteile abgekürzt werden, so betrachte alles nach dem letzten Punkt als Nachnamen
-        $result = [
-            'FirstName' => trim(substr($name, 0, $posLastPeriod + 1)),
-        ];
+        $result['FirstName'] = trim(substr($name, 0, $posLastPeriod + 1));
         if ($posLastPeriod < strlen($name) - 1) {
             $result['LastName'] = trim(substr($name, $posLastPeriod + 1));
         }

@@ -1106,4 +1106,16 @@ class ParserTest extends TestCase
     {
         return __DIR__ . DIRECTORY_SEPARATOR . '_files' . DIRECTORY_SEPARATOR . $fileName;
     }
+
+    public function testDoubledAuthorFieldLastOneWins()
+    {
+        $testfile      = $this->getPath('doubledfield.bib');
+        $parser        = new Parser($testfile);
+        $bibTexRecords = $parser->parse();
+        $this->assertCount(1, $bibTexRecords);
+        $this->assertEquals(
+            'Muster, Mariane',
+            $bibTexRecords[0]['author']
+        );
+    }
 }

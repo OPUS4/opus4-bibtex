@@ -25,7 +25,7 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * @copyright   Copyright (c) 2021-2022, OPUS 4 development team
+ * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
@@ -33,6 +33,7 @@ namespace OpusTest\Bibtex\Import\Rules;
 
 use Opus\Bibtex\Import\Parser;
 use Opus\Bibtex\Import\Processor;
+use Opus\Bibtex\Import\Rules\Person;
 use PHPUnit\Framework\TestCase;
 
 class PersonTest extends TestCase
@@ -112,5 +113,210 @@ class PersonTest extends TestCase
         $rule->apply($record, $result);
 
         // var_dump($result);
+    }
+
+    public function testGetValueSingleAuthor()
+    {
+        $rule = new Person();
+        $rule->setBibtexField('author');
+
+        $value = $rule->getValue('Meier, Thomas');
+
+        $this->assertEquals([
+            [
+                'Role'      => 'author',
+                'LastName'  => 'Meier',
+                'FirstName' => 'Thomas',
+            ],
+        ], $value);
+    }
+
+    public function testGetValueMultipleAuthors()
+    {
+        $rule = new Person();
+        $rule->setBibtexField('author');
+
+        $value = $rule->getValue('Meier, Thomas and Muster, Mathilde');
+
+        $this->assertEquals([
+            [
+                'Role'      => 'author',
+                'LastName'  => 'Meier',
+                'FirstName' => 'Thomas',
+            ],
+            [
+                'Role'      => 'author',
+                'LastName'  => 'Muster',
+                'FirstName' => 'Mathilde',
+            ],
+        ], $value);
+    }
+
+    /**
+     * @return array
+     */
+    public function valuesWithOrcidAndGndProvider()
+    {
+        return [
+            ['ORCID:0001-0002-0003-0004+GND:123456789+Doe, John'],
+            ['GND:123456789+ORCID:0001-0002-0003-0004+Doe, John'],
+            ['ORCID:0001-0002-0003-0004+Doe, John+GND:123456789'],
+            ['GND:123456789+Doe, John+ORCID:0001-0002-0003-0004'],
+            ['Doe, John+ORCID:0001-0002-0003-0004+GND:123456789'],
+            ['Doe, John+GND:123456789+ORCID:0001-0002-0003-0004'],
+            [' ORCID:0001-0002-0003-0004 + GND:123456789 + Doe , John '],
+            [' ORCID: 0001-0002-0003-0004 + GND: 123456789 + Doe , John '],
+            ['Doe, John (ORCID:0001-0002-0003-0004,GND:123456789)'],
+            ['Doe, John ( ORCID: 0001-0002-0003-0004 , GND: 123456789 ) '],
+            ['Doe, John(ORCID:0001-0002-0003-0004, GND:123456789)'],
+        ];
+    }
+
+    /**
+     * @param string $fieldValue
+     * @dataProvider valuesWithOrcidAndGndProvider
+     */
+    public function testGetValueWithOrcidAndGnd($fieldValue)
+    {
+        $rule = new Person();
+        $rule->setBibtexField('author');
+
+        $value = $rule->getValue($fieldValue);
+
+        $this->assertEquals([
+            [
+                'FirstName'       => 'John',
+                'LastName'        => 'Doe',
+                'Role'            => 'author',
+                'IdentifierOrcid' => '0001-0002-0003-0004',
+                'IdentifierGnd'   => '123456789',
+            ],
+        ], $value);
+    }
+
+    public function testGetValueWithNameAnd()
+    {
+        $rule = new Person();
+        $rule->setBibtexField('author');
+
+        $value = $rule->getValue('And, And and And, And');
+
+        $this->assertEquals([
+            [
+                'FirstName' => 'And',
+                'LastName'  => 'And',
+                'Role'      => 'author',
+            ],
+            [
+                'FirstName' => 'And',
+                'LastName'  => 'And',
+                'Role'      => 'author',
+            ],
+        ], $value);
+    }
+
+    public function testGetValueWithNameAndInNames()
+    {
+        $rule = new Person();
+        $rule->setBibtexField('author');
+
+        $value = $rule->getValue('Brand, Mandy and Bland, Candy');
+
+        $this->assertEquals([
+            [
+                'FirstName' => 'Mandy',
+                'LastName'  => 'Brand',
+                'Role'      => 'author',
+            ],
+            [
+                'FirstName' => 'Candy',
+                'LastName'  => 'Bland',
+                'Role'      => 'author',
+            ],
+        ], $value);
+    }
+
+    public function testGetValueWithMultipleAuthorsWithOrcid()
+    {
+        $rule = new Person();
+        $rule->setBibtexField('author');
+
+        $value = $rule->getValue('ORCID:0001-0002-0003-0004+Doe, John and Muster, Jane+ORCID:0000-0002-0002-0002');
+
+        $this->assertEquals([
+            [
+                'FirstName'       => 'John',
+                'LastName'        => 'Doe',
+                'Role'            => 'author',
+                'IdentifierOrcid' => '0001-0002-0003-0004',
+            ],
+            [
+                'FirstName'       => 'Jane',
+                'LastName'        => 'Muster',
+                'Role'            => 'author',
+                'IdentifierOrcid' => '0000-0002-0002-0002',
+            ],
+        ], $value);
+    }
+
+    public function testGetValueWithMultipleAuthorsWithOrcidInBrackets()
+    {
+        $rule = new Person();
+        $rule->setBibtexField('author');
+
+        $value = $rule->getValue('Doe, John (ORCID:0001-0002-0003-0004) and Muster, Jane (ORCID:0000-0002-0002-0002)');
+
+        $this->assertEquals([
+            [
+                'FirstName'       => 'John',
+                'LastName'        => 'Doe',
+                'Role'            => 'author',
+                'IdentifierOrcid' => '0001-0002-0003-0004',
+            ],
+            [
+                'FirstName'       => 'Jane',
+                'LastName'        => 'Muster',
+                'Role'            => 'author',
+                'IdentifierOrcid' => '0000-0002-0002-0002',
+            ],
+        ], $value);
+    }
+
+    public function testGetValueSupportIdentifierMisc()
+    {
+        $rule = new Person();
+        $rule->setBibtexField('author');
+        $value = $rule->getValue('MISC:1234+Doe, John');
+
+        $this->assertEquals([
+            [
+                'FirstName'      => 'John',
+                'LastName'       => 'Doe',
+                'Role'           => 'author',
+                'IdentifierMisc' => '1234',
+            ],
+        ], $value);
+    }
+
+    public function testGetRoleDefault()
+    {
+        $rule = new Person();
+
+        $rule->setBibtexField('editor');
+        $this->assertEquals('editor', $rule->getRole());
+
+        $rule->setBibtexField('Contributor');
+        $this->assertEquals('contributor', $rule->getRole());
+    }
+
+    public function testSetRole()
+    {
+        $rule = new Person();
+
+        $rule->setBibtexField('contributors');
+        $rule->setRole('contributor');
+        $rule->setBibtexField('contributors');
+
+        $this->assertEquals('contributor', $rule->getRole());
     }
 }
