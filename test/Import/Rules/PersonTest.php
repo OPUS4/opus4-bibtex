@@ -297,4 +297,26 @@ class PersonTest extends TestCase
             ],
         ], $value);
     }
+
+    public function testGetRoleDefault()
+    {
+        $rule = new Person();
+
+        $rule->setBibtexField('editor');
+        $this->assertEquals('editor', $rule->getRole());
+
+        $rule->setBibtexField('Contributor');
+        $this->assertEquals('contributor', $rule->getRole());
+    }
+
+    public function testSetRole()
+    {
+        $rule = new Person();
+
+        $rule->setBibtexField('contributors');
+        $rule->setRole('contributor');
+        $rule->setBibtexField('contributors');
+
+        $this->assertEquals('contributor', $rule->getRole());
+    }
 }

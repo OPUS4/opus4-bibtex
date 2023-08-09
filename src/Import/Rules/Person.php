@@ -39,6 +39,7 @@ use function stripos;
 use function strlen;
 use function strpos;
 use function strrpos;
+use function strtolower;
 use function substr;
 use function trim;
 
@@ -47,12 +48,34 @@ use function trim;
  */
 class Person extends AbstractArrayRule
 {
-    /**
-     * Konstruktor
-     */
+    /** @var string Role of persons, i.e. 'author', default is name of BibTeX field */
+    private $role;
+
     public function __construct()
     {
         $this->setOpusField('Person');
+    }
+
+    /**
+     * @return string
+     */
+    public function getRole()
+    {
+        if ($this->role === null) {
+            return strtolower($this->getBibtexField());
+        } else {
+            return $this->role;
+        }
+    }
+
+    /**
+     * @param string|null $role
+     * @return $this
+     */
+    public function setRole($role)
+    {
+        $this->role = strtolower($role);
+        return $this;
     }
 
     /**
@@ -67,7 +90,7 @@ class Person extends AbstractArrayRule
         $persons = explode(' and ', $value);
         $result  = [];
         foreach ($persons as $person) {
-            $result[] = array_merge(['Role' => $this->bibtexField], $this->extractNameParts($person));
+            $result[] = array_merge(['Role' => $this->getRole()], $this->extractNameParts($person));
         }
         return $result;
     }
