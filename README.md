@@ -198,26 +198,27 @@ In the example above a custom BibTeX field "LocalId" will be mapped to the enric
 
 OPUS4 provides a number of pre-defined rule classes (located in namespace `Opus\Bibtex\Import\Rules`):
 
-| Class Name              | Description |
-|-------------------------|-------------|
-| `Arxiv`                 | adds an identifier of type `arxiv` |
-| `BelongsToBibliography` | sets OPUS document field `belongsToBibliography` to a fixed value |
-| `DocumentType`          | sets the OPUS document type according to the configured type mapping |
-| `Doi`                   | adds an identifier of type `doi` |
-| `Enrichment`            | Maps to enrichment |
-| `Isbn`                  | adds an identifier of type `isbn` |
-| `Issn`                  | adds an identifier of type `issn` |
-| `Language`              | sets OPUS document field `language` to a fixed value |
-| `Note`                  | adds a note (additionally, allows to specify `messagePrefix` and `visibilty`) |
+| Class Name              | Description                                                                            |
+|-------------------------|----------------------------------------------------------------------------------------|
+| `Arxiv`                 | adds an identifier of type `arxiv`                                                     |
+| `BelongsToBibliography` | sets OPUS document field `belongsToBibliography` to a fixed value                      |
+| `DocumentType`          | sets the OPUS document type according to the configured type mapping                   |
+| `Doi`                   | adds an identifier of type `doi`                                                       |
+| `Enrichment`            | Maps to enrichment                                                                     |
+| `Isbn`                  | adds an identifier of type `isbn`                                                      |
+| `Issn`                  | adds an identifier of type `issn`                                                      |
+| `Language`              | sets OPUS document field `language` to a fixed value                                   |
+| `Note`                  | adds a note (additionally, allows to specify `messagePrefix` and `visibilty`)          |
 | `Pages`                 | handling of page-specific OPUS metadata fields (`PageFirst`, `PageLast`, `PageNumber`) |
-| `Person`                | adds a person |
-| `PublishedYear`         | sets the OPUS document field `publishedYear` |
-| `SourceData`            | adds the imported BibTeX record to enrichment `opus.import.data` |
-| `SourceDataHash`        | adds MD5 hash sum of the imported BibTeX record to enrichment `opus.import.dataHash` |
-| `Subject`               | adds a subject (default: language `eng`, type `uncontrolled`) |
-| `TitleMain`             | adds a main title |
-| `TitleParent`           | adds a parent title |
-| `Umlauts`               | converts non-standard escaped umlauts to their corresponding unicode characters |
+| `Person`                | adds a person                                                                          |
+| `PublishedYear`         | sets the OPUS document field `publishedYear`                                           |
+| `SourceData`            | adds the imported BibTeX record to enrichment `opus.import.data`                       |
+| `SourceDataHash`        | adds MD5 hash sum of the imported BibTeX record to enrichment `opus.import.dataHash`   |
+| `Subject`               | adds a subject (default: language `eng`, type `uncontrolled`)                          |
+| `Title`                 | Configurable class for adding titles (default: titleType `main`, language `eng`)       |            
+| `TitleMain`             | Preconfigured for main title (BibTeX: title)                                           |
+| `TitleParent`           | Preconfigured for parent title (BibTeX: journal)                                       |
+| `Umlauts`               | converts non-standard escaped umlauts to their corresponding unicode characters        |
 
 ### Base rule classes
 
