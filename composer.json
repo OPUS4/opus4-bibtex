@@ -11,8 +11,8 @@
   "require": {
     "php" : ">=7.1",
     "ext-json" : "*",
-    "renanbr/bibtex-parser": "^2.1.2",
-    "ryakad/pandoc-php": "~1.0",
+    "renanbr/bibtex-parser": "^2",
+    "ueberdosis/pandoc": "*",
     "opus4-repo/opus4-common": "^4.8",
     "symfony/console": "*"
   },
