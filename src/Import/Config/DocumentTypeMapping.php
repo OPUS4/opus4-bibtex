@@ -34,7 +34,11 @@ namespace Opus\Bibtex\Import\Config;
 use Opus\Common\Config;
 use Zend_Config;
 
+use function array_change_key_case;
 use function array_key_exists;
+use function strtolower;
+
+use const CASE_LOWER;
 
 /**
  * Hält die Konfigurationseinstellungen zum Mapping von BibTeX-Typen auf OPUS-Dokumenttypen.
@@ -145,9 +149,12 @@ class DocumentTypeMapping
             return $config->bibtex->entryTypes->$bibtexType;
         }
 
+        $typeMap = array_change_key_case($this->typeMap, CASE_LOWER);
+
         // Use standard mapping
-        if (array_key_exists($bibtexType, $this->typeMap)) {
-            return $this->typeMap[$bibtexType];
+        $bibtexTypeKey = strtolower($bibtexType);
+        if (array_key_exists($bibtexTypeKey, $typeMap)) {
+            return $typeMap[$bibtexTypeKey];
         }
 
         // Use default mapping
