@@ -161,6 +161,22 @@ class DocumentTypeTest extends TestCase
         $this->assertEmpty($metadata);
     }
 
+    public function testMappingCaseInsensitive()
+    {
+        $docType = new DocumentType();
+
+        $typeMapping = new DocumentTypeMapping();
+        $typeMapping->setDefaultType('article');
+        $typeMapping->setMapping('inproceedings', 'inproceedings');
+        $docType->setDocumentTypeMapping($typeMapping);
+
+        $bibtexBlock = [
+            'type' => 'InProceedings',
+        ];
+
+        $this->assertTypeField($docType, $bibtexBlock, 'inproceedings');
+    }
+
     /**
      * @param string $docType Document type
      * @param array  $bibtexBlock BibTeX data
