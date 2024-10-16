@@ -27,10 +27,6 @@
  *
  * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
- *
- * @category    Tests
- * @package     OpusTest\Bibtex\Import
- * @author      Sascha Szott <opus-repository@saschaszott.de>
  */
 
 namespace OpusTest\Bibtex\Import;
@@ -513,7 +509,7 @@ class ParserTest extends TestCase
      */
     private function splitBibtex($bibtex)
     {
-        $entries = preg_split('/^@/m', $bibtex, null, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+        $entries = preg_split('/^@/m', $bibtex, 0, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
 
         $entries = array_map(function ($value) {
             return '@' . trim($value);

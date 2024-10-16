@@ -155,7 +155,7 @@ class PersonTest extends TestCase
     /**
      * @return array
      */
-    public function valuesWithOrcidAndGndProvider()
+    public static function valuesWithOrcidAndGndProvider()
     {
         return [
             ['ORCID:0001-0002-0003-0004+GND:123456789+Doe, John'],

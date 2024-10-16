@@ -37,7 +37,7 @@ use PHPUnit\Framework\TestCase;
 
 class TitleTest extends TestCase
 {
-    public function dataProvider(): array
+    public static function dataProvider(): array
     {
         return [
             [['title' => 'My Article'], 'My Article'],

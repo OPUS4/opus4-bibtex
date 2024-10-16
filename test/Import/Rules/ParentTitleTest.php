@@ -27,10 +27,6 @@
  *
  * @copyright   Copyright (c) 2021, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
- *
- * @category    Tests
- * @package     OpusTest\Bibtex\Import\Rules
- * @author      Sascha Szott <opus-repository@saschaszott.de>
  */
 
 namespace OpusTest\Bibtex\Import\Rules;
@@ -40,7 +36,7 @@ use PHPUnit\Framework\TestCase;
 
 class ParentTitleTest extends TestCase
 {
-    public function dataProvider(): array
+    public static function dataProvider(): array
     {
         return [
             [['journal' => 'My Journal'], 'My Journal'],

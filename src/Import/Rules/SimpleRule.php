@@ -130,7 +130,7 @@ class SimpleRule implements RuleInterface
      */
     public function setOpusField($opusField)
     {
-        $this->opusField = ucfirst($opusField);
+        $this->opusField = $opusField !== null ? ucfirst($opusField) : null;
         return $this;
     }
 
