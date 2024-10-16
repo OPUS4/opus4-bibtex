@@ -56,7 +56,7 @@ EOT;
             ->setHelp($help);
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $bibtex = BibtexService::getInstance();
 

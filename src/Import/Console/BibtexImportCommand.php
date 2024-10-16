@@ -134,7 +134,7 @@ EOT;
             );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $fileName = $input->getArgument(self::ARGUMENT_IMPORT_FILE);
 
