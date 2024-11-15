@@ -188,20 +188,20 @@ class DocumentTypeMappingTest extends TestCase
         $documentTypeMapping
             // dieser OPUS-Dokumenttyp wird immer dann verwendet, wenn kein Mapping für den aus dem BibTeX-Record
             // abgeleiteten Record-Typ vorliegt.
-            ->setDefaultType('misc')
+            ->setDefaultType('other')
 
             ->setMapping('article', 'article')
             ->setMapping('book', 'book')
-            ->setMapping('booklet', 'bookpart')
+            ->setMapping('booklet', 'book')
             ->setMapping('conference', 'conferenceobject')
             ->setMapping('inbook', 'bookpart')
             ->setMapping('incollection', 'bookpart')
-            ->setMapping('inproceedings', 'article')
-            ->setMapping('manual', 'article')
+            ->setMapping('inproceedings', 'conferenceobject')
+            ->setMapping('manual', 'report')
             ->setMapping('mastersthesis', 'masterthesis')
-            ->setMapping('misc', 'misc')
+            ->setMapping('misc', 'other')
             ->setMapping('phdthesis', 'doctoralthesis')
-            ->setMapping('proceedings', 'conferenceobject')
+            ->setMapping('proceedings', 'conferenceproceedings')
             ->setMapping('techreport', 'report')
             ->setMapping('unpublished', 'workingpaper')
             // Mapping von nicht Standard BibTeX-Typen
