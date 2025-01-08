@@ -1017,7 +1017,7 @@ class ParserTest extends TestCase
             'BelongsToBibliography' => false,
             'PublishedYear'         => '2006',
             'Language'              => 'eng',
-            'Type'                  => 'misc',
+            'Type'                  => 'other',
             'TitleMain'             => [
                 [
                     'Language' => 'eng',
