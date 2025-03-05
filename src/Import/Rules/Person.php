@@ -127,6 +127,8 @@ class Person extends AbstractArrayRule
                     $result['IdentifierGnd'] = trim(substr($part, strpos($part, ':') + 1));
                 } elseif (stripos($part, 'MISC:') === 0) {
                     $result['IdentifierMisc'] = trim(substr($part, strpos($part, ':') + 1));
+                } elseif (stripos($part, 'Email') === 0) {
+                    $result['Email'] = trim(substr($part, strpos($part, ':') + 1));
                 } else {
                     $name = $part;
                 }
