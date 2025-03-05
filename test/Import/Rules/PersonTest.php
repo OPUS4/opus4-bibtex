@@ -194,6 +194,58 @@ class PersonTest extends TestCase
         ], $value);
     }
 
+    /**
+     * @return array
+     */
+    public static function valuesWithEmailProvider()
+    {
+        return [
+            ['ORCID:0001-0002-0003-0004+GND:123456789+Email:test@example.com+Doe, John'],
+            ['Email:test@example.com+GND:123456789+ORCID:0001-0002-0003-0004+Doe, John'],
+            ['ORCID:0001-0002-0003-0004+Email:test@example.com+Doe, John+GND:123456789'],
+            ['Doe, John+Email:test@example.com+ORCID:0001-0002-0003-0004+GND:123456789'],
+            [' Email:test@example.com + ORCID:0001-0002-0003-0004 + GND:123456789 + Doe , John '],
+            [' ORCID: 0001-0002-0003-0004 + Email:test@example.com + GND: 123456789 + Doe , John '],
+            ['Doe, John(ORCID:0001-0002-0003-0004, GND:123456789, Email: test@example.com)'],
+            ['Doe, John(ORCID:0001-0002-0003-0004, GND:123456789, EMAIL: test@example.com)'],
+            ['Doe, John (EMAIL: test@example.com)'],
+            ['Doe, John (email:test@example.com)'],
+        ];
+    }
+
+    /**
+     * @param string $fieldValue
+     * @dataProvider valuesWithEmailProvider
+     */
+    public function testGetValueWithEmail($fieldValue)
+    {
+        $rule = new Person();
+        $rule->setBibtexField('author');
+
+        $value = $rule->getValue($fieldValue);
+
+        $person = $value[0];
+
+        $expected = [
+            'FirstName'       => 'John',
+            'LastName'        => 'Doe',
+            'Role'            => 'author',
+            'IdentifierOrcid' => '0001-0002-0003-0004',
+            'IdentifierGnd'   => '123456789',
+            'Email'           => 'test@example.com',
+        ];
+
+        $filter = ['IdentifierOrcid', 'IdentifierGnd'];
+
+        foreach ($filter as $field) {
+            if (! isset($person[$field])) {
+                unset($expected[$field]);
+            }
+        }
+
+        $this->assertEquals($expected, $person);
+    }
+
     public function testGetValueWithNameAnd()
     {
         $rule = new Person();
