@@ -25,7 +25,7 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * @copyright   Copyright (c) 2022, OPUS 4 development team
+ * @copyright   Copyright (c) 2025, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
@@ -36,17 +36,33 @@ use function explode;
 use function trim;
 
 /**
- * Imports IDs in custom BibTeX field 'collections'.
+ * Imports BibTeX field 'series' for automatic linking  to series
+ * (Schriftenreihen) in OPUS 4.
  *
- * TODO Why does Licences extend Collections? There does not seem to be code used from Collections.
+ * If Series-ID is missing, matching the name to a series is attempted.
+ *
+ * Formats:
+ *
+ *   [NAME OF SERIES], [NUMBER], [SERIES-ID]
+ *
+ * Fields:
+ *
+ *   number => [NUMBER],
+ *   series => [SERIES], [ID]
+ *   series => [SERIES] (ID)
+ *   series => [SERIES] (OPUS4: ID)
+ *
+ * TODO support different formats
+ * TODO Match by ISSN?
+ * TODO Support getting NUMBER from BibTeX field "number".
  */
-class Licences extends Collections
+class Series extends AbstractArrayRule
 {
     public function __construct()
     {
         parent::__construct();
-        $this->setBibtexField('licences');
-        $this->setOpusField('Licence');
+        $this->setBibtexField('series');
+        $this->setOpusField('Series');
     }
 
     /**

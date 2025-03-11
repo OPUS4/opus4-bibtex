@@ -25,40 +25,79 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * @copyright   Copyright (c) 2022, OPUS 4 development team
+ * @copyright   Copyright (c) 2025, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace Opus\Bibtex\Import\Rules;
+namespace OpusTest\Bibtex\Import\Rules;
 
-use function array_map;
-use function explode;
-use function trim;
+use Opus\Bibtex\Import\Rules\Series;
+use Opus\Common\Series as OpusSeries;
+use PHPUnit\Framework\TestCase;
 
-/**
- * Imports IDs in custom BibTeX field 'collections'.
- *
- * TODO Why does Licences extend Collections? There does not seem to be code used from Collections.
- */
-class Licences extends Collections
+use function var_dump;
+
+class SeriesTest extends TestCase
 {
-    public function __construct()
+    /** @var OpusSeries */
+    private $series;
+
+    public function setUp(): void
     {
-        parent::__construct();
-        $this->setBibtexField('licences');
-        $this->setOpusField('Licence');
+        parent::setUp();
+
+        /* TODO testing with database not setup
+        $series = OpusSeries::new();
+        $series->setName('Test Series');
+        $series->store();
+
+        $this->series = $series;
+        */
     }
 
-    /**
-     * @param string $bibtexValue
-     * @return array
-     */
-    public function getValue($bibtexValue)
+    public function tearDown(): void
     {
-        $licenceIds = explode(',', $bibtexValue);
+        if ($this->series !== null) {
+            $this->series->delete();
+        }
 
-        return array_map(function ($value) {
-            return ['Id' => trim($value)];
-        }, $licenceIds);
+        parent::tearDown();
+    }
+
+    public function testApply()
+    {
+        $this->markTestIncomplete('todo');
+
+        $rule = new Series();
+
+        $metadata     = [];
+        $bibtexRecord = [
+            'series' => '',
+        ];
+        $rule->apply($bibtexRecord, $metadata);
+
+        $expected = [];
+
+        $this->assertEquals($expected, $metadata['Series']);
+    }
+
+    public function testApplyValuesWithWhitespace()
+    {
+        $this->markTestIncomplete('todo');
+    }
+
+    public function testApplyWithMatchingName()
+    {
+        $this->markTestIncomplete('todo');
+    }
+
+    public function testApplyException()
+    {
+        $this->markTestIncomplete('todo');
+    }
+
+    public function testDuplicateSeriesNumber()
+    {
+        $this->markTestIncomplete('check');
     }
 }
