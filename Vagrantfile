@@ -2,16 +2,16 @@
 # vi: set ft=ruby :
 
 $software = <<SCRIPT
-# Downgrade to PHP 8.1
+# Downgrade to PHP 8.2
 apt-add-repository -y ppa:ondrej/php
 apt-get -yq update
-apt-get -yq install php8.1
+apt-get -yq install php8.2
 
 # Install required PHP packages
-apt-get -yq install php8.1-dom
-apt-get -yq install php8.1-mbstring
-apt-get -yq install php8.1-curl
-apt-get -yq install php8.1-zip
+apt-get -yq install php8.2-dom
+apt-get -yq install php8.2-mbstring
+apt-get -yq install php8.2-curl
+apt-get -yq install php8.2-zip
 
 # Install required tools
 apt-get -yq install pandoc
@@ -42,7 +42,7 @@ echo "'composer cs-fix' to automatically fix basic style problems"
 SCRIPT
 
 Vagrant.configure("2") do |config|
-  config.vm.box = "bento/ubuntu-22.04"
+  config.vm.box = "bento/ubuntu-24.04"
 
   config.vm.provision 'shell', inline: $software
   config.vm.provision 'shell', privileged: false, inline: $composer
