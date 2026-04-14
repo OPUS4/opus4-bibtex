@@ -106,6 +106,7 @@ abstract class AbstractComplexRule implements RuleInterface
      *
      * @param array $fieldValues Werte von BibTeX-Feldern
      * @param array $documentMetadata OPUS-Metadatensatz (Array von Metadatenfeldern)
+     * @return void
      */
     abstract protected function setFields($fieldValues, &$documentMetadata);
 }
