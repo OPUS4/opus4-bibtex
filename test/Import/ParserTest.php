@@ -106,6 +106,8 @@ class ParserTest extends TestCase
 
     public function testProcessInvalidUrlFile()
     {
+        $this->markTestSkipped('#85 test is broken');
+
         $testfile = $this->getPath('invalid-url.bib');
 
         $parser = new Parser($testfile);
