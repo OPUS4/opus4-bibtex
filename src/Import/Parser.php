@@ -87,7 +87,7 @@ class Parser
 
         $listener       = new Listener();
         $latexProcessor = new LatexToUnicodeProcessor();
-        $latexProcessor->setTagCoverage(['doi', 'url'], 'blacklist'); // TODO get blacklist from mapping
+        $latexProcessor->setTagCoverage(['_original', 'doi', 'url'], 'blacklist'); // TODO get blacklist from mapping
         $listener->addProcessor($latexProcessor);
         // LTUProcessor schneidet führende und abschließende Leerzeichen in den Feldinhalten ab
         $parser->addListener($listener);
