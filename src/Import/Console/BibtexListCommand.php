@@ -45,7 +45,7 @@ use function sprintf;
  */
 class BibtexListCommand extends Command
 {
-    protected function configure()
+    protected function configure(): void
     {
         $help = <<<EOT
 List the available BibTeX mapping configurations.
