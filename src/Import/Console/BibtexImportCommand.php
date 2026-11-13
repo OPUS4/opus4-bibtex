@@ -79,7 +79,7 @@ class BibtexImportCommand extends Command
      */
     const OPTION_MAPPING_CONFIGURATION = 'mapping';
 
-    protected function configure()
+    protected function configure(): void
     {
         $help = <<<EOT
 The <fg=green>bibtex:import</> command can be used to import a BibTeX file 
